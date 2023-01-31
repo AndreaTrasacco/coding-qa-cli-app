@@ -4,12 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7a80ea41-8b1b-40fc-abb8-1008547220f9" name="Changes" comment="Packaging 1">
+    <list default="true" id="7a80ea41-8b1b-40fc-abb8-1008547220f9" name="Changes" comment="added BaseNeo4JDAO, RegisteredUser and User">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/UserNodeDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/UserNodeDAO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/base/BaseNeo4JDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/base/BaseNeo4JDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/model/RegisteredUser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/model/RegisteredUser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/model/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/neo4j/UserNeo4JDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/neo4j/UserNeo4JDAO.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,7 +72,7 @@
       <workItem from="1675095101408" duration="10731000" />
       <workItem from="1675180069946" duration="401000" />
       <workItem from="1675180497730" duration="201000" />
-      <workItem from="1675180713853" duration="2481000" />
+      <workItem from="1675180713853" duration="5932000" />
     </task>
     <task id="LOCAL-00001" summary="Packaging 1">
       <created>1675020274919</created>
@@ -81,7 +81,14 @@
       <option name="project" value="LOCAL" />
       <updated>1675020274919</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="added BaseNeo4JDAO, RegisteredUser and User">
+      <created>1675183426448</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1675183426448</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -100,6 +107,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Packaging 1" />
-    <option name="LAST_COMMIT_MESSAGE" value="Packaging 1" />
+    <MESSAGE value="added BaseNeo4JDAO, RegisteredUser and User" />
+    <option name="LAST_COMMIT_MESSAGE" value="added BaseNeo4JDAO, RegisteredUser and User" />
   </component>
 </project>

@@ -3,6 +3,7 @@ package it.unipi.lsmsd.coding_qa.dao.base;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.Session;
 
 public abstract class BaseNeo4JDAO {
     private static final String NEO4J_URI = "neo4j://localhost:7687";
@@ -12,8 +13,13 @@ public abstract class BaseNeo4JDAO {
     private static Driver Neo4jDriver;
 
     //method that returns the driver instance
-    public static Driver getConnection(){
+    private static Driver getConnection(){
         return Neo4jDriver;
+    }
+
+    //method that return the session
+    public static Session getSession(){
+        return getConnection().session();
     }
 
     //method that initialize the Neo4j driver
