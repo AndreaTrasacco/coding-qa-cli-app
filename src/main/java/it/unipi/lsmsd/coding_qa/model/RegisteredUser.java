@@ -17,6 +17,16 @@ public class RegisteredUser extends User{
         this.score = score;
     }
 
+    public RegisteredUser(String id, String fullName, String nickname, String encPassword,
+                          Date birthdate, String country, Date createdDate, String website, int score) {
+        super(id, fullName, nickname, encPassword);
+        this.birthdate = birthdate;
+        this.country = country;
+        this.createdDate = createdDate;
+        this.website = website;
+        this.score = score;
+    }
+
     public Date getBirthdate() {
         return birthdate;
     }
