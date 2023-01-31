@@ -8,6 +8,7 @@ public abstract class User {
     private String nickname;
     private String encPassword;
 
+    public User(){}
     public User(String id, String fullName, String nickname, String encPassword){
         this.id = id;
         this.fullName = fullName;
