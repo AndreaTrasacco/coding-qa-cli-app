@@ -45,7 +45,7 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
                 "SET u.nickname = $nickname";
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
-                tx.run(updateUser, parameters("nickename", nickname)).consume();
+                tx.run(updateUser, parameters("nickname", nickname)).consume();
                 return 1;
             });
         }
@@ -70,5 +70,20 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
             });
         }
         return followerList;
+    }
+
+    //this method create the follow relationship
+    @Override
+    public void followUser(String myNickname, String userToFollow) {
+        final String followString = "MATCH (u1: User), (u2: User)" +
+                "WHERE u1.nickname = $myNickname AND u2.nickname = $userToFollow" +
+                "CREATE (u1)-[r:FOLLOW]->(u2)" +
+                "RETURN type(r)";
+        try(Session session = getSession()){
+            session.writeTransaction(tx -> {
+                tx.run(followString, parameters("myNickname", myNickname, "userToFollow", userToFollow)).consume();
+                return 1;
+            });
+        }
     }
 }

@@ -13,4 +13,6 @@ public interface UserNodeDAO {
     public void update(String nickname);
 
     public List<String> getFollowerList(String nickname);
+
+    public void followUser(String myNickname, String userToFollow);
 }
