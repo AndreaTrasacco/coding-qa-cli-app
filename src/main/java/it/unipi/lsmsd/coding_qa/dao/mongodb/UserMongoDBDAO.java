@@ -1,13 +1,19 @@
 package it.unipi.lsmsd.coding_qa.dao.mongodb;
 
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import it.unipi.lsmsd.coding_qa.dao.UserDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
+import it.unipi.lsmsd.coding_qa.dto.QuestionsAndAnswersReported;
 import it.unipi.lsmsd.coding_qa.model.RegisteredUser;
 import org.bson.Document;
+import org.bson.conversions.Bson;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
 
@@ -76,5 +82,36 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionUser = database.getCollection("User");
         collectionUser.deleteOne(Filters.eq("_id", user.getId()));
+    }
+
+    // NON VA QUI !! (o question o answer)
+    public List<QuestionsAndAnswersReported> getReportedQuestionsAndAnswers(){
+        MongoDatabase database = getDB();
+        MongoCollection<Document> collectionQuestion = database.getCollection("Question");
+        Bson filter = Filters.eq("reported", true);
+
+        List<QuestionsAndAnswersReported> questionsAndAnswersReported = new ArrayList<>();
+
+        MongoCursor<Document> cursor = collectionQuestion.find(filter).iterator();
+
+        while (cursor.hasNext()) {
+            Document question = cursor.next();
+            QuestionsAndAnswersReported q = new QuestionsAndAnswersReported(question.getString("_id"),
+                    question.getString("title"), question.getString("body"), question.getString("author"),
+                    question.getDate("createdDate"), 0);
+            questionsAndAnswersReported.add(q);
+
+            List<Document> answers = (List<Document>) question.get("answers");
+            for (Document answer : answers) {
+                if (answer.getBoolean("reported")) {
+                    QuestionsAndAnswersReported a = new QuestionsAndAnswersReported(question.getString("_id")+answers.indexOf(answer),
+                            question.getString("title"), answer.getString("body"), answer.getString("author"),
+                            answer.getDate("createdDate"), 0);
+                    questionsAndAnswersReported.add(q);
+                }
+            }
+        }
+
+        return questionsAndAnswersReported;
     }
 }

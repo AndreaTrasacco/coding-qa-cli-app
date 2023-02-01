@@ -19,7 +19,7 @@ public class Question {
     public Question(String id, String title, String body, String topic, String author,
                     List<Answer> answers, boolean closed, Date createdDate, boolean reported){
         this.id = id;
-        this.title = id;
+        this.title = title;
         this.body = body;
         this.topic = topic;
         this.author = author;
