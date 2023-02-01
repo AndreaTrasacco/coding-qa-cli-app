@@ -51,7 +51,6 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
         }
     }
 
-
     //this method returns the list of follower
     @Override
     public List<String> getFollowerList(String nickname) {
@@ -72,5 +71,4 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
         }
         return followerList;
     }
-
 }
