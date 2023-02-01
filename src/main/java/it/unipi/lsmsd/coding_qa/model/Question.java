@@ -1,30 +1,32 @@
 package it.unipi.lsmsd.coding_qa.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class Question {
     // array of answers
     private String id;
     private String title;
     private String body;
-    private int viewsCount;
     private String topic;
     private String author;
-    private Answer[] answers;
+    private List<Answer> answers; // meglio utilizzare una lista?
     private boolean closed; // mettere nel modello?
     private Date createdDate;
 
-    public Question(String id, String title, String body, int viewsCount, String topic, String author,
-                    Answer[] answers, boolean closed, Date createdDate){
+    private boolean reported;
+
+    public Question(String id, String title, String body, String topic, String author,
+                    List<Answer> answers, boolean closed, Date createdDate, boolean reported){
         this.id = id;
         this.title = id;
         this.body = body;
-        this.viewsCount = viewsCount;
         this.topic = topic;
         this.author = author;
         this.answers = answers;
         this.closed = closed;
         this.createdDate = createdDate;
+        this.reported = reported;
     }
 
     public String getTitle() {
@@ -69,15 +71,6 @@ public class Question {
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
     }
-
-    public int getViewsCount() {
-        return viewsCount;
-    }
-
-    public void setViewsCount(int viewsCount) {
-        this.viewsCount = viewsCount;
-    }
-
     public String getTopic() {
         return topic;
     }
@@ -94,11 +87,19 @@ public class Question {
         this.author = author;
     }
 
-    public Answer[] getAnswers() {
+    public List<Answer> getAnswers() {
         return answers;
     }
 
-    public void setAnswers(Answer[] answers) {
+    public void setAnswers(List<Answer> answers) {
         this.answers = answers;
+    }
+
+    public boolean isReported() {
+        return reported;
+    }
+
+    public void setReported(boolean reported) {
+        this.reported = reported;
     }
 }

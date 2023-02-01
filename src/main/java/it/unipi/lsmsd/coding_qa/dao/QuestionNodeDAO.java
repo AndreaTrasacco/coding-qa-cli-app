@@ -6,5 +6,6 @@ public interface QuestionNodeDAO {
     void create(Question question);
     void update(Question question);
     void delete(Question question);
+    // fare create, update, delete di answer ???
 
 }
