@@ -1,25 +1,19 @@
 package it.unipi.lsmsd.coding_qa.dao.mongodb;
 
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import it.unipi.lsmsd.coding_qa.dao.UserDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionsAndAnswersReported;
 import it.unipi.lsmsd.coding_qa.model.RegisteredUser;
 import org.bson.Document;
-import org.bson.conversions.Bson;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
 
     public RegisteredUser register(RegisteredUser user){
         MongoDatabase database = getDB();
-        MongoCollection<Document> collectionUser = database.getCollection("User");
+        MongoCollection<Document> collectionUser = database.getCollection("users");
         Document docUser = new Document("_id", user.getId())
                 .append("nickname", user.getNickname())
                 .append("fullName", user.getFullName())
@@ -36,7 +30,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
 
     public boolean authenticate(String username, String password){
         MongoDatabase database = getDB();
-        MongoCollection<Document> collectionUser = database.getCollection("User");
+        MongoCollection<Document> collectionUser = database.getCollection("users");
         Document user = collectionUser.find(Filters.and(Filters.eq("nickname", username),
                         Filters.eq("encPassword", password))).first();
         if (user == null) {
@@ -48,7 +42,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
 
     public RegisteredUser updateInfo(RegisteredUser user){
         MongoDatabase database = getDB();
-        MongoCollection<Document> collectionUser = database.getCollection("User");
+        MongoCollection<Document> collectionUser = database.getCollection("users");
         collectionUser.updateOne(Filters.eq("nickname", user.getNickname()),
                 Updates.combine(Updates.set("fullName", user.getFullName()),
                         Updates.set("encPassword", user.getEncPassword()),
@@ -62,7 +56,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
 
     public RegisteredUser getInfo(String id){
         MongoDatabase database = getDB();
-        MongoCollection<Document> collectionUser = database.getCollection("User");
+        MongoCollection<Document> collectionUser = database.getCollection("users");
         Document userDoc = collectionUser.find(Filters.eq("_id", id)).first();
 
         RegisteredUser user = new RegisteredUser(userDoc.getObjectId("_id").toHexString(),
@@ -80,38 +74,8 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
 
     public void delete(RegisteredUser user){
         MongoDatabase database = getDB();
-        MongoCollection<Document> collectionUser = database.getCollection("User");
+        MongoCollection<Document> collectionUser = database.getCollection("users");
         collectionUser.deleteOne(Filters.eq("_id", user.getId()));
     }
 
-    // NON VA QUI !! (o question o answer)
-    public List<QuestionsAndAnswersReported> getReportedQuestionsAndAnswers(){
-        MongoDatabase database = getDB();
-        MongoCollection<Document> collectionQuestion = database.getCollection("Question");
-        Bson filter = Filters.eq("reported", true);
-
-        List<QuestionsAndAnswersReported> questionsAndAnswersReported = new ArrayList<>();
-
-        MongoCursor<Document> cursor = collectionQuestion.find(filter).iterator();
-
-        while (cursor.hasNext()) {
-            Document question = cursor.next();
-            QuestionsAndAnswersReported q = new QuestionsAndAnswersReported(question.getString("_id"),
-                    question.getString("title"), question.getString("body"), question.getString("author"),
-                    question.getDate("createdDate"), 0);
-            questionsAndAnswersReported.add(q);
-
-            List<Document> answers = (List<Document>) question.get("answers");
-            for (Document answer : answers) {
-                if (answer.getBoolean("reported")) {
-                    QuestionsAndAnswersReported a = new QuestionsAndAnswersReported(question.getString("_id")+answers.indexOf(answer),
-                            question.getString("title"), answer.getString("body"), answer.getString("author"),
-                            answer.getDate("createdDate"), 0);
-                    questionsAndAnswersReported.add(q);
-                }
-            }
-        }
-
-        return questionsAndAnswersReported;
-    }
 }

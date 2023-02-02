@@ -2,7 +2,7 @@ package it.unipi.lsmsd.coding_qa.dto;
 
 import java.util.Date;
 
-public class QuestionsAndAnswersReported {
+public class QuestionsAndAnswersReportedDTO {
     private String id;
     private String title;
     private String body;
@@ -10,7 +10,7 @@ public class QuestionsAndAnswersReported {
     private Date createdDate;
     private int type; // 0: Question, 1: Answer
 
-    public QuestionsAndAnswersReported(String id, String title, String body, String author, Date createdDate, int type) {
+    public QuestionsAndAnswersReportedDTO(String id, String title, String body, String author, Date createdDate, int type) {
         this.id = id;
         this.title = title;
         this.body = body;

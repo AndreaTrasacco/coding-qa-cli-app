@@ -48,7 +48,7 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
     private List<Question> retrieveQuestions(String suggestionQuery, User user){
         try(Session session = getSession()){
             List<Question> suggestedQuestions = session.readTransaction(tx -> {
-                Result result = tx.run(suggestionQuery, parameters("nickename", user.getNickname()));
+                Result result = tx.run(suggestionQuery, parameters("nickname", user.getNickname()));
                 ArrayList<Question> questions = new ArrayList<>();
                 while(result.hasNext()){
                     Record r = result.next();
@@ -76,8 +76,8 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
                 }
                 return questions;
             });
+            return suggestedQuestions;
         }
 
-        return null;
     }
 }
