@@ -1,25 +1,27 @@
 package it.unipi.lsmsd.coding_qa.dto.aggregations;
 
 public class TopicDTO {
+    private String topic;
+    private int count;
 
-    //DTO needed for the analytics: RANKING OF THE MOST DISCUSSED TOPIC OF THE WEEK
-
-    private String topicName;
-    private int questionCount;
-
-    public String getTopicName() {
-        return topicName;
+    public TopicDTO(String topic, int count) {
+        this.topic = topic;
+        this.count = count;
     }
 
-    public void setTopicName(String topicName) {
-        this.topicName = topicName;
+    public String getTopic() {
+        return topic;
     }
 
-    public int getQuestionCount() {
-        return questionCount;
+    public void setTopic(String topic) {
+        this.topic = topic;
     }
 
-    public void setQuestionCount(int questionCount) {
-        this.questionCount = questionCount;
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
     }
 }

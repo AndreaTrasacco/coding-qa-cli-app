@@ -4,10 +4,18 @@ import java.util.List;
 
 public class ExperienceLevelDTO {
 
-    //DTO needed for the analytics: SHOW % OF EXPERIENCE LEVELS FOR EACH COUNTRY
+    class Level {
+        private String expLevel;
+        private float percentage;
+    }
 
     private String country;
-    private List<Float> percentages;
+    private List<Level> levels;
+
+    public ExperienceLevelDTO(String country, List<Level> levels) {
+        this.country = country;
+        this.levels = levels;
+    }
 
     public String getCountry() {
         return country;
@@ -17,11 +25,11 @@ public class ExperienceLevelDTO {
         this.country = country;
     }
 
-    public List<Float> getPercentages() {
-        return percentages;
+    public List<Level> getLevels() {
+        return levels;
     }
 
-    public void setPercentages(List<Float> percentages) {
-        this.percentages = percentages;
+    public void setLevels(List<Level> levels) {
+        this.levels = levels;
     }
 }
