@@ -4,7 +4,7 @@ import java.util.List;
 
 public class ExperienceLevelDTO {
 
-    class Level {
+    public class Level {
         private String expLevel;
         private float percentage;
     }

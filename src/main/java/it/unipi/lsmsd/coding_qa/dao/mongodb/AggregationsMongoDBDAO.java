@@ -2,12 +2,15 @@ package it.unipi.lsmsd.coding_qa.dao.mongodb;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.Sorts;
 import it.unipi.lsmsd.coding_qa.dao.AggregationsDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
 import it.unipi.lsmsd.coding_qa.dto.aggregations.ExperienceLevelDTO;
 import it.unipi.lsmsd.coding_qa.dto.aggregations.QuestionScoreDTO;
 import it.unipi.lsmsd.coding_qa.dto.aggregations.TopicDTO;
+import org.bson.BsonArray;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
@@ -24,6 +27,7 @@ import static com.mongodb.client.model.Accumulators.sum;
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Sorts.ascending;
 import static com.mongodb.client.model.Sorts.descending;
 
 public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements AggregationsDAO {
@@ -33,12 +37,82 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
         MongoDatabase mongoDatabase = getDB();
         MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
-        Bson project1 = project(include("country")); //TODO capire come fare prima project
-        Bson group1 = group(new Document("country", 1).append("exp_level", 1), sum("numUser", 1));
-        Bson group2 = group(); //TODO capire come fare
+        //Bson project1 = project(include("country")); //TODO capire come fare prima project
+        //Bson group1 = group(new Document("country", 1).append("exp_level", 1), sum("numUser", 1));
+        //Bson group2 = group(); //TODO capire come fare
 
-        //TODO finire query
-        return null;
+
+        //{ $project : {
+        //
+        //country: 1,
+        //
+        //exp_level: { $cond: [ { $gte: ["$score", 10]}, { $cond: [{ $gte: ["$score", 100]}, "advanced", "intermediate"]}, "beginner" ] } } }
+        Bson project1 = project(fields(
+                include("country"),
+                computed("exp_level", new Document("$cond", Arrays.asList(
+                        new Document("$gte", Arrays.asList("$score", 10)),
+                        new Document("$cond", Arrays.asList(
+                                new Document("$gte", Arrays.asList("$score", 100)),
+                                "advanced",
+                                "intermediate"
+                        )),
+                        "beginner"
+                )))
+        ));
+
+
+        // { $group : { _id: {country: "$country", exp_level: "$exp_level"}, numUsers : { $sum : 1 } } },
+        Bson group1 = group(
+                new Document("_id", new Document("country", "$country").append("exp_level", "$exp_level")),
+                sum("numUsers", 1)
+        );
+
+        // { $group: { _id: "$_id.country",total: { $sum: "$numUsers" },exp_levels: { $push: { exp_level: "$_id.exp_level", numUsers: "$numUsers" } } } },
+        Bson group2 = group("$_id.country",
+                sum("total", "$numUsers"),
+                Accumulators.push("exp_levels",
+                        new Document("exp_level", "$_id.exp_level")
+                                .append("numUsers", "$numUsers")));
+
+
+        //{ $project: { _id: 0, country: "$_id", levels: { $map: { input: "$exp_levels", in: { $mergeObjects: [ "$$this", { percentage : { $multiply: [ { $divide: ["$$this.numUsers", "$total"]}, 100] } } ] } } } } }
+        Bson project2 = Projections.fields(
+                Projections.computed("_id", new Document("$ifNull", Arrays.asList("$_id", 0))),
+                Projections.include("country"),
+                Projections.computed("levels",
+                        new Document("$map",
+                                new Document("input", "$exp_levels")
+                                        .append("as", "el")
+                                        .append("in",
+                                                new Document("$mergeObjects",
+                                                        Arrays.asList("$$el",
+                                                                new Document("percentage",
+                                                                        new Document("$multiply",
+                                                                                Arrays.asList(
+                                                                                        new Document("$divide",
+                                                                                                Arrays.asList("$$el.numUsers", "$total")
+                                                                                        ),
+                                                                                        100
+                                                                                )
+                                                                        )
+                                                                )
+                                                        )
+                                                )
+                                        )
+                        )
+                ));
+
+
+        Bson project3 = Projections.exclude("levels.numUsers");
+        Bson sort = sort(Sorts.ascending("country"));
+
+        collectionQuestions.aggregate(Arrays.asList(project1, group1, group2, project2, project3, sort)).forEach(doc -> {
+            ExperienceLevelDTO temp = new ExperienceLevelDTO(doc.getString("country"), doc.getList( "exp_level", ExperienceLevelDTO.Level.class));
+            ExperienceLevelDTOList.add(temp);
+        });
+
+
+        return ExperienceLevelDTOList;
     }
 
     //methods that retrieve the % of users of different experience level per country
