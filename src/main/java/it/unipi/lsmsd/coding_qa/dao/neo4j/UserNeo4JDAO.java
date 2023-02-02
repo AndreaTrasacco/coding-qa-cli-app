@@ -29,10 +29,9 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
     public void delete(String nickname) {
         final String deleteUser = "MATCH (u: User{nickname: $nickname})" +
                 "DELETE u";
-        // TODO va fatta cosi la delete ?? non ho trovato esempi nelle slide
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
-                tx.run(deleteUser, parameters("nickename", nickname)).consume();
+                tx.run(deleteUser, parameters("nickname", nickname)).consume();
                 return 1;
             });
         }
@@ -82,6 +81,30 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
                 tx.run(followString, parameters("myNickname", myNickname, "userToFollow", userToFollow)).consume();
+                return 1;
+            });
+        }
+    }
+
+    @Override
+    public void deleteQuestion(String nickname, String id) {
+        final String deleteQuestion = "MATCH (u: User{nickname: $nickname})-[:CREATED]->(q: Question{id: $id})" +
+                "DELETE q";
+        try(Session session = getSession()){
+            session.writeTransaction(tx -> {
+               tx.run(deleteQuestion, parameters("nickname", nickname, "id", id));
+               return 1;
+            });
+        }
+    }
+
+    @Override
+    public void deleteAnswer(String nickname, String id) {
+        final String deleteQuestion = "MATCH (u: User{nickname: $nickname})-[:ANSWERED]->(q: Question{id: $id})" +
+                "DELETE q";
+        try(Session session = getSession()){
+            session.writeTransaction(tx -> {
+                tx.run(deleteQuestion, parameters("nickname", nickname, "id", id));
                 return 1;
             });
         }

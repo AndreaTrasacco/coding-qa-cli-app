@@ -13,6 +13,8 @@ import org.bson.conversions.Bson;
 
 import javax.print.Doc;
 import java.sql.Date;
+import java.time.LocalDateTime;
+import java.time.Year;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -61,13 +63,14 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
         return questionScoreDTOList;
     }
 
+    //methods that retrieve the rank of each topic during the week
     @Override
     public List<TopicDTO> getTopicRank() {
         List<TopicDTO> topicDTOList = new ArrayList<>();
         MongoDatabase mongoDatabase = getDB();
         MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
-        Date sevenDaysAgo = new Date(System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000);
-        Date currentDate = new Date(System.currentTimeMillis());
+        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+        LocalDateTime currentDate = LocalDateTime.now();
 
         Bson match1 = match(exists("answers", true));
         Bson project1 = project(new Document("topic", 1).append("createdDate", 1)

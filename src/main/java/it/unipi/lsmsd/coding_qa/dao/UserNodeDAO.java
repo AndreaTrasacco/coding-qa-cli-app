@@ -15,4 +15,8 @@ public interface UserNodeDAO {
     public List<String> getFollowerList(String nickname);
 
     public void followUser(String myNickname, String userToFollow);
+
+    public void deleteQuestion(String nickname, String id);
+
+    public void deleteAnswer(String nickname, String id);
 }
