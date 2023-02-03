@@ -38,6 +38,10 @@ public class Answer {
         return id;
     }
 
+    public String getParentQuestionId(){
+        return this.id.substring(0, this.id.indexOf('-'));
+    }
+
     public void setId(String id) {
         this.id = id;
     }

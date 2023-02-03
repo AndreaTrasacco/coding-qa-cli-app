@@ -29,6 +29,10 @@ public class Question {
         this.reported = reported;
     }
 
+    public Question(String id){
+        this.id = id;
+    }
+
     public String getTitle() {
         return title;
     }

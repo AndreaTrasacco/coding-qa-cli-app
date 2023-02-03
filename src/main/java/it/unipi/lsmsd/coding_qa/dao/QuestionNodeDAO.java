@@ -10,6 +10,8 @@ public interface QuestionNodeDAO {
     void create(Question question);
     void update(Question question);
     void delete(Question question);
+    void deleteIngoingEdges(Question question);
+    void deleteAnsweredEdge(String questionId, String nickname);
     void close(Question question);
     List<QuestionNodeDTO> viewCreatedAndAnsweredQuestions(User user);
     // fare create, update, delete di answer ???

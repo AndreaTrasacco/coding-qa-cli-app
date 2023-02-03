@@ -12,11 +12,15 @@ public interface UserNodeDAO {
 
     public void update(String nickname);
 
-    public List<String> getFollowerList(String nickname);
+    public List<String> getFollowingList(String nickname);
+
+    public List<String> getFollowers(String nickname);
 
     public void followUser(String myNickname, String userToFollow);
 
-    public void deleteQuestion(String nickname, String id);
+    public void deleteCreated(String nickname, String id);
 
-    public void deleteAnswer(String nickname, String id);
+    public void deleteAnswered(String nickname, String id);
+
+    public void deleteFollowed(String myNickname, String userToFollow);
 }

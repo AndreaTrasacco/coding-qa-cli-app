@@ -2,9 +2,14 @@ package it.unipi.lsmsd.coding_qa.service;
 
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
+import it.unipi.lsmsd.coding_qa.dto.QuestionNodeDTO;
+import it.unipi.lsmsd.coding_qa.dto.QuestionsAndAnswersReportedDTO;
 import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.model.Question;
+import it.unipi.lsmsd.coding_qa.model.User;
 import it.unipi.lsmsd.coding_qa.service.exception.BusinessException;
+
+import java.util.List;
 
 public interface QuestionService {
     // create
@@ -39,9 +44,15 @@ public interface QuestionService {
 
     public void reportAnswer(Answer answer) throws BusinessException;
 
+    public List<QuestionsAndAnswersReportedDTO> getReportedQuestionsAndAnswers() throws BusinessException;
+
+    public void acceptAnswer(Answer answer) throws BusinessException;
+
     public Question getQuestionInfo(String id) throws BusinessException;
 
     public PageDTO<QuestionDTO> getQuestionPageByTitle(int page, String searchString) throws BusinessException;
 
     public PageDTO<QuestionDTO> getQuestionPageByTopic(int page, String topic) throws BusinessException;
+
+    public List<QuestionNodeDTO> getCreatedAndAnsweredQuestions(User user) throws BusinessException;
 }

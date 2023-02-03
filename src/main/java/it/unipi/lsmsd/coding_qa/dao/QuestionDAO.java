@@ -17,7 +17,7 @@ public interface QuestionDAO {
 
     public Question getQuestionInfo(String id);
 
-    public List<Question> getReportedQuestions();
+    public List<Question> getReportedQuestions(); // Non utilizzata perchè la funzione getReportedQuestionsAndAnswers raccoglie sia domande che risposte
 
     public PageDTO<QuestionDTO> getQuestionPageByTitle(int page, String searchString);
 

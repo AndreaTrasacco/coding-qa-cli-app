@@ -52,9 +52,29 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
 
     //this method returns the list of follower
     @Override
-    public List<String> getFollowerList(String nickname) {
+    public List<String> getFollowingList(String nickname) {
         List<String> followerList;
         final String listOfUser = "MATCH (u: User)-[:FOLLOW]->(u1: User)" +
+                "WHERE u.nickname = $nickname" +
+                "RETURN u1.nickname as Nickname";
+        try(Session session = getSession()){
+            followerList = session.readTransaction( (TransactionWork<List<String>>) tx -> {
+                Result result = tx.run(listOfUser, parameters("nickname", nickname));
+                ArrayList<String> users = new ArrayList<>();
+                while(result.hasNext()){
+                    Record user = result.next();
+                    users.add(user.get("Nickname").asString());
+                }
+                return users;
+            });
+        }
+        return followerList;
+    }
+
+    @Override
+    public List<String> getFollowers(String nickname) {
+        List<String> followerList;
+        final String listOfUser = "MATCH (u: User)<-[:FOLLOW]-(u1: User)" +
                 "WHERE u.nickname = $nickname" +
                 "RETURN u1.nickname as Nickname";
         try(Session session = getSession()){
@@ -86,8 +106,9 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
         }
     }
 
+    // delete the relationship CREATED
     @Override
-    public void deleteQuestion(String nickname, String id) {
+    public void deleteCreated(String nickname, String id) {
         final String deleteQuestion = "MATCH (u: User{nickname: $nickname})-[:CREATED]->(q: Question{id: $id})" +
                 "DELETE q";
         try(Session session = getSession()){
@@ -98,13 +119,27 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
         }
     }
 
+    // delete the relationship ANSWERED
     @Override
-    public void deleteAnswer(String nickname, String id) {
+    public void deleteAnswered(String nickname, String id) {
         final String deleteQuestion = "MATCH (u: User{nickname: $nickname})-[:ANSWERED]->(q: Question{id: $id})" +
                 "DELETE q";
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
                 tx.run(deleteQuestion, parameters("nickname", nickname, "id", id));
+                return 1;
+            });
+        }
+    }
+
+    @Override
+    public void deleteFollowed(String myNickname, String userToUnfollow) {
+        final String unfollow = "MATCH (u1: User)-[r:FOLLOW]->(u2: User)" +
+                "WHERE u1.nickname = $myNickname AND u2.nickname = $userToUnfollow" +
+                "DELETE r";
+        try(Session session = getSession()){
+            session.writeTransaction(tx -> {
+                tx.run(unfollow, parameters("myNickname", myNickname, "userToUnfollow", userToUnfollow)).consume();
                 return 1;
             });
         }

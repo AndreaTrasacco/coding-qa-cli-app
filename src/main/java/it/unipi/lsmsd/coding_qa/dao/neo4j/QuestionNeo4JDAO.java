@@ -47,6 +47,31 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
         }
     }
 
+    @Override
+    public void deleteIngoingEdges(Question question) {
+        String deleteEdges = "MATCH (q: Question)<-[r]-()" +
+                "WHERE q.id = $id";
+        try(Session session = getSession()){
+            session.writeTransaction(tx -> {
+                tx.run(deleteEdges, parameters("id", question.getId())).consume();
+                return 1;
+            });
+        }
+    }
+
+    @Override
+    public void deleteAnsweredEdge(String questionId, String nickname) {
+        String deleteAnswered = "MATCH (u:User)-[r:ANSWERED]->(q:Question)" +
+                "WHERE u.nickname = $nickname AND q.id = $id" +
+                "DELETE r";
+        try(Session session = getSession()){
+            session.writeTransaction(tx -> {
+                tx.run(deleteAnswered, parameters("nickname", nickname, "id", questionId));
+                return 1;
+            });
+        }
+    }
+
     public void close(Question question){
         String closeQuestion = "MATCH (q:Question)" +
                 "WHERE q.id = $id" +
@@ -74,14 +99,14 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
                 List<QuestionNodeDTO> questions = new ArrayList<>();
                 while(resultCreated.hasNext()){
                     Record r = resultCreated.next();
-                    QuestionNodeDTO q = new QuestionNodeDTO(r.get("title").asString(), true);
+                    QuestionNodeDTO q = new QuestionNodeDTO(r.get("id").asString(), r.get("title").asString(), true);
                     questions.add(q);
                 }
 
                 Result resultAnswered = tx.run(answeredQuestionsQuery, parameters("nickname", user.getNickname()));
                 while(resultAnswered.hasNext()){
                     Record r = resultAnswered.next();
-                    QuestionNodeDTO q = new QuestionNodeDTO(r.get("title").asString(), false);
+                    QuestionNodeDTO q = new QuestionNodeDTO(r.get("id").asString(), r.get("title").asString(), false);
                     questions.add(q);
                 }
 
