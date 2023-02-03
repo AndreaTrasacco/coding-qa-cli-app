@@ -22,7 +22,7 @@ import static org.neo4j.driver.Values.parameters;
 
 public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO {
     // method for suggesting questions the user might be interested in
-    public List<Question> questionToReadSuggestions(User user){
+    public List<Question> questionToReadSuggestions(String nickname){
         String suggestionQuery = "MATCH (startUserQuestion:Question) <- [:CREATED]-(startUser:User{ nickname : $nickname})" +
                 "WHERE startUserQuestion.closed = false" +
                 "WITH DISTINCT(startUserQuestion.topic) AS topics, startUser" +
@@ -32,23 +32,23 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
                 "ORDER BY depth DESC" +
                 "LIMIT 100 ";
 
-        return retrieveQuestions(suggestionQuery, user);
+        return retrieveQuestions(suggestionQuery, nickname);
     }
 
     // method for suggesting questions that the user might be able to answer
-    public List<Question> questionToAnswerSuggestions(User user){
+    public List<Question> questionToAnswerSuggestions(String nickname){
         String suggestionQuery = "MATCH (u1:User{nickname : $nickname})-[:ANSWERED]->(q1)<-[:CREATED]-(:User)-[:CREATED]->(q2:Question{closed: false})<-[a:ANSWERED]-()" +
                 "RETURN q2, COUNT(a) AS ans_count" +
                 "ORDER BY ans_count" +
                 "LIMIT 10 ";
 
-        return retrieveQuestions(suggestionQuery, user);
+        return retrieveQuestions(suggestionQuery, nickname);
     }
 
-    private List<Question> retrieveQuestions(String suggestionQuery, User user){
+    private List<Question> retrieveQuestions(String suggestionQuery, String nickname){
         try(Session session = getSession()){
             List<Question> suggestedQuestions = session.readTransaction(tx -> {
-                Result result = tx.run(suggestionQuery, parameters("nickname", user.getNickname()));
+                Result result = tx.run(suggestionQuery, parameters("nickname", nickname));
                 ArrayList<Question> questions = new ArrayList<>();
                 while(result.hasNext()){
                     Record r = result.next();

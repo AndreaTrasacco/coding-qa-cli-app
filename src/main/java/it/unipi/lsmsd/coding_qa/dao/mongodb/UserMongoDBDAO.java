@@ -40,7 +40,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
         return true;
     }
 
-    public RegisteredUser updateInfo(RegisteredUser user){
+    public void updateInfo(RegisteredUser user){
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionUser = database.getCollection("users");
         collectionUser.updateOne(Filters.eq("nickname", user.getNickname()),
@@ -51,7 +51,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
                         Updates.set("createdDate", user.getCreatedDate()),
                         Updates.set("website", user.getWebsite()),
                         Updates.set("score", user.getScore())));
-        return user;
+
     }
 
     public RegisteredUser getInfo(String id){
@@ -72,10 +72,10 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
         return user;
     }
 
-    public void delete(RegisteredUser user){
+    public void delete(String id){
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionUser = database.getCollection("users");
-        collectionUser.deleteOne(Filters.eq("_id", user.getId()));
+        collectionUser.deleteOne(Filters.eq("_id", id));
     }
 
 }
