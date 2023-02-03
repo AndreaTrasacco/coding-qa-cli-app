@@ -7,6 +7,7 @@ import it.unipi.lsmsd.coding_qa.dao.enums.DAORepositoryEnum;
 import it.unipi.lsmsd.coding_qa.model.Question;
 import it.unipi.lsmsd.coding_qa.model.User;
 import it.unipi.lsmsd.coding_qa.service.SuggestionsService;
+import it.unipi.lsmsd.coding_qa.service.exception.BusinessException;
 
 import java.util.List;
 
@@ -16,10 +17,18 @@ public class SuggestionsServiceImpl implements SuggestionsService {
     public SuggestionsServiceImpl(){
         this.suggestionsDAO = DAOLocator.getSuggestionDAO(DAORepositoryEnum.NEO4J);
     }
-    public List<Question> questionToReadSuggestions(User user){
-        return suggestionsDAO.questionToReadSuggestions(user.getNickname());
+    public List<Question> questionToReadSuggestions(User user) throws BusinessException {
+        try {
+            return suggestionsDAO.questionToReadSuggestions(user.getNickname());
+        } catch(Exception e){
+            throw new BusinessException(e);
+        }
     }
-    public List<Question> questionToAnswerSuggestions(User user){
-        return suggestionsDAO.questionToAnswerSuggestions(user.getNickname());
+    public List<Question> questionToAnswerSuggestions(User user) throws BusinessException{
+        try {
+            return suggestionsDAO.questionToAnswerSuggestions(user.getNickname());
+        } catch(Exception e){
+            throw new BusinessException(e);
+        }
     }
 }
