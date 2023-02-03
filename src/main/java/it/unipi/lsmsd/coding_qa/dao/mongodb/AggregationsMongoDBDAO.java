@@ -37,11 +37,6 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
         MongoDatabase mongoDatabase = getDB();
         MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
-        //Bson project1 = project(include("country")); //TODO capire come fare prima project
-        //Bson group1 = group(new Document("country", 1).append("exp_level", 1), sum("numUser", 1));
-        //Bson group2 = group(); //TODO capire come fare
-
-
         //{ $project : {
         //
         //country: 1,

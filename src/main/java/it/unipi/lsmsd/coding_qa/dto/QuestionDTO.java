@@ -4,17 +4,27 @@ import java.util.Date;
 
 public class QuestionDTO {
 
+    private String id;
     private String title;
     private Date createdDate;
     private String topic;
     private String author;
 
 
-    public QuestionDTO(String title, Date createdDate, String topic, String author) {
+    public QuestionDTO(String id, String title, Date createdDate, String topic, String author) {
+        this.id = id;
         this.title = title;
         this.createdDate = createdDate;
         this.topic = topic;
         this.author = author;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getTitle() {

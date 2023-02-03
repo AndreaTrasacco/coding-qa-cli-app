@@ -13,8 +13,9 @@ public interface QuestionDAO {
 
     public void updateQuestion(Question question);
 
-
     public void reportQuestion(Question question);
+
+    public Question getQuestionInfo(String id);
 
     public List<Question> getReportedQuestions();
 
