@@ -1,76 +1,136 @@
 package it.unipi.lsmsd.coding_qa.service.implementation;
 
 import it.unipi.lsmsd.coding_qa.dao.AnswerDAO;
+import it.unipi.lsmsd.coding_qa.dao.DAOLocator;
 import it.unipi.lsmsd.coding_qa.dao.QuestionDAO;
 import it.unipi.lsmsd.coding_qa.dao.QuestionNodeDAO;
+import it.unipi.lsmsd.coding_qa.dao.enums.DAORepositoryEnum;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
 import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.model.Question;
 import it.unipi.lsmsd.coding_qa.service.QuestionService;
+import it.unipi.lsmsd.coding_qa.service.exception.BusinessException;
 
 public class QuestionServiceImpl implements QuestionService {
 
     private QuestionDAO questionDAO;
     private AnswerDAO answerDAO;
     private QuestionNodeDAO questionNodeDAO;
-    @Override
-    public void createQuestion(Question question) {
 
+    public QuestionServiceImpl(){
+        this.questionDAO = DAOLocator.getQuestionDAO(DAORepositoryEnum.MONGODB);
+        this.answerDAO = DAOLocator.getAnswerDAO(DAORepositoryEnum.MONGODB);
+        this.questionNodeDAO = DAOLocator.getQuestionNodeDAO(DAORepositoryEnum.NEO4J);
+    }
+    @Override
+    public void createQuestion(Question question) throws BusinessException {
+        try {
+            questionDAO.createQuestion(question);
+            questionNodeDAO.create(question);
+        } catch(Exception e){
+            throw new BusinessException(e);
+        }
     }
 
     @Override
-    public void addAnswer(Answer answer) {
-
+    public void addAnswer(Answer answer) throws BusinessException {
+        try {
+            answerDAO.create(answer);
+        } catch (Exception e){
+            throw new BusinessException(e);
+        }
     }
 
     @Override
-    public void updateQuestion(Question question) {
-
+    public void updateQuestion(Question question) throws BusinessException {
+        try {
+            questionDAO.updateQuestion(question);
+            questionNodeDAO.update(question);
+        } catch(Exception e){
+            throw new BusinessException(e);
+        }
     }
 
     @Override
-    public void updateAnswer(Answer answer) {
-
+    public void updateAnswer(Answer answer) throws BusinessException {
+        try {
+            answerDAO.update(answer);
+        } catch(Exception e){
+            throw new BusinessException(e);
+        }
     }
 
     @Override
-    public void deleteQuestion(Question question) {
-
+    public void deleteQuestion(Question question) throws BusinessException {
+        try {
+            questionDAO.deleteQuestion(question);
+            questionNodeDAO.delete(question);
+        } catch(Exception e){
+            throw new BusinessException(e);
+        }
     }
 
     @Override
-    public void deleteAnswer(Answer answer) {
-
+    public void deleteAnswer(Answer answer) throws BusinessException {
+        try {
+            answerDAO.delete(answer);
+        } catch (Exception e){
+            throw new BusinessException(e);
+        }
     }
 
     @Override
-    public void voteAnswer(Answer answer, boolean voteType) {
-
+    public void voteAnswer(Answer answer, boolean voteType) throws BusinessException {
+        try {
+            answerDAO.vote(answer, voteType);
+        } catch (Exception e){
+            throw new BusinessException(e);
+        }
     }
 
     @Override
-    public void reportQuestion(Question question) {
-
+    public void reportQuestion(Question question) throws BusinessException {
+        try {
+            questionDAO.reportQuestion(question);
+        } catch (Exception e){
+            throw new BusinessException(e);
+        }
     }
 
     @Override
-    public void reportAnswer(Answer answer) {
-
+    public void reportAnswer(Answer answer) throws BusinessException {
+        try {
+            answerDAO.report(answer);
+        } catch (Exception e){
+            throw new BusinessException(e);
+        }
     }
 
     @Override
-    public Question getQuestionInfo(String id) {
-        return null;
+    public Question getQuestionInfo(String id) throws BusinessException {
+        try {
+            return questionDAO.getQuestionInfo(id);
+        } catch (Exception e){
+            throw new BusinessException(e);
+        }
     }
 
     @Override
-    public PageDTO<QuestionDTO> getQuestionPageByTitle(int page, String searchString) {
-        return null;
+    public PageDTO<QuestionDTO> getQuestionPageByTitle(int page, String searchString) throws BusinessException {
+        try {
+            return questionDAO.getQuestionPageByTitle(page, searchString);
+        } catch (Exception e){
+            throw new BusinessException(e);
+        }
     }
 
     @Override
-    public PageDTO<QuestionDTO> getQuestionPageByTopic(int page, String topic) {
-        return null;
+    public PageDTO<QuestionDTO> getQuestionPageByTopic(int page, String topic) throws BusinessException {
+        try {
+            return questionDAO.getQuestionPageByTopic(page, topic);
+        } catch (Exception e){
+            throw new BusinessException(e);
+        }
     }
 }
