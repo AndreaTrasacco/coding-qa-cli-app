@@ -14,8 +14,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
     public RegisteredUser register(RegisteredUser user){
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionUser = database.getCollection("users");
-        Document docUser = new Document("_id", user.getId())
-                .append("nickname", user.getNickname())
+        Document docUser = new Document("nickname", user.getNickname())
                 .append("fullName", user.getFullName())
                 .append("encPassword", user.getEncPassword())
                 .append("birthdate", user.getBirthdate())
@@ -24,15 +23,15 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
                 .append("website", user.getWebsite())
                 .append("score", user.getScore());
         collectionUser.insertOne(docUser);
-
+        // TODO SETTARE id UTENTE
         return user;
     }
 
-    public boolean authenticate(String username, String password){
+    public User authenticate(String username, String encPassword){
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionUser = database.getCollection("users");
         Document user = collectionUser.find(Filters.and(Filters.eq("nickname", username),
-                        Filters.eq("encPassword", password))).first();
+                        Filters.eq("encPassword", encPassword))).first();
         if (user == null) {
             return false;
         }

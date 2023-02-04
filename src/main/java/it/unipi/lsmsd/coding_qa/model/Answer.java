@@ -9,7 +9,7 @@ public class Answer {
     private Date createdDate;
     private String author;
     private int score;
-    private List<String> voters; // voters: array of String or RegUser??
+    private List<String> voters;
     private boolean accepted;
     private boolean reported;
 
@@ -39,7 +39,7 @@ public class Answer {
     }
 
     public String getParentQuestionId(){
-        return this.id.substring(0, this.id.indexOf('-'));
+        return this.id.substring(0, this.id.indexOf('_'));
     }
 
     public void setId(String id) {

@@ -29,7 +29,7 @@ public class QuestionServiceImpl implements QuestionService {
         this.questionNodeDAO = DAOLocator.getQuestionNodeDAO(DAORepositoryEnum.NEO4J);
     }
     @Override
-    public void createQuestion(Question question) throws BusinessException {
+    public void createQuestion(Question question) throws BusinessException { // TODO ROLLBACK
         try {
             questionDAO.createQuestion(question);
             questionNodeDAO.create(question);
@@ -69,7 +69,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public void deleteQuestion(Question question) throws BusinessException {
         try {
-            questionDAO.deleteQuestion(question);
+            questionDAO.deleteQuestion(question.getId());
             questionNodeDAO.deleteIngoingEdges(question);
             questionNodeDAO.delete(question);
         } catch(Exception e){
@@ -81,6 +81,7 @@ public class QuestionServiceImpl implements QuestionService {
     public void deleteAnswer(Answer answer) throws BusinessException {
         try {
             answerDAO.delete(answer);
+            // TODO CONTROLLARE SE L'UTENTE HA ALTRE RISPOSTE SUL GRAFO
             questionNodeDAO.deleteAnsweredEdge(answer.getParentQuestionId(), answer.getAuthor());
         } catch (Exception e){
             throw new BusinessException(e);

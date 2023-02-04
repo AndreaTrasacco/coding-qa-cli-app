@@ -34,14 +34,15 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
                 .append("createdDate", question.getCreatedDate());
 
         collectionQuestions.insertOne(docQuestion);
+        // TODO SETTARE ID DOMANDA
     }
 
     @Override
-    public void deleteQuestion(Question question) {
+    public void deleteQuestion(String id) {
         MongoDatabase mongoDatabase = getDB();
         MongoCollection collectionQuestions = mongoDatabase.getCollection("questions");
 
-        collectionQuestions.deleteOne(Filters.eq("_id", question.getId()));
+        collectionQuestions.deleteOne(Filters.eq("_id", id));
     }
 
     @Override

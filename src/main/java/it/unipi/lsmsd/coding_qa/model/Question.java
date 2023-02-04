@@ -4,14 +4,13 @@ import java.util.Date;
 import java.util.List;
 
 public class Question {
-    // array of answers
     private String id;
     private String title;
     private String body;
     private String topic;
     private String author;
-    private List<Answer> answers; // meglio utilizzare una lista?
-    private boolean closed; // mettere nel modello?
+    private List<Answer> answers;
+    private boolean closed; // TODO TOGLIERE E CREARE METODO PRIVATE PER CALCOLO
     private Date createdDate;
 
     private boolean reported;

@@ -86,8 +86,8 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         int increment = voteType? 1 : -1;
 
         // questionId_answerIndex
-        String questionId = answer.getId().substring(0, answer.getId().indexOf('-'));
-        String answerIndex = answer.getId().substring(answer.getId().indexOf('-'));
+        String questionId = answer.getId().substring(0, answer.getId().indexOf('_'));
+        String answerIndex = answer.getId().substring(answer.getId().indexOf('_'));
         collectionQuestion.updateOne(
                 Filters.eq("_id", questionId),
                 Updates.inc("answers." + answerIndex + ".score", increment)

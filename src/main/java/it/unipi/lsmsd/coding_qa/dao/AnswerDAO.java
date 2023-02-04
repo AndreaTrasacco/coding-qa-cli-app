@@ -13,5 +13,5 @@ public interface AnswerDAO {
     void report(Answer answer);
     void vote(Answer answer, boolean voteType); // true: upvote, false: downvote
     void accept(Answer answer); // accepting an answer means closing the question
-    List<QuestionsAndAnswersReportedDTO> getReportedQuestionsAndAnswers();
+    List<QuestionsAndAnswersReportedDTO> getReportedQuestionsAndAnswers(); // TODO CORREZIONE
 }

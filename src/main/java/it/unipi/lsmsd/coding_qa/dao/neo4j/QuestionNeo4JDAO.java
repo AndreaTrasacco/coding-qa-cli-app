@@ -25,10 +25,10 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
             });
         }
     }
-    public void update(Question question){
+    public void update(Question question){ // TODO CAPIRE SE SERVE DTO
         String updateQuestion = "MATCH (q:Question)" +
                 "WHERE q.id = $id" +
-                "SET q.title = $title, q.topic = $topic, q.closed = $closed, q.createdDate = $createdDate}";
+                "SET q.title = $title, q.topic = $topic}";
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
                 tx.run(updateQuestion, parameters("id", question.getId(), "title", question.getTitle(),
