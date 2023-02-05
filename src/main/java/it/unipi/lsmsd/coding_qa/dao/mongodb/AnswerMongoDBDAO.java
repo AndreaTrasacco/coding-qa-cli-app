@@ -7,7 +7,6 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import it.unipi.lsmsd.coding_qa.dao.AnswerDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionsAndAnswersReportedDTO;
 import it.unipi.lsmsd.coding_qa.model.Answer;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -22,7 +21,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         MongoCollection<Document> collectionQuestion = database.getCollection("questions");
 
         // questionId_answerIndex
-        String answerIndex = answer.getId().substring(answer.getId().indexOf('-'));
+        String answerIndex = answer.getId().substring(answer.getId().indexOf('_'));
 
         Document docUser = new Document("_id", new ObjectId(questionId))
                 .append("answers"+answerIndex+"body", answer.getBody())
@@ -33,6 +32,9 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
                 .append("answers"+answerIndex+"accepted", answer.isAccepted())
                 .append("answers"+answerIndex+"reported", answer.isReported());
         collectionQuestion.insertOne(docUser);
+        // SERVE FARE UNA UPDATE DELLA QUESTION, NON INSERT
+
+        //AGGIUNGERE ID ALLA RISPOSTA CON QUESTION ID _ POSIZIONE _ CREATED_DATE
     }
     public Answer update(Answer answer){
         MongoDatabase database = getDB();
@@ -96,8 +98,8 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionQuestion = database.getCollection("questions");
         // questionId_answerIndex
-        String questionId = id.substring(0, id.indexOf('-'));
-        String answerIndex = id.substring(id.indexOf('-'));
+        String questionId = id.substring(0, id.indexOf('_'));
+        String answerIndex = id.substring(id.indexOf('_'));
         collectionQuestion.updateOne(
                 Filters.eq("_id", new ObjectId(questionId)),
                 Updates.set("answers." + answerIndex + ".accepted", true)

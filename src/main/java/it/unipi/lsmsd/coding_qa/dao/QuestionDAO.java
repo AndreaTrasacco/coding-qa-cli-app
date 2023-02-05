@@ -13,5 +13,5 @@ public interface QuestionDAO { // TODO AGGIUNGERE PAGINAZIONE DOVE SERVE, ECCEZI
     Question getQuestionInfo(String id);
     PageDTO<QuestionDTO> getReportedQuestions();
     PageDTO<QuestionDTO> getQuestionPageByTitle(int page, String searchString); // TODO "Metodo" per body
-    PageDTO<QuestionDTO> getQuestionPageByTopic(int page, String topic);
+    PageDTO<QuestionDTO> getQuestionPageByTopic(int page, String topic);  // TODO FARE CON AGGREGATE E RECUPERARE ANCHE CLOSED
 }

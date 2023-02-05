@@ -20,7 +20,7 @@ import java.util.List;
 
 import static org.neo4j.driver.Values.parameters;
 
-public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO {
+public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO { // TODO AGGIUNGERE RECUPERO AUTHOR E USARE QUESTIONDTO
     // method for suggesting questions the user might be interested in
     public PageDTO<Question> questionsToRead(String nickname){
         String suggestionQuery = "MATCH (startUserQuestion:Question) <- [:CREATED]-(startUser:User{ nickname : $nickname})" +
@@ -71,7 +71,7 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
 
 
                     // reported = false as a default value
-                    Question q = new Question(r.get("id").asString(), r.get("title").asString(), r.get("body").asString(),
+                    Question q = new Question(r.get("id").asString(), r.get("title").asString(), null,
                             r.get("topic").asString(), r.get("author").asString(), answers, r.get("closed").asBoolean(), date, false);
                 }
                 return questions;

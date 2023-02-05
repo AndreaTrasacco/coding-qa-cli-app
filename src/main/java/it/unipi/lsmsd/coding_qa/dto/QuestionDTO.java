@@ -2,14 +2,12 @@ package it.unipi.lsmsd.coding_qa.dto;
 
 import java.util.Date;
 
-public class QuestionDTO {
-
+public class QuestionDTO { // TODO AGGIUNGERE CLOSED
     private String id;
     private String title;
     private Date createdDate;
     private String topic;
     private String author;
-
 
     public QuestionDTO(String id, String title, Date createdDate, String topic, String author) {
         this.id = id;

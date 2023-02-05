@@ -107,7 +107,6 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
         MongoDatabase mongoDatabase = getDB();
         MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
-        AtomicInteger counter = new AtomicInteger(); // TODO ????
         int pageOffset = (page - 1) * Constants.PAGE_SIZE;
 
         TextSearchOptions options = new TextSearchOptions().caseSensitive(false);
@@ -116,10 +115,9 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
             QuestionDTO temp = new QuestionDTO(doc.getObjectId("_id").toString(), doc.getString("title"),
                     doc.getDate("createdDate"), doc.getString("topic"), doc.getString("author"));
             questionDTOList.add(temp);
-            counter.set(counter.get() + 1); // TODO capire perchè
         });
 
-        pageDTO.setCounter(counter.get());
+        pageDTO.setCounter(questionDTOList.size());
         pageDTO.setEntries(questionDTOList);
         return pageDTO;
     }

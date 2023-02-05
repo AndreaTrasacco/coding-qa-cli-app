@@ -5,7 +5,6 @@ import it.unipi.lsmsd.coding_qa.dao.enums.DAORepositoryEnum;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionNodeDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionsAndAnswersReportedDTO;
 import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.model.Question;
 import it.unipi.lsmsd.coding_qa.model.User;
@@ -26,7 +25,7 @@ public class QuestionServiceImpl implements QuestionService {
         this.questionNodeDAO = DAOLocator.getQuestionNodeDAO(DAORepositoryEnum.NEO4J);
     }
     @Override
-    public void createQuestion(Question question) throws BusinessException { // TODO ROLLBACK
+    public void createQuestion(Question question) throws BusinessException { // TODO ROLLBACK, PASSARE QUESTIONDTO (FORSE?)
         try {
             questionDAO.createQuestion(question);
             questionNodeDAO.create(question);

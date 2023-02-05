@@ -12,7 +12,6 @@ public class Question {
     private List<Answer> answers;
     private boolean closed; // TODO TOGLIERE E CREARE METODO PRIVATE PER CALCOLO
     private Date createdDate;
-
     private boolean reported;
 
     public Question(String id, String title, String body, String topic, String author,

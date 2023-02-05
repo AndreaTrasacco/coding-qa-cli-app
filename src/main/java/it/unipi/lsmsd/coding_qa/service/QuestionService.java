@@ -3,7 +3,6 @@ package it.unipi.lsmsd.coding_qa.service;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionNodeDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionsAndAnswersReportedDTO;
 import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.model.Question;
 import it.unipi.lsmsd.coding_qa.model.User;

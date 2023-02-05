@@ -13,7 +13,7 @@ public interface QuestionNodeDAO { // TODO ATTENZIONE USARE DETACH, ECCEZIONI, N
     void delete(String id);
     //void deleteIngoingEdges(String id);
     void deleteAnsweredEdge(String questionId, String nickname); // CAMBIARE NOME (dipende da graph db)
-    void close(String questionId);
+    void updateClose(String questionId, boolean type);
     PageDTO<QuestionNodeDTO> viewCreatedAndAnsweredQuestions(String nickname); // TODO SEPARARE
     // fare create, update, delete di answer ???
 

@@ -1,6 +1,14 @@
 package it.unipi.lsmsd.coding_qa.dto;
 
 public class QuestionNodeDTO {
+
+    /*
+    * find answers.accepted : true
+    *
+    * */
+
+
+
     private String id;
     private String title;
     private boolean type; // true: created, false: answered
