@@ -12,12 +12,11 @@ public abstract class BaseMongoDBDAO {
 
     private static void createConnection(){
         MongoClient myClient = MongoClients.create(URI);
-        MongoDatabase database = myClient.getDatabase(DB_NAME);
     }
 
     public static void closeConnection(){
         connection.close();
-    }
+    } // TODO SERVE?
 
     public static MongoDatabase getDB(){
         if(database == null)

@@ -2,7 +2,7 @@ package it.unipi.lsmsd.coding_qa.dto;
 
 import java.util.Date;
 
-public class QuestionsAndAnswersReportedDTO {
+public class QuestionsAndAnswersReportedDTO { // TODO ELIMINARE
     private String id;
     private String title;
     private String body;

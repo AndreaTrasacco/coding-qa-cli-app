@@ -6,8 +6,9 @@ import it.unipi.lsmsd.coding_qa.dao.UserDAO;
 import it.unipi.lsmsd.coding_qa.dao.UserNodeDAO;
 import it.unipi.lsmsd.coding_qa.dao.enums.DAORepositoryEnum;
 import it.unipi.lsmsd.coding_qa.dto.QuestionNodeDTO;
-import it.unipi.lsmsd.coding_qa.model.Question;
+import it.unipi.lsmsd.coding_qa.dto.UserDTO;
 import it.unipi.lsmsd.coding_qa.model.RegisteredUser;
+import it.unipi.lsmsd.coding_qa.model.User;
 import it.unipi.lsmsd.coding_qa.service.UserService;
 import it.unipi.lsmsd.coding_qa.service.exception.BusinessException;
 
@@ -33,15 +34,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public boolean login(RegisteredUser user) throws BusinessException{
+    public User login(String username, String encPassword) throws BusinessException{
         try {
-            return userDAO.authenticate(user.getNickname(), user.getEncPassword());
+            return userDAO.authenticate(username, encPassword);
         } catch(Exception e){
             throw new BusinessException(e);
         }
     }
 
-    public RegisteredUser getInfo(RegisteredUser user) throws BusinessException{
+    public UserDTO getInfo(RegisteredUser user) throws BusinessException{
         try {
             return userDAO.getInfo(user.getId());
         } catch(Exception e){
@@ -66,7 +67,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void delete(RegisteredUser user) throws BusinessException{
+    public void delete(RegisteredUser user) throws BusinessException{ // TODO CANCELLAZIONE DOMANDE E RISPOSTE UTENTE OPPURE NO?? (PER I NODI USARE DETACH, MODIFICARE IN DAO)
         try {
             userDAO.delete(user.getId());
             // delete all the Answered and Created edges

@@ -6,11 +6,8 @@ import it.unipi.lsmsd.coding_qa.dto.aggregations.TopicDTO;
 
 import java.util.List;
 
-public interface AggregationsDAO {
-
-    public List<ExperienceLevelDTO> getExperienceLvlPerCountry();
-
-    public List<QuestionScoreDTO> getUsefulQuestions();
-
-    public List<TopicDTO> getTopicRank();
+public interface AggregationsDAO { // TODO ECCEZIONI
+    List<ExperienceLevelDTO> getExperienceLvlPerCountry(); // TODO RISCRIVERE METODO --> GROUP BY SU PIU CAMPI VA FATTO DEFINENDO DOCUMENTO
+    List<QuestionScoreDTO> getUsefulQuestions();
+    List<TopicDTO> getTopicRank();
 }

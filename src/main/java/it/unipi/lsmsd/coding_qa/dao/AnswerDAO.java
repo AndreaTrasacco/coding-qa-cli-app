@@ -5,13 +5,12 @@ import it.unipi.lsmsd.coding_qa.model.Answer;
 
 import java.util.List;
 
-public interface AnswerDAO {
-    // metodi che hanno bisogno dell'id hanno un solo parametro id (nelle impl. mongodb viene diviso)
-    Answer create(Answer answer);
+public interface AnswerDAO { // TODO ECCEZIONI
+    void create(String questionId, Answer answer); // TODO RISCRIVERE - INDICE NON C'E PRIMA DI AGGIUNGERLO, POI VA SETTATO IN ANSWER ID
     Answer update(Answer answer);
-    void delete(Answer answer);
-    void report(Answer answer);
-    void vote(Answer answer, boolean voteType); // true: upvote, false: downvote
-    void accept(Answer answer); // accepting an answer means closing the question
-    List<QuestionsAndAnswersReportedDTO> getReportedQuestionsAndAnswers(); // TODO CORREZIONE
+    void delete(String id);
+    void report(String id);
+    void vote(String id, boolean voteType); // true: upvote, false: downvote
+    void accept(String id); // accepting an answer means closing the question
+    List<QuestionsAndAnswersReportedDTO> getReportedQuestionsAndAnswers(); // TODO CORREZIONE (SPLIT METODO) --> SERVE OPPORTUNA ANSWER DTO
 }

@@ -25,7 +25,7 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
             });
         }
     }
-    public void update(Question question){ // TODO CAPIRE SE SERVE DTO
+    public void update(Question question){
         String updateQuestion = "MATCH (q:Question)" +
                 "WHERE q.id = $id" +
                 "SET q.title = $title, q.topic = $topic}";
@@ -37,27 +37,27 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
             });
         }
     }
-    public void delete(Question question){
-        String deleteQuestion = "MATCH (q:Question) WHERE q.id = id DELETE q)";
+    public void delete(String id){
+        String deleteQuestion = "MATCH (q:Question) WHERE q.id = id DETACH DELETE q)";
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
-                tx.run(deleteQuestion, parameters("id", question.getId())).consume();
+                tx.run(deleteQuestion, parameters("id", id)).consume();
                 return 1;
             });
         }
     }
 
-    @Override
-    public void deleteIngoingEdges(Question question) {
+    /*@Override
+    public void deleteIngoingEdges(String id) {
         String deleteEdges = "MATCH (q: Question)<-[r]-()" +
                 "WHERE q.id = $id";
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
-                tx.run(deleteEdges, parameters("id", question.getId())).consume();
+                tx.run(deleteEdges, parameters("id", id)).consume();
                 return 1;
             });
         }
-    }
+    }*/
 
     @Override
     public void deleteAnsweredEdge(String questionId, String nickname) {
@@ -84,7 +84,7 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
         }
     }
 
-    public List<QuestionNodeDTO> viewCreatedAndAnsweredQuestions(User user){
+    public List<QuestionNodeDTO> viewCreatedAndAnsweredQuestions(String nickname){
         String createdQuestionsQuery = "MATCH (u:User {nickname: $nickname})" +
                 "MATCH (u)-[:CREATED]->(createdQuestion:Question)" +
                 "RETURN createdQuestion";
@@ -95,7 +95,7 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
 
         try(Session session = getSession()){
             List<QuestionNodeDTO> targetQuestions = session.readTransaction(tx -> {
-                Result resultCreated = tx.run(createdQuestionsQuery, parameters("nickname", user.getNickname()));
+                Result resultCreated = tx.run(createdQuestionsQuery, parameters("nickname", nickname));
                 List<QuestionNodeDTO> questions = new ArrayList<>();
                 while(resultCreated.hasNext()){
                     Record r = resultCreated.next();
@@ -103,7 +103,7 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
                     questions.add(q);
                 }
 
-                Result resultAnswered = tx.run(answeredQuestionsQuery, parameters("nickname", user.getNickname()));
+                Result resultAnswered = tx.run(answeredQuestionsQuery, parameters("nickname", nickname));
                 while(resultAnswered.hasNext()){
                     Record r = resultAnswered.next();
                     QuestionNodeDTO q = new QuestionNodeDTO(r.get("id").asString(), r.get("title").asString(), false);

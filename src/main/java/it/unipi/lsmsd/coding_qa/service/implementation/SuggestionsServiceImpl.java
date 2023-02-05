@@ -19,14 +19,14 @@ public class SuggestionsServiceImpl implements SuggestionsService {
     }
     public List<Question> questionToReadSuggestions(User user) throws BusinessException {
         try {
-            return suggestionsDAO.questionToReadSuggestions(user.getNickname());
+            return suggestionsDAO.questionsToRead(user.getNickname());
         } catch(Exception e){
             throw new BusinessException(e);
         }
     }
     public List<Question> questionToAnswerSuggestions(User user) throws BusinessException{
         try {
-            return suggestionsDAO.questionToAnswerSuggestions(user.getNickname());
+            return suggestionsDAO.questionsToAnswer(user.getNickname());
         } catch(Exception e){
             throw new BusinessException(e);
         }

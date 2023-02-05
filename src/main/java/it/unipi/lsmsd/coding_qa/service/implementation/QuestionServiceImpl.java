@@ -1,9 +1,6 @@
 package it.unipi.lsmsd.coding_qa.service.implementation;
 
-import it.unipi.lsmsd.coding_qa.dao.AnswerDAO;
-import it.unipi.lsmsd.coding_qa.dao.DAOLocator;
-import it.unipi.lsmsd.coding_qa.dao.QuestionDAO;
-import it.unipi.lsmsd.coding_qa.dao.QuestionNodeDAO;
+import it.unipi.lsmsd.coding_qa.dao.*;
 import it.unipi.lsmsd.coding_qa.dao.enums.DAORepositoryEnum;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
@@ -39,9 +36,9 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void addAnswer(Answer answer) throws BusinessException {
+    public void addAnswer(String questionId, Answer answer) throws BusinessException {
         try {
-            answerDAO.create(answer);
+            answerDAO.create(questionId, answer);
         } catch (Exception e){
             throw new BusinessException(e);
         }
@@ -80,8 +77,9 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public void deleteAnswer(Answer answer) throws BusinessException {
         try {
-            answerDAO.delete(answer);
-            // TODO CONTROLLARE SE L'UTENTE HA ALTRE RISPOSTE SUL GRAFO
+            answerDAO.delete(answer.getId()); // TODO METODO POTREBBE RESTITUIRE ID DOMANDA?? PER ESSERE USATO NEL GRAFO. E SCORE??
+            // TODO SCALARE ANCHE SCORE DELL'UTENTE
+            // TODO CONTROLLARE SE L'UTENTE HA ALTRE RISPOSTE SU QUELLA DOMANDA
             questionNodeDAO.deleteAnsweredEdge(answer.getParentQuestionId(), answer.getAuthor());
         } catch (Exception e){
             throw new BusinessException(e);
@@ -89,27 +87,27 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void voteAnswer(Answer answer, boolean voteType) throws BusinessException {
+    public void voteAnswer(String answerId, boolean voteType) throws BusinessException {
         try {
-            answerDAO.vote(answer, voteType);
+            answerDAO.vote(answerId, voteType);
         } catch (Exception e){
             throw new BusinessException(e);
         }
     }
 
     @Override
-    public void reportQuestion(Question question) throws BusinessException {
+    public void reportQuestion(String questionId) throws BusinessException {
         try {
-            questionDAO.reportQuestion(question);
+            questionDAO.reportQuestion(questionId);
         } catch (Exception e){
             throw new BusinessException(e);
         }
     }
 
     @Override
-    public void reportAnswer(Answer answer) throws BusinessException {
+    public void reportAnswer(String answerId) throws BusinessException {
         try {
-            answerDAO.report(answer);
+            answerDAO.report(answerId);
         } catch (Exception e){
             throw new BusinessException(e);
         }
@@ -125,9 +123,9 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void acceptAnswer(Answer answer) throws BusinessException {
+    public void acceptAnswer(String answerId) throws BusinessException {
         try {
-            answerDAO.accept(answer);
+            answerDAO.accept(answerId);
             questionNodeDAO.close(new Question(answer.getParentQuestionId()));
         } catch (Exception e){
             throw new BusinessException(e);

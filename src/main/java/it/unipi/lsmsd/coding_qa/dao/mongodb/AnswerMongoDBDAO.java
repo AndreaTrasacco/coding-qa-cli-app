@@ -11,21 +11,20 @@ import it.unipi.lsmsd.coding_qa.dto.QuestionsAndAnswersReportedDTO;
 import it.unipi.lsmsd.coding_qa.model.Answer;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
-    // Su mongo db l'id dell'answer deve essere scomposto
-    public Answer create(Answer answer){
+    public void create(String questionId, Answer answer){
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionQuestion = database.getCollection("questions");
 
         // questionId_answerIndex
-        String questionId = answer.getId().substring(0, answer.getId().indexOf('-'));
         String answerIndex = answer.getId().substring(answer.getId().indexOf('-'));
 
-        Document docUser = new Document("_id", questionId)
+        Document docUser = new Document("_id", new ObjectId(questionId))
                 .append("answers"+answerIndex+"body", answer.getBody())
                 .append("answers"+answerIndex+"createdDate", answer.getCreatedDate())
                 .append("answers"+answerIndex+"author", answer.getAuthor())
@@ -34,8 +33,6 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
                 .append("answers"+answerIndex+"accepted", answer.isAccepted())
                 .append("answers"+answerIndex+"reported", answer.isReported());
         collectionQuestion.insertOne(docUser);
-
-        return answer;
     }
     public Answer update(Answer answer){
         MongoDatabase database = getDB();
@@ -45,7 +42,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         String questionId = answer.getId().substring(0, answer.getId().indexOf('-'));
         String answerIndex = answer.getId().substring(answer.getId().indexOf('-'));
 
-        collectionQuestion.updateOne(Filters.eq("_id", questionId),
+        collectionQuestion.updateOne(Filters.eq("_id", new ObjectId(questionId)),
                 Updates.combine(Updates.set("answers"+answerIndex+"body", answer.getBody()),
                         Updates.set("answers"+answerIndex+"createdDate", answer.getCreatedDate()),
                         Updates.set("answers"+answerIndex+"author", answer.getAuthor()),
@@ -55,59 +52,58 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
                         Updates.set("answers"+answerIndex+"reported", answer.isReported())));
         return answer;
     }
-    public void delete(Answer answer){
+    public void delete(String id){
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionQuestion = database.getCollection("questions");
 
         // questionId_answerIndex
-        String questionId = answer.getId().substring(0, answer.getId().indexOf('-'));
-        String answerIndex = answer.getId().substring(answer.getId().indexOf('-'));
+        String questionId = id.substring(0, id.indexOf('_'));
+        String answerIndex = id.substring(id.indexOf('_'));
 
         collectionQuestion.updateOne(
-                Filters.eq("_id", questionId),
-                Updates.unset("answers.<i>")
+                Filters.eq("_id", new ObjectId(questionId)),
+                Updates.unset("answers." + answerIndex)
         );
     }
-    public void report(Answer answer){
+    public void report(String id){
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionQuestion = database.getCollection("questions");
-        // questionId_answerIndex
-        String questionId = answer.getId().substring(0, answer.getId().indexOf('-'));
-        String answerIndex = answer.getId().substring(answer.getId().indexOf('-'));
+        // The answer id has the following format: questionId_answerIndex
+        String questionId = id.substring(0, id.indexOf('-'));
+        String answerIndex = id.substring(id.indexOf('-'));
         collectionQuestion.updateOne(
-                Filters.eq("_id", questionId),
+                Filters.eq("_id", new ObjectId(questionId)),
                 Updates.set("answers." + answerIndex + ".reported", true)
         );
     }
 
-    public void vote(Answer answer, boolean voteType){
+    public void vote(String id, boolean voteType){
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionQuestion = database.getCollection("questions");
         int increment = voteType? 1 : -1;
 
         // questionId_answerIndex
-        String questionId = answer.getId().substring(0, answer.getId().indexOf('_'));
-        String answerIndex = answer.getId().substring(answer.getId().indexOf('_'));
+        String questionId = id.substring(0, id.indexOf('_'));
+        String answerIndex = id.substring(id.indexOf('_'));
         collectionQuestion.updateOne(
-                Filters.eq("_id", questionId),
+                Filters.eq("_id", new ObjectId(questionId)),
                 Updates.inc("answers." + answerIndex + ".score", increment)
         );
 
     }
 
-    public void accept(Answer answer){
+    public void accept(String id){
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionQuestion = database.getCollection("questions");
         // questionId_answerIndex
-        String questionId = answer.getId().substring(0, answer.getId().indexOf('-'));
-        String answerIndex = answer.getId().substring(answer.getId().indexOf('-'));
+        String questionId = id.substring(0, id.indexOf('-'));
+        String answerIndex = id.substring(id.indexOf('-'));
         collectionQuestion.updateOne(
-                Filters.eq("_id", questionId),
+                Filters.eq("_id", new ObjectId(questionId)),
                 Updates.set("answers." + answerIndex + ".accepted", true)
         );
     }
 
-    // DECIDERE IN CHE CLASSE METTERE QUESTO METODO (o question o answer)
     public List<QuestionsAndAnswersReportedDTO> getReportedQuestionsAndAnswers(){
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionQuestion = database.getCollection("questions");
@@ -115,22 +111,23 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
 
         List<QuestionsAndAnswersReportedDTO> questionsAndAnswersReported = new ArrayList<>();
 
-        MongoCursor<Document> cursor = collectionQuestion.find(filter).iterator();
+        try (MongoCursor<Document> cursor = collectionQuestion.find(filter).iterator()) {
 
-        while (cursor.hasNext()) {
-            Document question = cursor.next();
-            QuestionsAndAnswersReportedDTO q = new QuestionsAndAnswersReportedDTO(question.getString("_id"),
-                    question.getString("title"), question.getString("body"), question.getString("author"),
-                    question.getDate("createdDate"), 0);
-            questionsAndAnswersReported.add(q);
+            while (cursor.hasNext()) {
+                Document question = cursor.next();
+                QuestionsAndAnswersReportedDTO q = new QuestionsAndAnswersReportedDTO(question.getString("_id"),
+                        question.getString("title"), question.getString("body"), question.getString("author"),
+                        question.getDate("createdDate"), 0);
+                questionsAndAnswersReported.add(q);
 
-            List<Document> answers = (List<Document>) question.get("answers");
-            for (Document answer : answers) {
-                if (answer.getBoolean("reported")) {
-                    QuestionsAndAnswersReportedDTO a = new QuestionsAndAnswersReportedDTO(question.getString("_id")+answers.indexOf(answer),
-                            question.getString("title"), answer.getString("body"), answer.getString("author"),
-                            answer.getDate("createdDate"), 0);
-                    questionsAndAnswersReported.add(q);
+                List<Document> answers = (ArrayList<Document>) question.get("answers");
+                for (Document answer : answers) {
+                    if (answer.getBoolean("reported")) {
+                        QuestionsAndAnswersReportedDTO a = new QuestionsAndAnswersReportedDTO(question.getString("_id") + answers.indexOf(answer),
+                                question.getString("title"), answer.getString("body"), answer.getString("author"),
+                                answer.getDate("createdDate"), 0);
+                        questionsAndAnswersReported.add(a);
+                    }
                 }
             }
         }

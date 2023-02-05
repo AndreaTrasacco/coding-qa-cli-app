@@ -8,9 +8,7 @@ import it.unipi.lsmsd.coding_qa.service.exception.BusinessException;
 import java.util.List;
 
 public interface AggregationsService {
-    public List<ExperienceLevelDTO> getExperienceLvlPerCountry() throws BusinessException;
-
-    public List<QuestionScoreDTO> getUsefulQuestions() throws BusinessException;
-
-    public List<TopicDTO> getTopicRank() throws BusinessException;
+    List<ExperienceLevelDTO> getExperienceLvlPerCountry() throws BusinessException;
+    List<QuestionScoreDTO> getUsefulQuestions() throws BusinessException;
+    List<TopicDTO> getTopicRank() throws BusinessException;
 }

@@ -17,12 +17,12 @@ public abstract class BaseNeo4JDAO {
         return Neo4jDriver;
     }
 
-    //method that return the session
+    //method that returns the session
     public static Session getSession(){
         return getConnection().session();
     }
 
-    //method that initialize the Neo4j driver
+    //method that initializes the Neo4j driver
     public static void initPool(){
         Neo4jDriver = GraphDatabase.driver(NEO4J_URI, AuthTokens.basic(NEO4J_USER, NEO4J_PASSWORD));
     }

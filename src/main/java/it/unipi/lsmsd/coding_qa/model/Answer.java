@@ -38,9 +38,9 @@ public class Answer {
         return id;
     }
 
-    public String getParentQuestionId(){
+    /*public String getParentQuestionId(){ // TODO ELIMINARE, NEL MODELLO QUESTO NON VA BENE (E' UNA COSA DI MONGODB)
         return this.id.substring(0, this.id.indexOf('_'));
-    }
+    }*/
 
     public void setId(String id) {
         this.id = id;

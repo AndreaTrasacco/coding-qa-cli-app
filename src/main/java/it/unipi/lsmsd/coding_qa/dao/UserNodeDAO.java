@@ -1,18 +1,14 @@
 package it.unipi.lsmsd.coding_qa.dao;
 
+import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.model.User;
 
 import java.util.List;
 
-public interface UserNodeDAO {
-
+public interface UserNodeDAO { // TODO ATTENZIONE USARE DETACH
     void create(String nickname);
-
-    public void delete(String nickname);
-
-    public List<String> getFollowingList(String nickname);
-
-    public void followUser(String myNickname, String userToFollow);
-
-    public void deleteFollowed(String myNickname, String userToUnFollow);
+    void delete(String nickname);
+    PageDTO<String> getFollowingList(String nickname);
+    void followUser(String myNickname, String userToFollow);
+    void deleteFollowed(String myNickname, String userToUnFollow);
 }

@@ -6,8 +6,11 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import it.unipi.lsmsd.coding_qa.dao.UserDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
+import it.unipi.lsmsd.coding_qa.dto.UserDTO;
 import it.unipi.lsmsd.coding_qa.model.RegisteredUser;
+import it.unipi.lsmsd.coding_qa.model.User;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
 
@@ -27,7 +30,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
         return user;
     }
 
-    public User authenticate(String username, String encPassword){
+    public User authenticate(String username, String encPassword){ // TODO
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionUser = database.getCollection("users");
         Document user = collectionUser.find(Filters.and(Filters.eq("nickname", username),
@@ -53,15 +56,14 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
 
     }
 
-    public RegisteredUser getInfo(String id){
+    public UserDTO getInfo(String id){
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionUser = database.getCollection("users");
-        Document userDoc = collectionUser.find(Filters.eq("_id", id)).first();
+        Document userDoc = collectionUser.find(Filters.eq("_id", new ObjectId(id))).first();
 
-        RegisteredUser user = new RegisteredUser(userDoc.getObjectId("_id").toHexString(),
+        UserDTO user = new UserDTO(userDoc.getObjectId("_id").toHexString(),
                 userDoc.getString("fullName"),
                 userDoc.getString("nickname"),
-                userDoc.getString("encPassword"),
                 userDoc.getDate("birthdate"),
                 userDoc.getString("country"),
                 userDoc.getDate("createdDate"),
@@ -74,7 +76,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
     public void delete(String id){
         MongoDatabase database = getDB();
         MongoCollection<Document> collectionUser = database.getCollection("users");
-        collectionUser.deleteOne(Filters.eq("_id", id));
+        collectionUser.deleteOne(Filters.eq("_id", new ObjectId(id)));
     }
 
 }

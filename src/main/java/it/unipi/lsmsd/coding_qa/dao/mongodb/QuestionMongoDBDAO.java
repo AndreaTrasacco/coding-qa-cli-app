@@ -1,12 +1,15 @@
 package it.unipi.lsmsd.coding_qa.dao.mongodb;
 
+import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.TextSearchOptions;
 import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.InsertOneResult;
 import it.unipi.lsmsd.coding_qa.dao.QuestionDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
+import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
 import it.unipi.lsmsd.coding_qa.model.Answer;
@@ -16,14 +19,12 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
-import javax.print.Doc;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     @Override
-    public void createQuestion(Question question) {
+    public void createQuestion(Question question) throws DAOException {
         MongoDatabase mongoDatabase = getDB();
         MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
@@ -33,8 +34,12 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
                 .append("author", question.getAuthor())
                 .append("createdDate", question.getCreatedDate());
 
-        collectionQuestions.insertOne(docQuestion);
-        // TODO SETTARE ID DOMANDA
+        try {
+            InsertOneResult result =  collectionQuestions.insertOne(docQuestion);
+            question.setId(result.getInsertedId().toString());
+        } catch (Exception ex) {
+            throw new DAOException(ex);
+        }
     }
 
     @Override
@@ -42,7 +47,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
         MongoDatabase mongoDatabase = getDB();
         MongoCollection collectionQuestions = mongoDatabase.getCollection("questions");
 
-        collectionQuestions.deleteOne(Filters.eq("_id", id));
+        collectionQuestions.deleteOne(Filters.eq("_id", new ObjectId(id)));
     }
 
     @Override
@@ -55,11 +60,11 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     }
 
     @Override
-    public void reportQuestion(Question question) {
+    public void reportQuestion(String id) {
         MongoDatabase mongoDatabase = getDB();
         MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
-        collectionQuestions.updateOne(Filters.eq("_id", question.getId()), Updates.set("reported", true));
+        collectionQuestions.updateOne(Filters.eq("_id", new ObjectId(id)), Updates.set("reported", true));
     }
 
     @Override
@@ -67,7 +72,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
         MongoDatabase mongoDatabase = getDB();
         MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
-        Document doc = collectionQuestions.find(Filters.eq("_id", id)).first();
+        Document doc = collectionQuestions.find(Filters.eq("_id", new ObjectId(id))).first();
 
         Question temp = new Question(doc.getObjectId("_id").toString(), doc.getString("title"),
                 doc.getString("body"), doc.getString("topic"), doc.getString("author"),
@@ -78,7 +83,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     }
 
     @Override
-    public List<Question> getReportedQuestions() {
+    public PageDTO<QuestionDTO> getReportedQuestions() {
         List<Question> reportedQuestions = new ArrayList<>();
         MongoDatabase mongoDatabase = getDB();
         MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
@@ -91,7 +96,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
             reportedQuestions.add(temp);
         });
 
-        return  reportedQuestions;
+        return reportedQuestions;
     }
 
     @Override
@@ -102,7 +107,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
         MongoDatabase mongoDatabase = getDB();
         MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
-        AtomicInteger counter = new AtomicInteger();
+        AtomicInteger counter = new AtomicInteger(); // TODO ????
         int pageOffset = (page - 1) * Constants.PAGE_SIZE;
 
         TextSearchOptions options = new TextSearchOptions().caseSensitive(false);

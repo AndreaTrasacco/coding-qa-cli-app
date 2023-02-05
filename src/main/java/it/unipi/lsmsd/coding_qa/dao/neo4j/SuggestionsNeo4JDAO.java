@@ -22,7 +22,7 @@ import static org.neo4j.driver.Values.parameters;
 
 public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO {
     // method for suggesting questions the user might be interested in
-    public List<Question> questionToReadSuggestions(String nickname){
+    public PageDTO<Question> questionsToRead(String nickname){
         String suggestionQuery = "MATCH (startUserQuestion:Question) <- [:CREATED]-(startUser:User{ nickname : $nickname})" +
                 "WHERE startUserQuestion.closed = false" +
                 "WITH DISTINCT(startUserQuestion.topic) AS topics, startUser" +
@@ -36,7 +36,7 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
     }
 
     // method for suggesting questions that the user might be able to answer
-    public List<Question> questionToAnswerSuggestions(String nickname){
+    public PageDTO<Question> questionsToAnswer(String nickname){
         String suggestionQuery = "MATCH (u1:User{nickname : $nickname})-[:ANSWERED]->(q1)<-[:CREATED]-(:User)-[:CREATED]->(q2:Question{closed: false})<-[a:ANSWERED]-()" +
                 "RETURN q2, COUNT(a) AS ans_count" +
                 "ORDER BY ans_count" +
@@ -45,7 +45,7 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
         return retrieveQuestions(suggestionQuery, nickname);
     }
 
-    private List<Question> retrieveQuestions(String suggestionQuery, String nickname){
+    private PageDTO<Question> retrieveQuestions(String suggestionQuery, String nickname){
         try(Session session = getSession()){
             List<Question> suggestedQuestions = session.readTransaction(tx -> {
                 Result result = tx.run(suggestionQuery, parameters("nickname", nickname));
