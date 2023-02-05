@@ -10,19 +10,24 @@ public class Question {
     private String topic;
     private String author;
     private List<Answer> answers;
-    private boolean closed; // TODO TOGLIERE E CREARE METODO PRIVATE PER CALCOLO
+    private boolean closed = false;
     private Date createdDate;
     private boolean reported;
 
     public Question(String id, String title, String body, String topic, String author,
-                    List<Answer> answers, boolean closed, Date createdDate, boolean reported){
+                    List<Answer> answers, Date createdDate, boolean reported){
         this.id = id;
         this.title = title;
         this.body = body;
         this.topic = topic;
         this.author = author;
         this.answers = answers;
-        this.closed = closed;
+        for (Answer answer : answers){
+            if(answer.isAccepted()){
+                closed = true;
+                break;
+            }
+        }
         this.createdDate = createdDate;
         this.reported = reported;
     }
