@@ -4,7 +4,6 @@ import it.unipi.lsmsd.coding_qa.dao.*;
 import it.unipi.lsmsd.coding_qa.dao.enums.DAORepositoryEnum;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionNodeDTO;
 import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.model.Question;
 import it.unipi.lsmsd.coding_qa.model.User;

@@ -2,9 +2,7 @@ package it.unipi.lsmsd.coding_qa.dao.neo4j;
 
 import it.unipi.lsmsd.coding_qa.dao.QuestionNodeDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseNeo4JDAO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionNodeDTO;
 import it.unipi.lsmsd.coding_qa.model.Question;
-import it.unipi.lsmsd.coding_qa.model.User;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;

@@ -5,7 +5,6 @@ import it.unipi.lsmsd.coding_qa.dao.QuestionNodeDAO;
 import it.unipi.lsmsd.coding_qa.dao.UserDAO;
 import it.unipi.lsmsd.coding_qa.dao.UserNodeDAO;
 import it.unipi.lsmsd.coding_qa.dao.enums.DAORepositoryEnum;
-import it.unipi.lsmsd.coding_qa.dto.QuestionNodeDTO;
 import it.unipi.lsmsd.coding_qa.dto.UserDTO;
 import it.unipi.lsmsd.coding_qa.model.RegisteredUser;
 import it.unipi.lsmsd.coding_qa.model.User;

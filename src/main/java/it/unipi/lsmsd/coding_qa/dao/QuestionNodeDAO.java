@@ -1,11 +1,7 @@
 package it.unipi.lsmsd.coding_qa.dao;
 
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionNodeDTO;
 import it.unipi.lsmsd.coding_qa.model.Question;
-import it.unipi.lsmsd.coding_qa.model.User;
-
-import java.util.List;
 
 public interface QuestionNodeDAO { // TODO ATTENZIONE USARE DETACH, ECCEZIONI, NON USARE "EDGE" riguarda un graph db
     void create(Question question);

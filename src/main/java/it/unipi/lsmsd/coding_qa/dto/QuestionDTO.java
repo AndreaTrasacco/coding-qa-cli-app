@@ -2,18 +2,20 @@ package it.unipi.lsmsd.coding_qa.dto;
 
 import java.util.Date;
 
-public class QuestionDTO { // TODO AGGIUNGERE CLOSED
+public class QuestionDTO {
     private String id;
     private String title;
     private Date createdDate;
     private String topic;
+    private boolean closed;
     private String author;
 
-    public QuestionDTO(String id, String title, Date createdDate, String topic, String author) {
+    public QuestionDTO(String id, String title, Date createdDate, String topic, boolean closed, String author) {
         this.id = id;
         this.title = title;
         this.createdDate = createdDate;
         this.topic = topic;
+        this.closed = closed;
         this.author = author;
     }
 
@@ -57,4 +59,11 @@ public class QuestionDTO { // TODO AGGIUNGERE CLOSED
         this.author = author;
     }
 
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
+    }
 }

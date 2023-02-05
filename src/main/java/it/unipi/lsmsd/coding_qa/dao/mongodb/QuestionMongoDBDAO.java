@@ -12,6 +12,7 @@ import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
+import it.unipi.lsmsd.coding_qa.dto.QuestionPageDTO;
 import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.model.Question;
 import it.unipi.lsmsd.coding_qa.utils.Constants;
@@ -68,7 +69,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     }
 
     @Override
-    public Question getQuestionInfo(String id) {
+    public QuestionPageDTO getQuestionInfo(String id) {
         MongoDatabase mongoDatabase = getDB();
         MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
