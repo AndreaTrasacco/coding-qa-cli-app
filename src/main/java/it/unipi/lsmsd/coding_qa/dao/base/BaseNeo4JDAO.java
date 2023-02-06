@@ -10,26 +10,28 @@ public abstract class BaseNeo4JDAO {
     private static final String NEO4J_USER = "neo4j"; //TODO mettere username giusto
     private static final String NEO4J_PASSWORD = "nicolo"; //TODO mettere password giusta
 
-    private static Driver Neo4jDriver;
+    private static Driver neo4jDriver;
 
     //method that returns the driver instance
-    private static Driver getConnection(){
-        return Neo4jDriver;
+    private static Driver getDriver(){
+        if(neo4jDriver == null)
+            initPool();
+        return neo4jDriver;
     }
 
     //method that returns the session
     public static Session getSession(){
-        return getConnection().session();
+        return getDriver().session();
     }
 
     //method that initializes the Neo4j driver
     public static void initPool(){
-        Neo4jDriver = GraphDatabase.driver(NEO4J_URI, AuthTokens.basic(NEO4J_USER, NEO4J_PASSWORD));
+        neo4jDriver = GraphDatabase.driver(NEO4J_URI, AuthTokens.basic(NEO4J_USER, NEO4J_PASSWORD));
     }
 
     //method that closes the Neo4j connection
     public static void close(){
-        Neo4jDriver.close();
+        neo4jDriver.close();
     }
 
 }
