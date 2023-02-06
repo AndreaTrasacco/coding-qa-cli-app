@@ -72,8 +72,7 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
                         throw new RuntimeException(e);
                     }
                     QuestionDTO temp = new QuestionDTO(question.get("q2.id").asString(), question.get("q2.title").asString(),
-                            createdDate, question.get("q2.topic").asString(),
-                            question.get("q2.closed").asBoolean(), question.get("followed.nickname").asString());
+                            createdDate, question.get("q2.topic").asString(), question.get("followed.nickname").asString());
                     questions.add(temp);
                 }
                 return questions;

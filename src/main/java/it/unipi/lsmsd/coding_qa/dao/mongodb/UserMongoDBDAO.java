@@ -69,9 +69,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
                             Updates.set("encPassword", user.getEncPassword()),
                             Updates.set("birthdate", user.getBirthdate()),
                             Updates.set("country", user.getCountry()),
-                            Updates.set("createdDate", user.getCreatedDate()),
-                            Updates.set("website", user.getWebsite()),
-                            Updates.set("score", user.getScore())));
+                            Updates.set("website", user.getWebsite())));
         } catch(Exception e){
             throw new DAOException(e);
         }
