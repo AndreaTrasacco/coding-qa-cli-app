@@ -9,6 +9,10 @@ public class RegisteredUser extends User{
     private String website;
     private int score;
 
+    public RegisteredUser(){
+
+    }
+
     public RegisteredUser(Date birthdate, String country, Date createdDate, String website, int score) {
         this.birthdate = birthdate;
         this.country = country;
