@@ -7,15 +7,13 @@ public class QuestionDTO {
     private String title;
     private Date createdDate;
     private String topic;
-    private boolean closed;
     private String author;
 
-    public QuestionDTO(String id, String title, Date createdDate, String topic, boolean closed, String author) {
+    public QuestionDTO(String id, String title, Date createdDate, String topic, String author) {
         this.id = id;
         this.title = title;
         this.createdDate = createdDate;
         this.topic = topic;
-        this.closed = closed;
         this.author = author;
     }
 
@@ -57,13 +55,5 @@ public class QuestionDTO {
 
     public void setAuthor(String author) {
         this.author = author;
-    }
-
-    public boolean isClosed() {
-        return closed;
-    }
-
-    public void setClosed(boolean closed) {
-        this.closed = closed;
     }
 }
