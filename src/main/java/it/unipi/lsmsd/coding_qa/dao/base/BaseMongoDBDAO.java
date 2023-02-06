@@ -5,22 +5,21 @@ import com.mongodb.client.*;
 public abstract class BaseMongoDBDAO {
 
     private final static String URI = "mongodb://localhost:27017"; // mettere macchine virtuali UNIPI
-    private static final String DB_NAME = "CodingQ&A";
+    protected static final String DB_NAME = "CodingQ&A";
     private static MongoClient connection = null;
-    private static MongoDatabase database = null;
 
 
     private static void createConnection(){
-        MongoClient myClient = MongoClients.create(URI);
+        connection = MongoClients.create(URI);
     }
 
     public static void closeConnection(){
         connection.close();
-    } // TODO SERVE?
+    }
 
-    public static MongoDatabase getDB(){
-        if(database == null)
+    public static MongoClient getConnection(){
+        if(connection == null)
             createConnection();
-        return database;
+        return connection;
     }
 }
