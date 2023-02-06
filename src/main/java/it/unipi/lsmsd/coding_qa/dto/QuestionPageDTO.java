@@ -14,6 +14,9 @@ public class QuestionPageDTO {
     private PageDTO<Answer> answers;
     private Date createdDate;
 
+    public QuestionPageDTO(){
+
+    }
     public QuestionPageDTO(String id, String title, String body, String topic, String author, PageDTO<Answer> answers, Date createdDate) {
         this.id = id;
         this.title = title;
