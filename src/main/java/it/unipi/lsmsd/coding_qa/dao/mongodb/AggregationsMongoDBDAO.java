@@ -54,10 +54,16 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
 
 
             // { $group : { _id: {country: "$country", exp_level: "$exp_level"}, numUsers : { $sum : 1 } } },
-            Bson group1 = group(
+            /*Bson group1 = group(
                     new Document("_id", new Document("country", "$country").append("exp_level", "$exp_level")),
                     sum("numUsers", 1)
             );
+             */
+
+            Bson group1 = new Document("$group",
+                    new Document("_id", new Document("country", "$country")
+                            .append("exp_level", "$exp_level"))
+                            .append("numUser", new Document("$sum", 1)));
 
             // { $group: { _id: "$_id.country",total: { $sum: "$numUsers" },exp_levels: { $push: { exp_level: "$_id.exp_level", numUsers: "$numUsers" } } } },
             Bson group2 = group("$_id.country",

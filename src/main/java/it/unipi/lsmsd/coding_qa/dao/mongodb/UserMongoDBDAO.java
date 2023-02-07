@@ -38,7 +38,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
     }
 
     @Override
-    public User authenticate(String username, String encPassword) throws DAOException { // TODO
+    public User authenticate(String username, String encPassword) throws DAOException {
         try(MongoClient mongoClient = getConnection()) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionUser = database.getCollection("users");

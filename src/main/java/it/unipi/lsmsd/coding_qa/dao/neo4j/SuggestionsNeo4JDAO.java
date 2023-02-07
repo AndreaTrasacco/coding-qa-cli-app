@@ -30,7 +30,7 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
                 "MATCH p = (startUser)-[*1..2]->(followed:User)-[:CREATED]->(q2:Question) " +
                 "WHERE q2.closed = true AND q2.topic IN topics " +
                 "RETURN DISTINCT q2.id AS id, toStringOrNull(q2.createdDate) AS createdDate, q2.title AS title, q2.topic AS topic, followed.nickname AS nickname, length(p) as depth " +
-                "ORDER BY depth DESC " +
+                "ORDER BY depth ASC, createdDate DESC " +
                 "SKIP $toSkip " +
                 "LIMIT $toLimit ";
 
@@ -41,7 +41,7 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
     public PageDTO<QuestionDTO> questionsToAnswer(int page, String nickname) throws DAONodeException {
         String suggestionQuery = "MATCH (u1:User{nickname : $nickname})-[:ANSWERED]->(q1)<-[:CREATED]-(followed:User)-[:CREATED]->(q2:Question{closed: false})<-[a:ANSWERED]-() " +
                 "RETURN q2.id AS id, toStringOrNull(q2.createdDate) AS createdDate, q2.title AS title, q2.topic AS topic, followed.nickname AS nickname, followed, COUNT(a) AS ans_count " +
-                "ORDER BY ans_count " +
+                "ORDER BY ans_count, createdDate DESC " +
                 "SKIP $toSkip " +
                 "LIMIT $toLimit ";
 

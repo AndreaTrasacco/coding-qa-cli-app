@@ -7,7 +7,7 @@ import it.unipi.lsmsd.coding_qa.model.*;
 
 import java.util.List;
 
-public interface SuggestionsDAO { // TODO ECCEZIONI, USARE QUESTIONDTO
-    PageDTO<QuestionDTO> questionsToRead(int page, String nickname) throws DAONodeException; // TODO CORREGGERE USANDO PAGINAZIONE
-    PageDTO<QuestionDTO> questionsToAnswer(int page, String nickname) throws DAONodeException; // TODO CORREGGERE USANDO PAGINAZIONE
+public interface SuggestionsDAO {
+    PageDTO<QuestionDTO> questionsToRead(int page, String nickname) throws DAONodeException;
+    PageDTO<QuestionDTO> questionsToAnswer(int page, String nickname) throws DAONodeException;
 }
