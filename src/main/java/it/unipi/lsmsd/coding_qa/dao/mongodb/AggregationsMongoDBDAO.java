@@ -66,7 +66,7 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
 
             collectionQuestions.aggregate(Arrays.asList(project1, group1, group2, project2, project3, sort)).forEach(doc -> {
                 System.out.println(doc.toJson(JsonWriterSettings.builder().indent(true).build()));
-                /*
+
                 List<Pair<String, Double>> pairList = new ArrayList<>();
                 for(int i = 0; i < 3; i++){
                     Pair<String, Double> pair = new Pair<>(doc.getString("levels."+i+".exp_level"), doc.getDouble("levels."+i+".percentage"));
@@ -74,7 +74,7 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
                 }
                 ExperienceLevelDTO temp = new ExperienceLevelDTO(doc.getString("country"), pairList);
                 experienceLevelDTOList.add(temp);
-                 */
+
             });
 
             return experienceLevelDTOList;
