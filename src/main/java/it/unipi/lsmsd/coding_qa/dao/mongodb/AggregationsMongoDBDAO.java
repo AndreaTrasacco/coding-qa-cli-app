@@ -8,6 +8,7 @@ import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Sorts;
 import it.unipi.lsmsd.coding_qa.dao.AggregationsDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
+import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
 import it.unipi.lsmsd.coding_qa.dto.aggregations.ExperienceLevelDTO;
 import it.unipi.lsmsd.coding_qa.dto.aggregations.QuestionScoreDTO;
 import it.unipi.lsmsd.coding_qa.dto.aggregations.TopicDTO;
@@ -19,12 +20,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.mongodb.client.model.Accumulators.first;
-import static com.mongodb.client.model.Accumulators.sum;
+import static com.mongodb.client.model.Accumulators.*;
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
-import static com.mongodb.client.model.Sorts.descending;
+import static com.mongodb.client.model.Sorts.*;
 
 public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements AggregationsDAO {
     @Override
@@ -108,20 +108,20 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
         }
     }
 
-    //methods that retrieve the % of users of different experience level per country
+    // Method that retrieves the % of users of different experience level per country
     @Override
-    public List<QuestionScoreDTO> getUsefulQuestions() {
+    public List<QuestionScoreDTO> getUsefulQuestions() throws DAOException {
         List<QuestionScoreDTO> questionScoreDTOList = new ArrayList<>();
         try (MongoClient mongoClient = getConnection()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
             Bson match = match(exists("answers", true));
-            Bson project1 = project(new Document("topic", 1).append("title", 1).append("score", new Document("$sum", "$answers.score"))); //TODO capire cosa va messo come secondo argomento
+            Bson project1 = project(fields(include("topic","title"),new Document("score", new Document("$sum", "$answers.score"))));
             Bson sort1 = sort(descending("score"));
             Bson group = group("$topic", first("first", "$title"), first("firstScore", "$score"));
             Bson sort2 = sort(descending("firstScore"));
-            Bson project2 = project(fields(excludeId(), computed("topic", "$_id"), include("title", "firstScore")));  //TODO non so se sono giusti gli argomenti del computed
+            Bson project2 = project(fields(excludeId(), computed("topic", "_id"), include("first", "firstScore")));
 
             collectionQuestions.aggregate(Arrays.asList(match, project1, sort1, group, sort2, project2)).forEach(doc -> {
                 QuestionScoreDTO temp = new QuestionScoreDTO(doc.getString("title"), doc.getInteger("firstScore"), doc.getString("topic"));
@@ -129,12 +129,14 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
             });
 
             return questionScoreDTOList;
+        } catch (Exception ex){
+            throw new DAOException(ex);
         }
     }
 
-    //methods that retrieve the rank of each topic during the week
+    // Method that retrieves the rank of each topic during the week
     @Override
-    public List<TopicDTO> getTopicRank() {
+    public List<TopicDTO> getTopicRank() throws DAOException {
         List<TopicDTO> topicDTOList = new ArrayList<>();
         try (MongoClient mongoClient = getConnection()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
@@ -142,19 +144,19 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
             LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
             LocalDateTime currentDate = LocalDateTime.now();
 
-            Bson match1 = match(exists("answers", true));
-            Bson project1 = project(new Document("topic", 1).append("createdDate", 1)
-                    .append("answerCount", new Document("$size", "$answers")));
-            Bson match2 = match(and(gte("createdDate", sevenDaysAgo), lt("createdDate", currentDate)));
+            Bson match = match(and(exists("answers", true),gte("createdDate", sevenDaysAgo), lt("createdDate", currentDate)));
+            Bson project1 = project(fields(include("topic", "createdDate"), new Document("answerCount", new Document("$size", "$answers")))); // There are no helpers in java driver for $size operator so i use the notation with "new Document(..)"
             Bson group = group("$topic", sum("count", "$answerCount"));
             Bson sort = sort(descending("count"));
-            Bson project2 = project(new Document("_id", 1).append("count", 1));
+            Bson project2 = project(fields(excludeId(), computed("_id", "topic")));
 
-            collectionQuestions.aggregate(Arrays.asList(match1, project1, match2, group, sort, project2)).forEach(doc -> {
-                TopicDTO temp = new TopicDTO(doc.getString("_id"), doc.getInteger("count"));
+            collectionQuestions.aggregate(Arrays.asList(match, project1, group, sort, project2)).forEach(doc -> {
+                TopicDTO temp = new TopicDTO(doc.getString("topic"), doc.getInteger("count"));
                 topicDTOList.add(temp);
             });
             return topicDTOList;
+        } catch (Exception ex){
+            throw new DAOException(ex);
         }
     }
 }

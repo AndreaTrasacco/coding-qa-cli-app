@@ -44,18 +44,18 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     public List<AnswerScoreDTO> deleteQuestion(String id) throws DAOException {
         try (MongoClient mongoClient = getConnection()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
-            MongoCollection collectionQuestions = mongoDatabase.getCollection("questions");
+            MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
             Bson project = project(fields(excludeId(), include("answers")));
 
-            Document deletedQAnswers = (Document) collectionQuestions.findOneAndDelete(eq("_id", new ObjectId(id)), new FindOneAndDeleteOptions().projection(project));
+            Document deletedQAnswers = collectionQuestions.findOneAndDelete(eq("_id", new ObjectId(id)), new FindOneAndDeleteOptions().projection(project));
             // For each answer in the deleted question
             List<AnswerScoreDTO> answerScores = new ArrayList<>();
             if (deletedQAnswers.containsKey("answers")) {
                 List<Document> answers = (ArrayList<Document>) deletedQAnswers.get("answers");
-                for (int i = 0; i < answers.size(); i++) {
+                for (Document answer : answers) {
                     // Get author and score of the answer
-                    if (answers.get(i).getInteger("score") != 0)
-                        answerScores.add(new AnswerScoreDTO(answers.get(i).getString("author"), answers.get(i).getInteger("score")));
+                    if (answer.getInteger("score") != 0)
+                        answerScores.add(new AnswerScoreDTO(answer.getString("author"), answer.getInteger("score")));
                 }
             }
             return answerScores;
