@@ -26,9 +26,9 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
 
     //this method deletes a User node
     @Override
-    public void delete(String nickname) { // TODO DETACH
+    public void delete(String nickname) {
         final String deleteUser = "MATCH (u: User{nickname: $nickname})" +
-                "DELETE u";
+                "DETACH DELETE u";
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
                 tx.run(deleteUser, parameters("nickname", nickname)).consume();
@@ -107,7 +107,7 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
     }
 
     // delete the relationship CREATED
-    @Override
+    /*@Override
     public void deleteCreated(String nickname, String id) {
         final String deleteQuestion = "MATCH (u: User{nickname: $nickname})-[:CREATED]->(q: Question{id: $id})" +
                 "DELETE q";
@@ -117,11 +117,11 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
                return 1;
             });
         }
-    }
+    }*/
 
     // delete the relationship ANSWERED
     @Override
-    public void deleteAnswered(String nickname, String id) {
+    /*public void deleteAnswered(String nickname, String id) {
         final String deleteQuestion = "MATCH (u: User{nickname: $nickname})-[:ANSWERED]->(q: Question{id: $id})" +
                 "DELETE q";
         try(Session session = getSession()){
@@ -130,7 +130,7 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
                 return 1;
             });
         }
-    }
+    }*/
 
     @Override
     public void deleteFollowed(String myNickname, String userToUnfollow) {
