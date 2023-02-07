@@ -14,6 +14,9 @@ public class Question {
     private Date createdDate;
     private boolean reported;
 
+    public Question(){
+
+    }
     public Question(String id, String title, String body, String topic, String author,
                     List<Answer> answers, Date createdDate, boolean reported){
         this.id = id;

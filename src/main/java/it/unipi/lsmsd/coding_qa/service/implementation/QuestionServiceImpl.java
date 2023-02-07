@@ -2,8 +2,7 @@ package it.unipi.lsmsd.coding_qa.service.implementation;
 
 import it.unipi.lsmsd.coding_qa.dao.*;
 import it.unipi.lsmsd.coding_qa.dao.enums.DAORepositoryEnum;
-import it.unipi.lsmsd.coding_qa.dto.PageDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
+import it.unipi.lsmsd.coding_qa.dto.*;
 import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.model.Question;
 import it.unipi.lsmsd.coding_qa.model.User;
@@ -64,21 +63,22 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public void deleteQuestion(Question question) throws BusinessException {
         try {
-            questionDAO.deleteQuestion(question.getId());
-            questionNodeDAO.deleteIngoingEdges(question);
-            questionNodeDAO.delete(question);
+            List<AnswerScoreDTO> answers = questionDAO.deleteQuestion(question.getId());// TODO VA MODIFICATO LO SCORE DEGLI UTENTI DELLE RISPOSTE
+            // for each answer decrease/increase score of author
+            //questionNodeDAO.deleteIngoingEdges(question);
+            //questionNodeDAO.delete(question);
         } catch(Exception e){
             throw new BusinessException(e);
         }
     }
 
     @Override
-    public void deleteAnswer(Answer answer) throws BusinessException {
+    public void deleteAnswer(String answerId) throws BusinessException {
         try {
-            answerDAO.delete(answer.getId()); // TODO METODO POTREBBE RESTITUIRE ID DOMANDA?? PER ESSERE USATO NEL GRAFO. E SCORE??
+            answerDAO.delete(answerId); // TODO METODO POTREBBE RESTITUIRE ID DOMANDA?? PER ESSERE USATO NEL GRAFO. E SCORE??
             // TODO SCALARE ANCHE SCORE DELL'UTENTE
             // TODO CONTROLLARE SE L'UTENTE HA ALTRE RISPOSTE SU QUELLA DOMANDA
-            questionNodeDAO.deleteAnsweredEdge(answer.getParentQuestionId(), answer.getAuthor());
+            //questionNodeDAO.deleteAnsweredEdge(answer.getParentQuestionId(), answer.getAuthor());
         } catch (Exception e){
             throw new BusinessException(e);
         }
@@ -112,26 +112,35 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public List<QuestionsAndAnswersReportedDTO> getReportedQuestionsAndAnswers() throws BusinessException {
+    public PageDTO<QuestionDTO> getReportedQuestions() throws BusinessException {
         try {
-            return answerDAO.getReportedQuestionsAndAnswers();
+            return questionDAO.getReportedQuestions();
         } catch (Exception e){
             throw new BusinessException(e);
         }
     }
 
     @Override
-    public void acceptAnswer(String answerId) throws BusinessException {
+    public PageDTO<AnswerDTO> getReportedAnswers() throws BusinessException {
         try {
+            return null;
+        } catch (Exception e){
+            throw new BusinessException(e);
+        }
+    }
+
+    @Override
+    public void acceptAnswer(String questionId, String answerId) throws BusinessException {
+        try {/*
             answerDAO.accept(answerId);
-            questionNodeDAO.close(new Question(answer.getParentQuestionId()));
+            questionNodeDAO.close(new Question(answer.getParentQuestionId()));*/
         } catch (Exception e){
             throw new BusinessException(e);
         }
     }
 
     @Override
-    public Question getQuestionInfo(String id) throws BusinessException {
+    public QuestionPageDTO getQuestionInfo(String id) throws BusinessException {
         try {
             return questionDAO.getQuestionInfo(id);
         } catch (Exception e){
@@ -140,9 +149,9 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public PageDTO<QuestionDTO> getQuestionPageByTitle(int page, String searchString) throws BusinessException {
+    public PageDTO<QuestionDTO> getQuestionPageByTitle(int page, String searchString, String topicFilter) throws BusinessException {
         try {
-            return questionDAO.getQuestionPageByTitle(page, searchString);
+            return questionDAO.searchQuestions(page, searchString, topicFilter);
         } catch (Exception e){
             throw new BusinessException(e);
         }
@@ -151,18 +160,19 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public PageDTO<QuestionDTO> getQuestionPageByTopic(int page, String topic) throws BusinessException {
         try {
-            return questionDAO.getQuestionPageByTopic(page, topic);
+            //return questionDAO.getQuestionPageByTopic(page, topic);
+            return null;
         } catch (Exception e){
             throw new BusinessException(e);
         }
     }
 
-    @Override
+    /*@Override
     public List<QuestionNodeDTO> getCreatedAndAnsweredQuestions(User user) throws BusinessException {
         try {
             return questionNodeDAO.viewCreatedAndAnsweredQuestions(user);
         } catch (Exception e){
             throw new BusinessException(e);
         }
-    }
+    }*/
 }

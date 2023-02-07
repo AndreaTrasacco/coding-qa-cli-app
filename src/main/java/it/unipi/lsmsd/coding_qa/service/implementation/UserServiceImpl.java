@@ -26,8 +26,9 @@ public class UserServiceImpl implements UserService {
     }
     public RegisteredUser register(RegisteredUser user) throws BusinessException{
         try {
-            userNodeDAO.create(user.getNickname());
-            return userDAO.register(user);
+            /*userNodeDAO.create(user.getNickname());
+            return userDAO.register(user);*/
+            return null;
         } catch(Exception e){
             throw new BusinessException(e);
         }
@@ -50,9 +51,9 @@ public class UserServiceImpl implements UserService {
     }
 
     public void updateInfo(RegisteredUser user) throws BusinessException{
-        try {
+        try {/*
             userNodeDAO.update(user.getNickname());
-            userDAO.updateInfo(user);
+            userDAO.updateInfo(user);*/
         } catch(Exception e){
             throw new BusinessException(e);
         }
@@ -67,7 +68,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public void delete(RegisteredUser user) throws BusinessException{ // TODO CANCELLAZIONE DOMANDE E RISPOSTE UTENTE OPPURE NO?? (PER I NODI USARE DETACH, MODIFICARE IN DAO)
-        try {
+        try {/*
             userDAO.delete(user.getId());
             // delete all the Answered and Created edges
             List<QuestionNodeDTO> questionsAndAnswersList = questionNodeDAO.viewCreatedAndAnsweredQuestions(user);
@@ -89,7 +90,7 @@ public class UserServiceImpl implements UserService {
                 //delete who follows me
                 userNodeDAO.deleteFollowed(followerList.get(i), user.getNickname());
             }
-            userNodeDAO.delete(user.getNickname());
+            userNodeDAO.delete(user.getNickname());*/
         } catch(Exception e){
             throw new BusinessException(e);
         }
@@ -97,7 +98,8 @@ public class UserServiceImpl implements UserService {
 
     public List<String> getFollowerList(RegisteredUser user) throws BusinessException{
         try {
-            return userNodeDAO.getFollowingList(user.getNickname());
+            //return userNodeDAO.getFollowingList(user.getNickname());
+            return null;
         } catch(Exception e){
             throw new BusinessException(e);
         }

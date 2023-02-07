@@ -1,42 +1,39 @@
 package it.unipi.lsmsd.coding_qa.dao.mongodb;
 
-import com.mongodb.MongoException;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.TextSearchOptions;
-import com.mongodb.client.model.Updates;
+import com.mongodb.client.*;
+import com.mongodb.client.model.*;
 import com.mongodb.client.result.InsertOneResult;
 import it.unipi.lsmsd.coding_qa.dao.QuestionDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
-import it.unipi.lsmsd.coding_qa.dto.PageDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionPageDTO;
-import it.unipi.lsmsd.coding_qa.model.Answer;
-import it.unipi.lsmsd.coding_qa.model.Question;
+import it.unipi.lsmsd.coding_qa.dto.*;
+import it.unipi.lsmsd.coding_qa.model.*;
 import it.unipi.lsmsd.coding_qa.utils.Constants;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.mongodb.client.model.Aggregates.*;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Sorts.*;
 
 public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     @Override
     public void createQuestion(Question question) throws DAOException {
-        MongoDatabase mongoDatabase = getDB();
-        MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
-
         Document docQuestion = new Document("title", question.getTitle())
                 .append("body", question.getBody())
                 .append("topic", question.getTopic())
                 .append("author", question.getAuthor())
                 .append("createdDate", question.getCreatedDate());
-
-        try {
-            InsertOneResult result =  collectionQuestions.insertOne(docQuestion);
+        try (MongoClient mongoClient = getConnection()) {
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
+            InsertOneResult result = collectionQuestions.insertOne(docQuestion);
+            // Set the id of the question
             question.setId(result.getInsertedId().toString());
         } catch (Exception ex) {
             throw new DAOException(ex);
@@ -44,105 +41,143 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     }
 
     @Override
-    public void deleteQuestion(String id) {
-        MongoDatabase mongoDatabase = getDB();
-        MongoCollection collectionQuestions = mongoDatabase.getCollection("questions");
+    public List<AnswerScoreDTO> deleteQuestion(String id) throws DAOException {
+        try (MongoClient mongoClient = getConnection()) {
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
+            MongoCollection collectionQuestions = mongoDatabase.getCollection("questions");
+            Bson project = project(fields(excludeId(), include("answers")));
 
-        collectionQuestions.deleteOne(Filters.eq("_id", new ObjectId(id)));
+            Document deletedQAnswers = (Document) collectionQuestions.findOneAndDelete(eq("_id", new ObjectId(id)), new FindOneAndDeleteOptions().projection(project));
+            // For each answer in the deleted question
+            List<AnswerScoreDTO> answerScores = new ArrayList<>();
+            if (deletedQAnswers.containsKey("answers")) {
+                List<Document> answers = (ArrayList<Document>) deletedQAnswers.get("answers");
+                for (int i = 0; i < answers.size(); i++) {
+                    // Get author and score of the answer
+                    if (answers.get(i).getInteger("score") != 0)
+                        answerScores.add(new AnswerScoreDTO(answers.get(i).getString("author"), answers.get(i).getInteger("score")));
+                }
+            }
+            return answerScores;
+        } catch (Exception ex) {
+            throw new DAOException(ex);
+        }
     }
 
     @Override
-    public void updateQuestion(Question question) {
+    public void updateQuestion(Question question) throws DAOException {
         //Only title, body and topic can be updated
-        MongoDatabase mongoDatabase = getDB();
-        MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
-
-        collectionQuestions.updateOne(Filters.eq("_id", question.getId()), Updates.combine(Updates.set("title", question.getTitle()), Updates.set("body", question.getBody()), Updates.set("topic", question.getBody())));
+        try (MongoClient mongoClient = getConnection()) {
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
+            collectionQuestions.updateOne(eq("_id", question.getId()), Updates.combine(Updates.set("title", question.getTitle()), Updates.set("body", question.getBody()), Updates.set("topic", question.getBody())));
+        } catch (Exception ex) {
+            throw new DAOException(ex);
+        }
     }
 
     @Override
-    public void reportQuestion(String id) {
-        MongoDatabase mongoDatabase = getDB();
-        MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
-
-        collectionQuestions.updateOne(Filters.eq("_id", new ObjectId(id)), Updates.set("reported", true));
+    public void reportQuestion(String id) throws DAOException {
+        try (MongoClient mongoClient = getConnection()) {
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
+            collectionQuestions.updateOne(eq("_id", new ObjectId(id)), Updates.set("reported", true));
+        } catch (Exception ex) {
+            throw new DAOException(ex);
+        }
     }
 
     @Override
-    public QuestionPageDTO getQuestionInfo(String id) {
-        MongoDatabase mongoDatabase = getDB();
-        MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
-
-        Document doc = collectionQuestions.find(Filters.eq("_id", new ObjectId(id))).first();
-
-        Question temp = new Question(doc.getObjectId("_id").toString(), doc.getString("title"),
-                doc.getString("body"), doc.getString("topic"), doc.getString("author"),
-                doc.getList("answers", Answer.class), doc.getBoolean("closed"),
-                doc.getDate("createdDate"), doc.getBoolean("reported"));
-
-        return temp;
+    public QuestionPageDTO getQuestionInfo(String id) throws DAOException {
+        try (MongoClient mongoClient = getConnection()) {
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
+            // Get the question info and firt PAGE_SIZE answers
+            // To do this is necessary to select the proper document and use unwind operator to separate the array in different documents
+            Bson match = match(eq("_id", new ObjectId(id)));
+            Bson unwind = unwind("answers");
+            Bson sort = sort(descending("answers.createdDate"));
+            Bson limit = limit(Constants.PAGE_SIZE);
+            List<Answer> answers = new ArrayList<>();
+            QuestionPageDTO questionPageDTO = new QuestionPageDTO();
+            AtomicBoolean first = new AtomicBoolean(true);
+            collectionQuestions.aggregate(Arrays.asList(match, unwind, sort, limit)).forEach(doc -> {
+                if (first.get()) {
+                    first.set(false);
+                    questionPageDTO.setTitle(doc.getString("title"));
+                    questionPageDTO.setBody(doc.getString("body"));
+                    questionPageDTO.setAuthor(doc.getString("author"));
+                    questionPageDTO.setTopic(doc.getString("topic"));
+                    questionPageDTO.setCreatedDate(doc.getDate("createdDate"));
+                }
+                Answer answer = new Answer(doc.getObjectId("_id").toString() + doc.getDate("createdDate"),
+                        doc.getString("answer.body"),
+                        doc.getDate("createdDate"),
+                        doc.getString("author"),
+                        doc.getInteger("score"),
+                        doc.getList("answers.voters", String.class), // TODO TESTARE BENE
+                        doc.getBoolean("accepted"),
+                        doc.getBoolean("reported"));
+                answers.add(answer);
+            });
+            if (first.get()) return null;
+            questionPageDTO.setId(id);
+            PageDTO<Answer> answersPage = new PageDTO<>();
+            answersPage.setEntries(answers);
+            answersPage.setCounter(answers.size());
+            questionPageDTO.setAnswers(answersPage);
+            return questionPageDTO;
+        } catch (Exception ex) {
+            throw new DAOException(ex);
+        }
     }
 
     @Override
-    public PageDTO<QuestionDTO> getReportedQuestions() {
-        List<Question> reportedQuestions = new ArrayList<>();
-        MongoDatabase mongoDatabase = getDB();
-        MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
+    public PageDTO<QuestionDTO> getReportedQuestions() throws DAOException {
+        PageDTO<QuestionDTO> reportedQuestions = new PageDTO<>();
+        List<QuestionDTO> reportedQ = new ArrayList<>();
+        try (MongoClient mongoClient = getConnection()) {
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
-        collectionQuestions.find(Filters.eq("reported", true)).forEach(doc -> {
-            Question temp = new Question(doc.getObjectId("_id").toString(), doc.getString("title"),
-                    doc.getString("body"), doc.getString("topic"), doc.getString("author"),
-                    doc.getList("answers", Answer.class), doc.getBoolean("closed"),
-                    doc.getDate("createdDate"), doc.getBoolean("reported"));
-            reportedQuestions.add(temp);
-        });
-
-        return reportedQuestions;
+            collectionQuestions.find(eq("reported", true)).projection(fields(include("title", "author", "createdDate", "topic"))).forEach(doc -> {
+                QuestionDTO temp = new QuestionDTO(doc.getObjectId("_id").toString(),
+                        doc.getString("title"),
+                        doc.getDate("createdDate"),
+                        doc.getString("topic"),
+                        doc.getString("author"));
+                reportedQ.add(temp);
+            });
+            reportedQuestions.setEntries(reportedQ);
+            return reportedQuestions;
+        } catch (Exception ex) {
+            throw new DAOException(ex);
+        }
     }
 
     @Override
-    public PageDTO<QuestionDTO> getQuestionPageByTitle(int page, String searchString) {
-
+    public PageDTO<QuestionDTO> searchQuestions(int page, String searchString, String topicFilter) throws DAOException {
         PageDTO<QuestionDTO> pageDTO = new PageDTO<>();
         List<QuestionDTO> questionDTOList = new ArrayList<>();
-        MongoDatabase mongoDatabase = getDB();
-        MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
+        try (MongoClient mongoClient = getConnection()) {
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
+            int pageOffset = (page - 1) * Constants.PAGE_SIZE;
+            TextSearchOptions options = new TextSearchOptions().caseSensitive(false);
+            Bson eq = eq("topic", topicFilter);
+            Bson text = text(searchString, options);
+            Bson project = fields(include("title", "createdDate", "topic", "author"));
+            collectionQuestions.find(and(eq, text)).projection(project).sort(descending("createdDate")).skip(pageOffset).limit(Constants.PAGE_SIZE).forEach(doc -> {
+                QuestionDTO temp = new QuestionDTO(doc.getObjectId("_id").toString(), doc.getString("title"),
+                        doc.getDate("createdDate"), doc.getString("topic"), doc.getString("author"));
+                questionDTOList.add(temp);
+            });
 
-        int pageOffset = (page - 1) * Constants.PAGE_SIZE;
-
-        TextSearchOptions options = new TextSearchOptions().caseSensitive(false);
-        Bson filter = Filters.text(searchString, options);
-        collectionQuestions.find(filter).skip(pageOffset).limit(Constants.PAGE_SIZE).forEach(doc -> {  // TODO capire se vanno bene la skip e la limit cosi
-            QuestionDTO temp = new QuestionDTO(doc.getObjectId("_id").toString(), doc.getString("title"),
-                    doc.getDate("createdDate"), doc.getString("topic"), doc.getString("author"));
-            questionDTOList.add(temp);
-        });
-
-        pageDTO.setCounter(questionDTOList.size());
-        pageDTO.setEntries(questionDTOList);
-        return pageDTO;
-    }
-
-    @Override
-    public PageDTO<QuestionDTO> getQuestionPageByTopic(int page, String topic) {
-        PageDTO<QuestionDTO> pageDTO = new PageDTO<>();
-        List<QuestionDTO> questionDTOList = new ArrayList<>();
-        MongoDatabase mongoDatabase = getDB();
-        MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
-
-        AtomicInteger counter = new AtomicInteger();
-        int pageOffset = (page - 1) * Constants.PAGE_SIZE;
-
-        Bson filter = Filters.eq("topic", topic);
-        collectionQuestions.find(filter).skip(pageOffset).limit(Constants.PAGE_SIZE).forEach(doc -> {
-            QuestionDTO temp = new QuestionDTO(doc.getObjectId("_id").toString(), doc.getString("title"),
-                    doc.getDate("createdDate"), doc.getString("topic"), doc.getString("author"));
-            questionDTOList.add(temp);
-            counter.set(counter.get() + 1);
-        });
-
-        pageDTO.setCounter(counter.get());
-        pageDTO.setEntries(questionDTOList);
-        return pageDTO;
+            pageDTO.setCounter(questionDTOList.size());
+            pageDTO.setEntries(questionDTOList);
+            return pageDTO;
+        } catch (Exception ex) {
+            throw new DAOException(ex);
+        }
     }
 }
