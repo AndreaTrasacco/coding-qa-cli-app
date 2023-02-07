@@ -34,7 +34,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
             InsertOneResult result = collectionQuestions.insertOne(docQuestion);
             // Set the id of the question
-            question.setId(result.getInsertedId().toString());
+            question.setId(result.getInsertedId().asString().toString());
         } catch (Exception ex) {
             throw new DAOException(ex);
         }

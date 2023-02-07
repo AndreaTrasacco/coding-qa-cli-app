@@ -87,7 +87,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public void voteAnswer(String answerId, boolean voteType) throws BusinessException {
         try {
-            answerDAO.vote(answerId, voteType);
+            //answerDAO.vote(answerId, voteType);
         } catch (Exception e){
             throw new BusinessException(e);
         }

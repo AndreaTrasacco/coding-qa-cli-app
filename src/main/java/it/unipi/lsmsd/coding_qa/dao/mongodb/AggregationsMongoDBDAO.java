@@ -1,5 +1,6 @@
 package it.unipi.lsmsd.coding_qa.dao.mongodb;
 
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Accumulators;
@@ -29,125 +30,131 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
     @Override
     public List<ExperienceLevelDTO> getExperienceLvlPerCountry() {
         List<ExperienceLevelDTO> ExperienceLevelDTOList = new ArrayList<>();
-        MongoDatabase mongoDatabase = getDB();
-        MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
+        try (MongoClient mongoClient = getConnection()) {
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
-        //{ $project : {
-        //
-        //country: 1,
-        //
-        //exp_level: { $cond: [ { $gte: ["$score", 10]}, { $cond: [{ $gte: ["$score", 100]}, "advanced", "intermediate"]}, "beginner" ] } } }
-        Bson project1 = project(fields(
-                include("country"),
-                computed("exp_level", new Document("$cond", Arrays.asList(
-                        new Document("$gte", Arrays.asList("$score", 10)),
-                        new Document("$cond", Arrays.asList(
-                                new Document("$gte", Arrays.asList("$score", 100)),
-                                "advanced",
-                                "intermediate"
-                        )),
-                        "beginner"
-                )))
-        ));
-
-
-        // { $group : { _id: {country: "$country", exp_level: "$exp_level"}, numUsers : { $sum : 1 } } },
-        Bson group1 = group(
-                new Document("_id", new Document("country", "$country").append("exp_level", "$exp_level")),
-                sum("numUsers", 1)
-        );
-
-        // { $group: { _id: "$_id.country",total: { $sum: "$numUsers" },exp_levels: { $push: { exp_level: "$_id.exp_level", numUsers: "$numUsers" } } } },
-        Bson group2 = group("$_id.country",
-                sum("total", "$numUsers"),
-                Accumulators.push("exp_levels",
-                        new Document("exp_level", "$_id.exp_level")
-                                .append("numUsers", "$numUsers")));
+            //{ $project : {
+            //
+            //country: 1,
+            //
+            //exp_level: { $cond: [ { $gte: ["$score", 10]}, { $cond: [{ $gte: ["$score", 100]}, "advanced", "intermediate"]}, "beginner" ] } } }
+            Bson project1 = project(fields(
+                    include("country"),
+                    computed("exp_level", new Document("$cond", Arrays.asList(
+                            new Document("$gte", Arrays.asList("$score", 10)),
+                            new Document("$cond", Arrays.asList(
+                                    new Document("$gte", Arrays.asList("$score", 100)),
+                                    "advanced",
+                                    "intermediate"
+                            )),
+                            "beginner"
+                    )))
+            ));
 
 
-        //{ $project: { _id: 0, country: "$_id", levels: { $map: { input: "$exp_levels", in: { $mergeObjects: [ "$$this", { percentage : { $multiply: [ { $divide: ["$$this.numUsers", "$total"]}, 100] } } ] } } } } }
-        Bson project2 = Projections.fields(
-                Projections.computed("_id", new Document("$ifNull", Arrays.asList("$_id", 0))),
-                Projections.include("country"),
-                Projections.computed("levels",
-                        new Document("$map",
-                                new Document("input", "$exp_levels")
-                                        .append("as", "el")
-                                        .append("in",
-                                                new Document("$mergeObjects",
-                                                        Arrays.asList("$$el",
-                                                                new Document("percentage",
-                                                                        new Document("$multiply",
-                                                                                Arrays.asList(
-                                                                                        new Document("$divide",
-                                                                                                Arrays.asList("$$el.numUsers", "$total")
-                                                                                        ),
-                                                                                        100
-                                                                                )
-                                                                        )
-                                                                )
-                                                        )
-                                                )
-                                        )
-                        )
-                ));
+            // { $group : { _id: {country: "$country", exp_level: "$exp_level"}, numUsers : { $sum : 1 } } },
+            Bson group1 = group(
+                    new Document("_id", new Document("country", "$country").append("exp_level", "$exp_level")),
+                    sum("numUsers", 1)
+            );
+
+            // { $group: { _id: "$_id.country",total: { $sum: "$numUsers" },exp_levels: { $push: { exp_level: "$_id.exp_level", numUsers: "$numUsers" } } } },
+            Bson group2 = group("$_id.country",
+                    sum("total", "$numUsers"),
+                    Accumulators.push("exp_levels",
+                            new Document("exp_level", "$_id.exp_level")
+                                    .append("numUsers", "$numUsers")));
 
 
-        Bson project3 = Projections.exclude("levels.numUsers");
-        Bson sort = sort(Sorts.ascending("country"));
+            //{ $project: { _id: 0, country: "$_id", levels: { $map: { input: "$exp_levels", in: { $mergeObjects: [ "$$this", { percentage : { $multiply: [ { $divide: ["$$this.numUsers", "$total"]}, 100] } } ] } } } } }
+            Bson project2 = Projections.fields(
+                    Projections.computed("_id", new Document("$ifNull", Arrays.asList("$_id", 0))),
+                    Projections.include("country"),
+                    Projections.computed("levels",
+                            new Document("$map",
+                                    new Document("input", "$exp_levels")
+                                            .append("as", "el")
+                                            .append("in",
+                                                    new Document("$mergeObjects",
+                                                            Arrays.asList("$$el",
+                                                                    new Document("percentage",
+                                                                            new Document("$multiply",
+                                                                                    Arrays.asList(
+                                                                                            new Document("$divide",
+                                                                                                    Arrays.asList("$$el.numUsers", "$total")
+                                                                                            ),
+                                                                                            100
+                                                                                    )
+                                                                            )
+                                                                    )
+                                                            )
+                                                    )
+                                            )
+                            )
+                    ));
 
-        collectionQuestions.aggregate(Arrays.asList(project1, group1, group2, project2, project3, sort)).forEach(doc -> {
-            ExperienceLevelDTO temp = new ExperienceLevelDTO(doc.getString("country"), doc.getList( "exp_level", ExperienceLevelDTO.Level.class));
-            ExperienceLevelDTOList.add(temp);
-        });
+
+            Bson project3 = Projections.exclude("levels.numUsers");
+            Bson sort = sort(Sorts.ascending("country"));
+
+            collectionQuestions.aggregate(Arrays.asList(project1, group1, group2, project2, project3, sort)).forEach(doc -> {
+                ExperienceLevelDTO temp = new ExperienceLevelDTO(doc.getString("country"), doc.getList("exp_level", ExperienceLevelDTO.Level.class));
+                ExperienceLevelDTOList.add(temp);
+            });
 
 
-        return ExperienceLevelDTOList;
+            return ExperienceLevelDTOList;
+        }
     }
 
     //methods that retrieve the % of users of different experience level per country
     @Override
     public List<QuestionScoreDTO> getUsefulQuestions() {
         List<QuestionScoreDTO> questionScoreDTOList = new ArrayList<>();
-        MongoDatabase mongoDatabase = getDB();
-        MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
+        try (MongoClient mongoClient = getConnection()) {
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
-        Bson match = match(exists("answers", true));
-        Bson project1 = project(new Document("topic", 1).append("title", 1).append("score", new Document("$sum", "$answers.score"))); //TODO capire cosa va messo come secondo argomento
-        Bson sort1 = sort(descending("score"));
-        Bson group = group("$topic", first("first", "$title"), first("firstScore", "$score"));
-        Bson sort2 = sort(descending("firstScore"));
-        Bson project2 = project(fields(excludeId(), computed("topic", "$_id"),include("title", "firstScore")));  //TODO non so se sono giusti gli argomenti del computed
+            Bson match = match(exists("answers", true));
+            Bson project1 = project(new Document("topic", 1).append("title", 1).append("score", new Document("$sum", "$answers.score"))); //TODO capire cosa va messo come secondo argomento
+            Bson sort1 = sort(descending("score"));
+            Bson group = group("$topic", first("first", "$title"), first("firstScore", "$score"));
+            Bson sort2 = sort(descending("firstScore"));
+            Bson project2 = project(fields(excludeId(), computed("topic", "$_id"), include("title", "firstScore")));  //TODO non so se sono giusti gli argomenti del computed
 
-        collectionQuestions.aggregate(Arrays.asList(match, project1, sort1, group, sort2, project2)).forEach(doc -> {
-            QuestionScoreDTO temp = new QuestionScoreDTO(doc.getString("title"), doc.getInteger("firstScore"), doc.getString("topic"));
-            questionScoreDTOList.add(temp);
-        });
+            collectionQuestions.aggregate(Arrays.asList(match, project1, sort1, group, sort2, project2)).forEach(doc -> {
+                QuestionScoreDTO temp = new QuestionScoreDTO(doc.getString("title"), doc.getInteger("firstScore"), doc.getString("topic"));
+                questionScoreDTOList.add(temp);
+            });
 
-        return questionScoreDTOList;
+            return questionScoreDTOList;
+        }
     }
 
     //methods that retrieve the rank of each topic during the week
     @Override
     public List<TopicDTO> getTopicRank() {
         List<TopicDTO> topicDTOList = new ArrayList<>();
-        MongoDatabase mongoDatabase = getDB();
-        MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
-        LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
-        LocalDateTime currentDate = LocalDateTime.now();
+        try (MongoClient mongoClient = getConnection()) {
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
+            LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+            LocalDateTime currentDate = LocalDateTime.now();
 
-        Bson match1 = match(exists("answers", true));
-        Bson project1 = project(new Document("topic", 1).append("createdDate", 1)
-                .append("answerCount", new Document("$size", "$answers")));
-        Bson match2 = match(and(gte("createdDate", sevenDaysAgo), lt("createdDate", currentDate)));
-        Bson group = group("$topic", sum("count", "$answerCount"));
-        Bson sort = sort(descending("count"));
-        Bson project2 = project(new Document("_id", 1).append("count", 1));
+            Bson match1 = match(exists("answers", true));
+            Bson project1 = project(new Document("topic", 1).append("createdDate", 1)
+                    .append("answerCount", new Document("$size", "$answers")));
+            Bson match2 = match(and(gte("createdDate", sevenDaysAgo), lt("createdDate", currentDate)));
+            Bson group = group("$topic", sum("count", "$answerCount"));
+            Bson sort = sort(descending("count"));
+            Bson project2 = project(new Document("_id", 1).append("count", 1));
 
-        collectionQuestions.aggregate(Arrays.asList(match1, project1, match2, group, sort, project2)).forEach(doc -> {
-            TopicDTO temp = new TopicDTO(doc.getString("_id"), doc.getInteger("count"));
-            topicDTOList.add(temp);
-        });
-        return topicDTOList;
+            collectionQuestions.aggregate(Arrays.asList(match1, project1, match2, group, sort, project2)).forEach(doc -> {
+                TopicDTO temp = new TopicDTO(doc.getString("_id"), doc.getInteger("count"));
+                topicDTOList.add(temp);
+            });
+            return topicDTOList;
+        }
     }
 }
