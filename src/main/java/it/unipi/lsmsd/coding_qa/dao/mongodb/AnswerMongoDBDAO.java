@@ -28,52 +28,81 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
+    public static void main(String[] args) {
+        AnswerMongoDBDAO answerDAO = new AnswerMongoDBDAO();
+        try {
+            //answerDAO.create("63e14ed126dc67afbbdb0a58", new Answer("1", "a", new Date(), "a", 1, new ArrayList<>(), false, false));
+            //AnswerDTO answerDTO = new AnswerDTO("63e14ed126dc67afbbdb0a58_2023-02-07T18:37:30.975+00:00", null, null, "a", 1 , false);
+            //System.out.println(answerDTO.getBody());
+            //answerDAO.getBody(new AnswerDTO("63e14ed126dc67afbbdb0a58_2023-02-07T18:37:30.975+00:00", null, null, "a", 1 , false));
+            //System.out.println(answerDTO.getBody());
+            //answerDAO.delete("63e14ed126dc67afbbdb0a58_2023-02-07T18:26:25.307+00:00");
+            //answerDAO.report("63e14ed126dc67afbbdb0a58_2023-02-07T18:37:30.975+00:00");
+            answerDAO.vote("63e14ed126dc67afbbdb0a58_2023-02-07T18:37:30.975+00:00", true, "1");
+        } catch(Exception e){
+            System.out.println("Errore");
+        }
+    }
+
+    // OK
     public void create(String questionId, Answer answer) throws DAOException{
         try(MongoClient myClient = getConnection()) {
             MongoDatabase database = myClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
             Document answerDoc = new Document();
-            Date date = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
-            String formattedDate = dateFormat.format(date);
+            //Date date = new Date();
+            Date date = new Date(System.currentTimeMillis());
+            //date.toInstant();
+            //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ");
+            //String formattedDate = dateFormat.format(date);
             answerDoc.put("body", answer.getBody());
-            answerDoc.put("createdDate", formattedDate); // messo string, dovevo mettere date?
+            answerDoc.put("createdDate", date); // messo string, dovevo mettere date?
             answerDoc.put("author", answer.getAuthor());
             collectionQuestion.updateOne(Filters.eq("_id", new ObjectId(questionId)),
                             Updates.push("answers", answerDoc));
 
-            answer.setId(questionId+formattedDate);
+            answer.setId(questionId+date);
 
         } catch(Exception e){
             throw new DAOException(e);
         }
 
-
-        //AGGIUNGERE ID ALLA RISPOSTA CON QUESTION ID _ CREATED_DATE
     }
+
+    // OK
     public Answer update(Answer answer) throws DAOException{
         try(MongoClient myClient = getConnection()) {
             MongoDatabase database = myClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
 
             // questionId_answerIndex
-            String questionId = answer.getId().substring(0, answer.getId().indexOf('-'));
-            String answerIndex = answer.getId().substring(answer.getId().indexOf('-'));
+            String questionId = answer.getId().substring(0, answer.getId().indexOf('_'));
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ");
+            Date createdDate = null;
+            try {
+                createdDate = dateFormat.parse(answer.getId().substring(answer.getId().indexOf('_')+1));
+            } catch(ParseException e){
+                System.out.println("Errore nel parsing1"+e.getMessage());
+            }
+
+            //String answerIndex = answer.getId().substring(answer.getId().indexOf('-'));
+            int answerIndex = findAnswerIndex(questionId, createdDate);
+            System.out.println("indice: "+answerIndex);
 
             collectionQuestion.updateOne(Filters.eq("_id", new ObjectId(questionId)),
-                    Updates.combine(Updates.set("answers" + answerIndex + "body", answer.getBody()),
-                            Updates.set("answers" + answerIndex + "createdDate", answer.getCreatedDate()),
-                            Updates.set("answers" + answerIndex + "author", answer.getAuthor()),
-                            Updates.set("answers" + answerIndex + "score", answer.getScore()),
-                            Updates.set("answers" + answerIndex + "voters", answer.getVoters()),
-                            Updates.set("answers" + answerIndex + "accepted", answer.isAccepted()),
-                            Updates.set("answers" + answerIndex + "reported", answer.isReported())));
+                    Updates.combine(Updates.set("answers." + answerIndex + ".body", answer.getBody()),
+                            Updates.set("answers." + answerIndex + ".author", answer.getAuthor()),
+                            Updates.set("answers." + answerIndex + ".score", answer.getScore()),
+                            Updates.set("answers." + answerIndex + ".voters", answer.getVoters()),
+                            Updates.set("answers." + answerIndex + ".accepted", answer.isAccepted()),
+                            Updates.set("answers." + answerIndex + ".reported", answer.isReported())));
             return answer;
         } catch(Exception e){
             throw new DAOException(e);
         }
     }
 
+    // errore parsing
     public void getBody(AnswerDTO answer) throws DAOException{
         try (MongoClient myClient = getConnection()){
             MongoDatabase database = myClient.getDatabase(DB_NAME);
@@ -96,14 +125,28 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             throw new DAOException(e);
         }
     }
+
+    // OK (se cancella l'unica risposta rimane array answers), va bene unset? usare pull?
     public void delete(String id) throws DAOException{
         try (MongoClient myClient = getConnection()){
             MongoDatabase database = myClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
 
-            // questionId_answerIndex
+            // questionId_createdDate
             String questionId = id.substring(0, id.indexOf('_'));
-            String answerIndex = id.substring(id.indexOf('_'));
+            //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+            Date createdDate = null;
+            try {
+                createdDate = dateFormat.parse(id.substring(id.indexOf('_')+1));
+            } catch(ParseException e){
+                System.out.println("Errore nel parsing1"+e.getMessage());
+            }
+
+            //String answerIndex = answer.getId().substring(answer.getId().indexOf('-'));
+            int answerIndex = findAnswerIndex(questionId, createdDate);
+            System.out.println("indice: "+answerIndex);
+
 
             collectionQuestion.updateOne(
                     Filters.eq("_id", new ObjectId(questionId)),
@@ -113,13 +156,26 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             throw new DAOException(e);
         }
     }
+
+    // OK
     public void report(String id) throws DAOException{
         try (MongoClient myClient = getConnection()){
             MongoDatabase database = myClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
-            // The answer id has the following format: questionId_answerIndex
-            String questionId = id.substring(0, id.indexOf('-'));
-            String answerIndex = id.substring(id.indexOf('-'));
+
+            String questionId = id.substring(0, id.indexOf('_'));
+            //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+            Date createdDate = null;
+            try {
+                createdDate = dateFormat.parse(id.substring(id.indexOf('_')+1));
+            } catch(ParseException e){
+                System.out.println("Errore nel parsing");
+            }
+
+            int answerIndex = findAnswerIndex(questionId, createdDate);
+            System.out.println("index: "+answerIndex);
+
             collectionQuestion.updateOne(
                     Filters.eq("_id", new ObjectId(questionId)),
                     Updates.set("answers." + answerIndex + ".reported", true)
@@ -129,7 +185,8 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         }
     }
 
-    // FARE CONTROLLO VOTERS
+
+    // Errore nel parsing dentro findAnswer
     public boolean vote(String id, boolean voteType, String idVoter) throws DAOException{
         try (MongoClient myClient = getConnection()){
             MongoDatabase database = myClient.getDatabase(DB_NAME);
@@ -137,18 +194,21 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             int increment = voteType ? 1 : -1;
 
             String questionId = id.substring(0, id.indexOf('_'));
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+            //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
             Date createdDate = null;
             try {
-                createdDate = dateFormat.parse(id.substring(id.indexOf('_')));
+                createdDate = dateFormat.parse(id.substring(id.indexOf('_')+1));
             } catch(ParseException e){
                 System.out.println("Errore nel parsing");
             }
             int answerDocIndex = findAnswerIndex(questionId, createdDate);
 
             // ottimizzare, fa due volte la query?
+            //ottimizzare facendo --> List<String> voters = collectionQuestion.find("_id", new ObjectId(questionId)). getList(answers.voters);
             Document answerDoc = findAnswer(id);
             List<String> voters = (List<String>) answerDoc.get("voters");
+
             for(String idVot : voters){
                 // user has already voted
                 if(idVoter == idVot){
@@ -158,7 +218,8 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
 
             collectionQuestion.updateOne(
                     Filters.eq("_id", new ObjectId(questionId)),
-                    Updates.inc("answers." + answerDocIndex + ".score", increment)
+                    Updates.combine(Updates.inc("answers." + answerDocIndex + ".score", increment),
+                    Updates.addToSet("answers."+answerDocIndex+".voters", idVoter))
             );
         } catch(Exception e){
             throw new DAOException(e);
@@ -278,21 +339,26 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
 
     private Document findAnswer(String answerId) throws DAOException{
         String questionId = answerId.substring(0, answerId.indexOf('_'));
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         Date createdDate = null;
         try {
-            createdDate = dateFormat.parse(answerId.substring(answerId.indexOf('_')));
+            createdDate = dateFormat.parse(answerId.substring(answerId.indexOf('_')+1));
         } catch(ParseException e){
             System.out.println("Errore nel parsing");
         }
 
+        System.out.println(createdDate);
+
         try (MongoClient myClient = getConnection()){
             MongoDatabase database = myClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
-            Document question = collectionQuestion.find(Filters.eq("_id", questionId)).first();
+            Document question = collectionQuestion.find(Filters.eq("_id", new ObjectId(questionId))).first();
             List<Document> answers = (List<Document>) question.get("answers");
             for(Document answer : answers){
+                System.out.println("qui1");
                 Date date = answer.getDate("createdDate");
+                System.out.println(date+ " "+createdDate);
                 if(date.compareTo(createdDate) == 0){
                     return answer;
                 }
@@ -309,7 +375,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         try (MongoClient myClient = getConnection()){
             MongoDatabase database = myClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
-            Document question = collectionQuestion.find(Filters.eq("_id", questionId)).first();
+            Document question = collectionQuestion.find(Filters.eq("_id", new ObjectId(questionId))).first();
             List<Document> answers = (List<Document>) question.get("answers");
             for(Document answer : answers){
                 Date date = answer.getDate("createdDate");
