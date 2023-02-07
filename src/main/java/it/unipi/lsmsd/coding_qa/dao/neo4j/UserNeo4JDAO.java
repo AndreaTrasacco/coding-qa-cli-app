@@ -2,6 +2,8 @@ package it.unipi.lsmsd.coding_qa.dao.neo4j;
 
 import it.unipi.lsmsd.coding_qa.dao.UserNodeDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseNeo4JDAO;
+import it.unipi.lsmsd.coding_qa.dto.PageDTO;
+import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
 import org.neo4j.driver.*;
 
 import java.util.ArrayList;
@@ -38,22 +40,12 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
     }
 
     //this method updates a User node
-    @Override
-    public void update(String nickname) {
-        final String updateUser = "MATCH (u: User{nickname: $nickname})" +
-                "SET u.nickname = $nickname";
-        try(Session session = getSession()){
-            session.writeTransaction(tx -> {
-                tx.run(updateUser, parameters("nickname", nickname)).consume();
-                return 1;
-            });
-        }
-    }
 
     //this method returns the list of follower
     @Override
-    public List<String> getFollowingList(String nickname) {
+    public PageDTO<String> getFollowingList(String nickname) {
         List<String> followerList;
+        PageDTO<String> pageDTO = new PageDTO<>();
         final String listOfUser = "MATCH (u: User)-[:FOLLOW]->(u1: User)" +
                 "WHERE u.nickname = $nickname" +
                 "RETURN u1.nickname as Nickname";
@@ -68,7 +60,9 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
                 return users;
             });
         }
-        return followerList;
+        pageDTO.setCounter(followerList.size());
+        pageDTO.setEntries(followerList);
+        return pageDTO;
     }
 
     /*@Override
@@ -120,8 +114,8 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
     }*/
 
     // delete the relationship ANSWERED
-    @Override
-    /*public void deleteAnswered(String nickname, String id) {
+    /*@Override
+    public void deleteAnswered(String nickname, String id) {
         final String deleteQuestion = "MATCH (u: User{nickname: $nickname})-[:ANSWERED]->(q: Question{id: $id})" +
                 "DELETE q";
         try(Session session = getSession()){
