@@ -15,6 +15,7 @@ import org.neo4j.driver.summary.ResultSummary;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,7 +30,7 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
                 "WITH DISTINCT(startUserQuestion.topic) AS topics, startUser " +
                 "MATCH p = (startUser)-[*1..2]->(followed:User)-[:CREATED]->(q2:Question) " +
                 "WHERE q2.closed = true AND q2.topic IN topics " +
-                "RETURN DISTINCT q2.id AS id, toStringOrNull(q2.createdDate) AS createdDate, q2.title AS title, q2.topic AS topic, followed.nickname AS nickname, length(p) as depth " +
+                "RETURN DISTINCT q2.id AS id, q2.createdDate AS createdDate, q2.title AS title, q2.topic AS topic, followed.nickname AS nickname, length(p) as depth " +
                 "ORDER BY depth ASC, createdDate DESC " +
                 "SKIP $toSkip " +
                 "LIMIT $toLimit ";
@@ -40,7 +41,7 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
     // method for suggesting questions that the user might be able to answer
     public PageDTO<QuestionDTO> questionsToAnswer(int page, String nickname) throws DAONodeException {
         String suggestionQuery = "MATCH (u1:User{nickname : $nickname})-[:ANSWERED]->(q1)<-[:CREATED]-(followed:User)-[:CREATED]->(q2:Question{closed: false})<-[a:ANSWERED]-() " +
-                "RETURN q2.id AS id, toStringOrNull(q2.createdDate) AS createdDate, q2.title AS title, q2.topic AS topic, followed.nickname AS nickname, followed, COUNT(a) AS ans_count " +
+                "RETURN q2.id AS id, q2.createdDate AS createdDate, q2.title AS title, q2.topic AS topic, followed.nickname AS nickname, followed, COUNT(a) AS ans_count " +
                 "ORDER BY ans_count, createdDate DESC " +
                 "SKIP $toSkip " +
                 "LIMIT $toLimit ";
@@ -59,13 +60,7 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
                 ArrayList<QuestionDTO> questions = new ArrayList<>();
                 while(result.hasNext()) {
                     Record question = result.next();
-                    String stringCreatedDate = question.get("createdDate").asString();
-                    Date createdDate;
-                    try {
-                        createdDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(stringCreatedDate);
-                    } catch (ParseException e) {
-                        throw new RuntimeException(e);
-                    }
+                    Date createdDate = Date.from(Instant.parse( question.get("createdDate").toString()));
                     QuestionDTO temp = new QuestionDTO(question.get("id").asString(), question.get("title").asString(),
                             createdDate, question.get("topic").asString(), question.get("nickname").asString());
                     questions.add(temp);

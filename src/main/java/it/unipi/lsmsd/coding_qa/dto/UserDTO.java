@@ -12,6 +12,9 @@ public class UserDTO {
     private String website;
     private int score;
 
+    public UserDTO() {
+    }
+
     public UserDTO(String id, String fullName, String nickname, Date birthdate, String country, Date createdDate, String website, int score) {
         this.id = id;
         this.fullName = fullName;

@@ -2,6 +2,7 @@ package it.unipi.lsmsd.coding_qa.dao.neo4j;
 
 import it.unipi.lsmsd.coding_qa.dao.UserNodeDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseNeo4JDAO;
+import it.unipi.lsmsd.coding_qa.dao.exception.DAONodeException;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
 import org.neo4j.driver.*;
@@ -15,20 +16,21 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
 
     //this method adds a new User node
     @Override
-    public void create(final String nickname) {
-        //TODO il controllo sull'unicità del nickname va messo qui???
+    public void create(final String nickname) throws DAONodeException {
         final String insertUser = "CREATE (u: User{nickname: $nickname})";
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
                 tx.run(insertUser, parameters("nickname", nickname)).consume();
                 return 1;
             });
+        } catch (Exception e){
+            throw new DAONodeException(e);
         }
     }
 
     //this method deletes a User node
     @Override
-    public void delete(String nickname) {
+    public void delete(String nickname) throws DAONodeException {
         final String deleteUser = "MATCH (u: User{nickname: $nickname}) " +
                 "DETACH DELETE u";
         try(Session session = getSession()){
@@ -36,14 +38,14 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
                 tx.run(deleteUser, parameters("nickname", nickname)).consume();
                 return 1;
             });
+        } catch (Exception e){
+            throw new DAONodeException(e);
         }
     }
 
-    //this method updates a User node
-
     //this method returns the list of follower
     @Override
-    public PageDTO<String> getFollowingList(String nickname) {
+    public PageDTO<String> getFollowingList(String nickname) throws DAONodeException {
         List<String> followerList;
         PageDTO<String> pageDTO = new PageDTO<>();
         final String listOfUser = "MATCH (u:User{nickname : $nickname})-[:FOLLOW]->(u1:User) " +
@@ -58,6 +60,8 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
                 }
                 return users;
             });
+        } catch (Exception e){
+            throw new DAONodeException(e);
         }
         pageDTO.setCounter(followerList.size());
         pageDTO.setEntries(followerList);
@@ -86,7 +90,7 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
 
     //this method create the follow relationship
     @Override
-    public void followUser(String myNickname, String userToFollow) {
+    public void followUser(String myNickname, String userToFollow) throws DAONodeException {
         final String followString = "MATCH (u1:User{nickname : $myNickname}), (u2: User{nickname : $userToFollow}) " +
                 "CREATE (u1)-[r:FOLLOW]->(u2)";
         try(Session session = getSession()){
@@ -94,6 +98,8 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
                 tx.run(followString, parameters("myNickname", myNickname, "userToFollow", userToFollow)).consume();
                 return null;
             });
+        } catch (Exception e){
+            throw new DAONodeException(e);
         }
     }
 
@@ -124,14 +130,16 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
     }*/
 
     @Override
-    public void deleteFollowed(String myNickname, String userToUnfollow) {
+    public void deleteFollowed(String myNickname, String userToUnfollow) throws DAONodeException {
         final String unfollow = "MATCH (u1:User{nickname : $myNickname})-[r:FOLLOW]->(u2:User{nickname : $userToUnfollow}) " +
-                "DELETE r";
+                "DETACH DELETE r";
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
                 tx.run(unfollow, parameters("myNickname", myNickname, "userToUnfollow", userToUnfollow)).consume();
                 return null;
             });
+        } catch (Exception e){
+            throw new DAONodeException(e);
         }
     }
 }

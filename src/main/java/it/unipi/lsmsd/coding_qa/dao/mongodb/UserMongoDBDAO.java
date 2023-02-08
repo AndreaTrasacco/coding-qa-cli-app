@@ -15,6 +15,13 @@ import it.unipi.lsmsd.coding_qa.model.User;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+
+import static com.mongodb.client.model.Projections.include;
+
 public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
 
     @Override
@@ -105,7 +112,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
         try(MongoClient mongoClient = getConnection()) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionUser = database.getCollection("users");
-            Document userDoc = collectionUser.find(Filters.eq("_id", new ObjectId(id))).first();
+            Document userDoc = collectionUser.find(Filters.eq("_id", new ObjectId(id))).projection(include("score")).first();
 
             return userDoc.getInteger("score");
         } catch (Exception e){
@@ -136,5 +143,19 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
             throw new DAOException(e);
         }
     }
+
+    /* TODO funzione per convertire la stringa in formato criptato, mettere dentro il controller
+    private static String bytesToHex(byte[] hash) {
+        StringBuilder hexString = new StringBuilder(2 * hash.length);
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
+    }
+*/
 
 }
