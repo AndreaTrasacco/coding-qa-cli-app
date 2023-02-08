@@ -40,12 +40,12 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             //answerDAO.accept("63e14ed126dc67afbbdb0a58_2023-02-08T16:19:28.705+00:00");
             //PageDTO<QuestionDTO> page = answerDAO.getReportedQuestions(1);
             //System.out.println("reported questions: "+page.getEntries());
-            //PageDTO<AnswerDTO> page = answerDAO.getReportedAnswers(1);
-            //System.out.println("reported answers: "+page.getEntries());
+            PageDTO<AnswerDTO> page = answerDAO.getReportedAnswers(1);
+            System.out.println("reported answers: "+page.getEntries());
             //System.out.println("reported answers: "+page.getEntries().get(0).getBody());
             //System.out.println("reported answers: "+page.getEntries().get(0).getId());
         } catch(Exception e){
-            System.out.println("Errore");
+            e.printStackTrace();
         }
     }
 
@@ -255,7 +255,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
 
             collectionQuestion.updateOne(
                     Filters.eq("_id", new ObjectId(questionId)),
-                    Updates.set("answers." + answerIndex + ".accepted", true)
+                    Updates.set("answers." + answerIndex + ".a-ccepted", true)
             );
         } catch(Exception e){
             throw new DAOException(e);
@@ -272,7 +272,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
 
             int pageOffset = (page - 1) * Constants.PAGE_SIZE;
 
-            Bson project = Projections.include("_id", "answers.body", "title", "createdDate", "topic", "author");
+            Bson project = Projections.include("_id", "title", "createdDate", "topic", "author");
             collectionQuestions.find(Filters.eq("reported", true)).projection(project).skip(pageOffset).limit(Constants.PAGE_SIZE).forEach(doc -> {
                 QuestionDTO temp = new QuestionDTO(doc.getObjectId("_id").toString(), doc.getString("title"),
                         doc.getDate("createdDate"), doc.getString("topic"), doc.getString("author"));
