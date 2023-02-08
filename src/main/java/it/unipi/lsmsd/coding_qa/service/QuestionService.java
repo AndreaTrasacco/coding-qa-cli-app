@@ -32,7 +32,7 @@ public interface QuestionService {
     void deleteQuestion(Question question) throws BusinessException; // TODO CAMBIARE ARG CON ID ??
     void deleteAnswer(String answerId) throws BusinessException;
     void voteAnswer(String answerId, boolean voteType) throws BusinessException; // true: upvote, false: downvote
-    void reportQuestion(String questionId) throws BusinessException;
+    void reportQuestion(String questionId, boolean report) throws BusinessException;
     void reportAnswer(String answerId) throws BusinessException;
     //List<QuestionsAndAnswersReportedDTO> getReportedQuestionsAndAnswers() throws BusinessException;
     PageDTO<QuestionDTO> getReportedQuestions() throws BusinessException;

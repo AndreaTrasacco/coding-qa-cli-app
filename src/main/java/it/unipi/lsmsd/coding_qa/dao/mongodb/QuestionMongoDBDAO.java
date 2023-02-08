@@ -34,7 +34,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
             InsertOneResult result = collectionQuestions.insertOne(docQuestion);
             // Set the id of the question
-            question.setId(result.getInsertedId().asString().toString());
+            question.setId(result.getInsertedId().asObjectId().getValue().toHexString());
         } catch (Exception ex) {
             throw new DAOException(ex);
         }
@@ -47,7 +47,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
             Bson project = project(fields(excludeId(), include("answers")));
 
-            Document deletedQAnswers = collectionQuestions.findOneAndDelete(eq("_id", new ObjectId(id)), new FindOneAndDeleteOptions().projection(project));
+            Document deletedQAnswers = collectionQuestions.findOneAndDelete(eq("_id", new ObjectId(id))/*, new FindOneAndDeleteOptions().projection(project)*/);
             // For each answer in the deleted question
             List<AnswerScoreDTO> answerScores = new ArrayList<>();
             if (deletedQAnswers.containsKey("answers")) {
@@ -70,18 +70,18 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
         try (MongoClient mongoClient = getConnection()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
-            collectionQuestions.updateOne(eq("_id", question.getId()), Updates.combine(Updates.set("title", question.getTitle()), Updates.set("body", question.getBody()), Updates.set("topic", question.getBody())));
+            collectionQuestions.updateOne(eq("_id", new ObjectId(question.getId())), Updates.combine(Updates.set("title", question.getTitle()), Updates.set("body", question.getBody()), Updates.set("topic", question.getTopic())));
         } catch (Exception ex) {
             throw new DAOException(ex);
         }
     }
 
     @Override
-    public void reportQuestion(String id) throws DAOException {
+    public void reportQuestion(String id, boolean report) throws DAOException {
         try (MongoClient mongoClient = getConnection()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
-            collectionQuestions.updateOne(eq("_id", new ObjectId(id)), Updates.set("reported", true));
+            collectionQuestions.updateOne(eq("_id", new ObjectId(id)), Updates.set("reported", report));
         } catch (Exception ex) {
             throw new DAOException(ex);
         }
@@ -92,40 +92,15 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
         try (MongoClient mongoClient = getConnection()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
-            // Get the question info and firt PAGE_SIZE answers
-            // To do this is necessary to select the proper document and use unwind operator to separate the array in different documents
-            Bson match = match(eq("_id", new ObjectId(id)));
-            Bson unwind = unwind("answers");
-            Bson sort = sort(descending("answers.createdDate"));
-            Bson limit = limit(Constants.PAGE_SIZE);
-            List<Answer> answers = new ArrayList<>();
             QuestionPageDTO questionPageDTO = new QuestionPageDTO();
-            AtomicBoolean first = new AtomicBoolean(true);
-            collectionQuestions.aggregate(Arrays.asList(match, unwind, sort, limit)).forEach(doc -> {
-                if (first.get()) {
-                    first.set(false);
-                    questionPageDTO.setTitle(doc.getString("title"));
-                    questionPageDTO.setBody(doc.getString("body"));
-                    questionPageDTO.setAuthor(doc.getString("author"));
-                    questionPageDTO.setTopic(doc.getString("topic"));
-                    questionPageDTO.setCreatedDate(doc.getDate("createdDate"));
-                }
-                Answer answer = new Answer(doc.getObjectId("_id").toString() + doc.getDate("createdDate"),
-                        doc.getString("answer.body"),
-                        doc.getDate("createdDate"),
-                        doc.getString("author"),
-                        doc.getInteger("score"),
-                        doc.getList("answers.voters", String.class), // TODO TESTARE BENE
-                        doc.getBoolean("accepted"),
-                        doc.getBoolean("reported"));
-                answers.add(answer);
-            });
-            if (first.get()) return null;
+            Document doc = collectionQuestions.find(eq("_id", new ObjectId(id))).projection(fields(excludeId(),include("title","body","topic","author","createdDate"))).first();
+            if(doc == null) return null;
             questionPageDTO.setId(id);
-            PageDTO<Answer> answersPage = new PageDTO<>();
-            answersPage.setEntries(answers);
-            answersPage.setCounter(answers.size());
-            questionPageDTO.setAnswers(answersPage);
+            questionPageDTO.setTitle(doc.getString("title"));
+            questionPageDTO.setTopic(doc.getString("topic"));
+            questionPageDTO.setBody(doc.getString("body"));
+            questionPageDTO.setAuthor(doc.getString("author"));
+            questionPageDTO.setCreatedDate(doc.getDate("createdDate"));
             return questionPageDTO;
         } catch (Exception ex) {
             throw new DAOException(ex);
@@ -178,6 +153,41 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
             return pageDTO;
         } catch (Exception ex) {
             throw new DAOException(ex);
+        }
+    }
+
+    public static void main(String[] args) {
+        Question q = new Question();
+        q.setTitle("TITLE");
+        q.setBody("BODY");
+        q.setAuthor("AUTHOR");
+        q.setTopic("TOPIC");
+        Date cDate = new Date(System.currentTimeMillis());
+        q.setCreatedDate(cDate);
+        QuestionMongoDBDAO qDAO = new QuestionMongoDBDAO();
+        try {
+            // test create and get q info
+            qDAO.createQuestion(q);
+            QuestionPageDTO qPage = qDAO.getQuestionInfo(q.getId());
+            System.out.println(qPage.getBody().equals(q.getBody()));
+            // test update
+            q.setTitle("ELTIT");
+            qDAO.updateQuestion(q);
+            qPage = qDAO.getQuestionInfo(q.getId());
+            System.out.println(qPage.getTitle().equals("ELTIT"));
+            // test report and get reported questions
+            qDAO.reportQuestion(q.getId(), true);
+            PageDTO<QuestionDTO> page = qDAO.getReportedQuestions();
+            System.out.println(page.getEntries().get(0).getId().equals(q.getId()));
+            // test search
+            page = qDAO.searchQuestions(1, "BODY", "TOPIC");
+            System.out.println(page.getEntries().get(0).getId().equals(q.getId()));
+            // test delete
+            qDAO.deleteQuestion(q.getId());
+            qPage = qDAO.getQuestionInfo(q.getId());
+            System.out.println(qPage == null);
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
     }
 }

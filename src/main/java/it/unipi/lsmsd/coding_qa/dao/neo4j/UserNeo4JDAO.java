@@ -29,7 +29,7 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
     //this method deletes a User node
     @Override
     public void delete(String nickname) {
-        final String deleteUser = "MATCH (u: User{nickname: $nickname})" +
+        final String deleteUser = "MATCH (u: User{nickname: $nickname}) " +
                 "DETACH DELETE u";
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
@@ -46,16 +46,15 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
     public PageDTO<String> getFollowingList(String nickname) {
         List<String> followerList;
         PageDTO<String> pageDTO = new PageDTO<>();
-        final String listOfUser = "MATCH (u: User)-[:FOLLOW]->(u1: User)" +
-                "WHERE u.nickname = $nickname" +
-                "RETURN u1.nickname as Nickname";
+        final String listOfUser = "MATCH (u:User{nickname : $nickname})-[:FOLLOW]->(u1:User) " +
+                "RETURN u1.nickname as nickname";
         try(Session session = getSession()){
             followerList = session.readTransaction( (TransactionWork<List<String>>) tx -> {
                 Result result = tx.run(listOfUser, parameters("nickname", nickname));
                 ArrayList<String> users = new ArrayList<>();
                 while(result.hasNext()){
                     Record user = result.next();
-                    users.add(user.get("Nickname").asString());
+                    users.add(user.get("nickname").asString());
                 }
                 return users;
             });
@@ -88,14 +87,12 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
     //this method create the follow relationship
     @Override
     public void followUser(String myNickname, String userToFollow) {
-        final String followString = "MATCH (u1: User), (u2: User)" +
-                "WHERE u1.nickname = $myNickname AND u2.nickname = $userToFollow" +
-                "CREATE (u1)-[r:FOLLOW]->(u2)" +
-                "RETURN type(r)";
+        final String followString = "MATCH (u1:User{nickname : $myNickname}), (u2: User{nickname : $userToFollow}) " +
+                "CREATE (u1)-[r:FOLLOW]->(u2)";
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
                 tx.run(followString, parameters("myNickname", myNickname, "userToFollow", userToFollow)).consume();
-                return 1;
+                return null;
             });
         }
     }
@@ -128,13 +125,12 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
 
     @Override
     public void deleteFollowed(String myNickname, String userToUnfollow) {
-        final String unfollow = "MATCH (u1: User)-[r:FOLLOW]->(u2: User)" +
-                "WHERE u1.nickname = $myNickname AND u2.nickname = $userToUnfollow" +
+        final String unfollow = "MATCH (u1:User{nickname : $myNickname})-[r:FOLLOW]->(u2:User{nickname : $userToUnfollow}) " +
                 "DELETE r";
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
                 tx.run(unfollow, parameters("myNickname", myNickname, "userToUnfollow", userToUnfollow)).consume();
-                return 1;
+                return null;
             });
         }
     }

@@ -94,9 +94,9 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void reportQuestion(String questionId) throws BusinessException {
+    public void reportQuestion(String questionId, boolean report) throws BusinessException {
         try {
-            questionDAO.reportQuestion(questionId);
+            questionDAO.reportQuestion(questionId, report);
         } catch (Exception e){
             throw new BusinessException(e);
         }
