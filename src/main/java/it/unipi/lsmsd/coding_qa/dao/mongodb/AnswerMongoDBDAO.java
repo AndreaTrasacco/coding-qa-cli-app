@@ -40,10 +40,12 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             //answerDAO.accept("63e14ed126dc67afbbdb0a58_2023-02-08T16:19:28.705+00:00");
             //PageDTO<QuestionDTO> page = answerDAO.getReportedQuestions(1);
             //System.out.println("reported questions: "+page.getEntries());
-            PageDTO<AnswerDTO> page = answerDAO.getReportedAnswers(1);
-            System.out.println("reported answers: "+page.getEntries());
+            //PageDTO<AnswerDTO> page = answerDAO.getReportedAnswers(1);
+            //System.out.println("reported answers: "+page.getEntries());
             //System.out.println("reported answers: "+page.getEntries().get(0).getBody());
             //System.out.println("reported answers: "+page.getEntries().get(0).getId());
+            PageDTO<AnswerDTO> page = answerDAO.getAnswersPage(1, "63d171b409f8b5fdd264791d");
+            System.out.println("answers: "+page.getEntries());
         } catch(Exception e){
             e.printStackTrace();
         }
@@ -408,7 +410,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
     }
 
 
-    /*public PageDTO<AnswerDTO> getAnswersPage(int page, String id) throws DAOException{
+    public PageDTO<AnswerDTO> getAnswersPage(int page, String id) throws DAOException{
         try(MongoClient myClient = getConnection()) {
             MongoDatabase database = myClient.getDatabase(DB_NAME);
             MongoCollection collectionQuestions = database.getCollection("questions");
@@ -417,10 +419,34 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             Bson sort = Aggregates.sort(Sorts.descending("answers.createdDate"));
             Bson skip = Aggregates.skip((page-1) * Constants.PAGE_SIZE);
             Bson limit = Aggregates.limit(Constants.PAGE_SIZE);
-            List<Answer> answers = new ArrayList<>();
+            List<AnswerDTO> answers = new ArrayList<>();
             QuestionPageDTO questionPageDTO = new QuestionPageDTO();
             questionPageDTO.setId(id);
-            collectionQuestions.aggregate(Arrays.asList(match, unwind, sort, limit)).forEach(doc -> {
+
+
+            AggregateIterable<Document> mongoList = collectionQuestions.aggregate(Arrays.asList(match, unwind, sort, limit, skip));
+            for(Document doc : mongoList){
+                questionPageDTO.setTitle(doc.getString("title"));
+                questionPageDTO.setBody(doc.getString("body"));
+                questionPageDTO.setAuthor(doc.getString("author"));
+                questionPageDTO.setTopic(doc.getString("topic"));
+                questionPageDTO.setCreatedDate(doc.getDate("createdDate"));
+
+                AnswerDTO answer = new AnswerDTO(doc.getObjectId("_id").toString() + "_" + doc.getDate("createdDate").toInstant(),
+                        doc.getString("answer.body"), doc.getDate("createdDate"), doc.getString("author"), doc.getInteger("score")
+                        , doc.getBoolean("accepted"));
+
+                answers.add(answer);
+            }
+
+            /*try(MongoCursor<Document> result = mongoList.iterator()) {
+                while (result.hasNext()) {
+                    Document doc = result.next();
+
+                }
+            }*/
+
+            /*collectionQuestions.aggregate(Arrays.asList(match, unwind, sort, limit)).forEach(doc -> {
 
                 questionPageDTO.setTitle(doc.getString("title"));
                 questionPageDTO.setBody(doc.getString("body"));
@@ -435,14 +461,16 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
                         doc.getList("answers.voters", String.class), doc.getBoolean("accepted"), doc.getBoolean("reported"));
 
                 answers.add(answer);
-            });
+            });*/
 
-            PageDTO<Answer> answersPage = new PageDTO<>();
+            PageDTO<AnswerDTO> answersPage = new PageDTO<>();
             answersPage.setEntries(answers);
             answersPage.setCounter(answers.size());
+
+            return answersPage;
         } catch(Exception e){
             throw new DAOException(e);
         }
-    }*/
+    }
 
 }

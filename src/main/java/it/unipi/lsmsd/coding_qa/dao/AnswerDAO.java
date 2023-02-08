@@ -14,7 +14,7 @@ public interface AnswerDAO {
     void getBody(AnswerDTO answer) throws DAOException;
     void delete(String id) throws DAOException;
     // dato il range della pagina trovare le risposte
-    //PageDTO<AnswerDTO> getAnswersPage(int page, String id) throws DAOException;
+    PageDTO<AnswerDTO> getAnswersPage(int page, String id) throws DAOException;
     void report(String id) throws DAOException;
     boolean vote(String id, boolean voteType, String idVoter) throws DAOException; // true: upvote, false: downvote
     void accept(String id) throws DAOException; // accepting an answer means closing the question
