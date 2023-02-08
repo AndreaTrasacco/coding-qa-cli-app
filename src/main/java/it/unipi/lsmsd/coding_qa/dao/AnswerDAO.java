@@ -2,17 +2,16 @@ package it.unipi.lsmsd.coding_qa.dao;
 
 import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
 import it.unipi.lsmsd.coding_qa.dto.AnswerDTO;
+import it.unipi.lsmsd.coding_qa.dto.AnswerScoreDTO;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
 import it.unipi.lsmsd.coding_qa.model.Answer;
-
-import java.util.List;
 
 public interface AnswerDAO {
     void create(String questionId, Answer answer) throws DAOException;
     Answer update(Answer answer) throws DAOException;
     void getBody(AnswerDTO answer) throws DAOException;
-    void delete(String id) throws DAOException;
+    AnswerScoreDTO delete(String id) throws DAOException;
     // dato il range della pagina trovare le risposte
     PageDTO<AnswerDTO> getAnswersPage(int page, String id) throws DAOException;
     void report(String id) throws DAOException;

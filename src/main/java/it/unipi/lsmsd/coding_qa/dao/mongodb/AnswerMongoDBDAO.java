@@ -5,10 +5,8 @@ import com.mongodb.client.model.*;
 import it.unipi.lsmsd.coding_qa.dao.AnswerDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
-import it.unipi.lsmsd.coding_qa.dto.AnswerDTO;
-import it.unipi.lsmsd.coding_qa.dto.PageDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionPageDTO;
+import it.unipi.lsmsd.coding_qa.dto.*;
+import it.unipi.lsmsd.coding_qa.dto.aggregations.QuestionScoreDTO;
 import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.model.Question;
 import it.unipi.lsmsd.coding_qa.utils.Constants;
@@ -135,7 +133,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
     }
 
     // OK TODO (se cancella l'unica risposta rimane array answers), va bene unset? usare pull?
-    public void delete(String id) throws DAOException{
+    public AnswerScoreDTO delete(String id) throws DAOException{
         try (MongoClient myClient = getConnection()){
             MongoDatabase database = myClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
