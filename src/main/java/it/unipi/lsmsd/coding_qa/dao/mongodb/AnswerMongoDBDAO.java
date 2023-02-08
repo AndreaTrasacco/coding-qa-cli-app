@@ -1,10 +1,7 @@
 package it.unipi.lsmsd.coding_qa.dao.mongodb;
 
 import com.mongodb.client.*;
-import com.mongodb.client.model.Aggregates;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Sorts;
-import com.mongodb.client.model.Updates;
+import com.mongodb.client.model.*;
 import it.unipi.lsmsd.coding_qa.dao.AnswerDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
@@ -32,13 +29,21 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         AnswerMongoDBDAO answerDAO = new AnswerMongoDBDAO();
         try {
             //answerDAO.create("63e14ed126dc67afbbdb0a58", new Answer("1", "a", new Date(), "a", 1, new ArrayList<>(), false, false));
-            //AnswerDTO answerDTO = new AnswerDTO("63e14ed126dc67afbbdb0a58_2023-02-07T18:37:30.975+00:00", null, null, "a", 1 , false);
-            //System.out.println(answerDTO.getBody());
-            //answerDAO.getBody(new AnswerDTO("63e14ed126dc67afbbdb0a58_2023-02-07T18:37:30.975+00:00", null, null, "a", 1 , false));
-            //System.out.println(answerDTO.getBody());
+            //AnswerDTO answerDTO = new AnswerDTO("63e14ed126dc67afbbdb0a58_2023-02-08T16:19:28.705+00:00", null, null, "a", 1 , false);
+            //System.out.println("prima: "+answerDTO.getBody());
+            //answerDAO.getBody(answerDTO);
+            //System.out.println("dopo: "+answerDTO.getBody());
             //answerDAO.delete("63e14ed126dc67afbbdb0a58_2023-02-07T18:26:25.307+00:00");
             //answerDAO.report("63e14ed126dc67afbbdb0a58_2023-02-07T18:37:30.975+00:00");
-            answerDAO.vote("63e14ed126dc67afbbdb0a58_2023-02-07T18:37:30.975+00:00", true, "1");
+            //answerDAO.vote("63e14ed126dc67afbbdb0a58_2023-02-07T18:37:30.975+00:00", true, "1");
+            //answerDAO.vote("63e14ed126dc67afbbdb0a58_2023-02-08T16:19:28.705+00:00", true, "1");
+            //answerDAO.accept("63e14ed126dc67afbbdb0a58_2023-02-08T16:19:28.705+00:00");
+            //PageDTO<QuestionDTO> page = answerDAO.getReportedQuestions(1);
+            //System.out.println("reported questions: "+page.getEntries());
+            //PageDTO<AnswerDTO> page = answerDAO.getReportedAnswers(1);
+            //System.out.println("reported answers: "+page.getEntries());
+            //System.out.println("reported answers: "+page.getEntries().get(0).getBody());
+            //System.out.println("reported answers: "+page.getEntries().get(0).getId());
         } catch(Exception e){
             System.out.println("Errore");
         }
@@ -58,6 +63,8 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             answerDoc.put("body", answer.getBody());
             answerDoc.put("createdDate", date); // messo string, dovevo mettere date?
             answerDoc.put("author", answer.getAuthor());
+            answerDoc.put("score", 0);
+            answerDoc.put("accepted", false);
             collectionQuestion.updateOne(Filters.eq("_id", new ObjectId(questionId)),
                             Updates.push("answers", answerDoc));
 
@@ -85,7 +92,6 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
                 System.out.println("Errore nel parsing1"+e.getMessage());
             }
 
-            //String answerIndex = answer.getId().substring(answer.getId().indexOf('-'));
             int answerIndex = findAnswerIndex(questionId, createdDate);
             System.out.println("indice: "+answerIndex);
 
@@ -102,7 +108,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         }
     }
 
-    // errore parsing
+    // OK
     public void getBody(AnswerDTO answer) throws DAOException{
         try (MongoClient myClient = getConnection()){
             MongoDatabase database = myClient.getDatabase(DB_NAME);
@@ -117,7 +123,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
 
             String body = answerDoc.getString("body");
             answer.setBody(body);
-            int score = answerDoc.getInteger("score");
+            int score = answerDoc.getInteger("score");;
             answer.setScore(score);
             boolean accepted = answerDoc.getBoolean("accepted");
             answer.setAccepted(accepted);
@@ -126,7 +132,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         }
     }
 
-    // OK (se cancella l'unica risposta rimane array answers), va bene unset? usare pull?
+    // OK TODO (se cancella l'unica risposta rimane array answers), va bene unset? usare pull?
     public void delete(String id) throws DAOException{
         try (MongoClient myClient = getConnection()){
             MongoDatabase database = myClient.getDatabase(DB_NAME);
@@ -143,9 +149,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
                 System.out.println("Errore nel parsing1"+e.getMessage());
             }
 
-            //String answerIndex = answer.getId().substring(answer.getId().indexOf('-'));
             int answerIndex = findAnswerIndex(questionId, createdDate);
-            System.out.println("indice: "+answerIndex);
 
 
             collectionQuestion.updateOne(
@@ -186,7 +190,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
     }
 
 
-    // Errore nel parsing dentro findAnswer
+    // OK
     public boolean vote(String id, boolean voteType, String idVoter) throws DAOException{
         try (MongoClient myClient = getConnection()){
             MongoDatabase database = myClient.getDatabase(DB_NAME);
@@ -204,15 +208,18 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             }
             int answerDocIndex = findAnswerIndex(questionId, createdDate);
 
+            // TODO fare ottimizzazione
             // ottimizzare, fa due volte la query?
             //ottimizzare facendo --> List<String> voters = collectionQuestion.find("_id", new ObjectId(questionId)). getList(answers.voters);
             Document answerDoc = findAnswer(id);
             List<String> voters = (List<String>) answerDoc.get("voters");
 
-            for(String idVot : voters){
-                // user has already voted
-                if(idVoter == idVot){
-                    return false;
+            if(voters != null) {
+                for (String idVot : voters) {
+                    // user has already voted
+                    if (idVoter == idVot) {
+                        return false;
+                    }
                 }
             }
 
@@ -228,16 +235,18 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         return true;
     }
 
+    // OK
     public void accept(String id) throws DAOException{
         try(MongoClient myClient = getConnection()) {
             MongoDatabase database = myClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
             // questionId_createdDate
             String questionId = id.substring(0, id.indexOf('_'));
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+            //SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
             Date createdDate = null;
             try {
-                createdDate = dateFormat.parse(id.substring(id.indexOf('_')));
+                createdDate = dateFormat.parse(id.substring(id.indexOf('_')+1));
             } catch(ParseException e){
                 System.out.println("Errore nel parsing");
             }
@@ -253,6 +262,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         }
     }
 
+    // OK
     public PageDTO<QuestionDTO> getReportedQuestions(int page) throws DAOException{
         try(MongoClient myClient = getConnection()){
             MongoDatabase database = myClient.getDatabase(DB_NAME);
@@ -262,8 +272,9 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
 
             int pageOffset = (page - 1) * Constants.PAGE_SIZE;
 
-            collectionQuestions.find(Filters.eq("reported", true)).skip(pageOffset).limit(Constants.PAGE_SIZE).forEach(doc -> {
-                QuestionDTO temp = new QuestionDTO(doc.getObjectId("_id").toHexString(), doc.getString("title"),
+            Bson project = Projections.include("_id", "answers.body", "title", "createdDate", "topic", "author");
+            collectionQuestions.find(Filters.eq("reported", true)).projection(project).skip(pageOffset).limit(Constants.PAGE_SIZE).forEach(doc -> {
+                QuestionDTO temp = new QuestionDTO(doc.getObjectId("_id").toString(), doc.getString("title"),
                         doc.getDate("createdDate"), doc.getString("topic"), doc.getString("author"));
                 reportedQuestions.add(temp);
             });
@@ -277,6 +288,8 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             throw new DAOException(e);
         }
     }
+
+    // OK
     public PageDTO<AnswerDTO> getReportedAnswers(int page) throws DAOException{
         try(MongoClient myClient = getConnection()){
             MongoDatabase database = myClient.getDatabase(DB_NAME);
@@ -286,14 +299,22 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
 
             int pageOffset = (page - 1) * Constants.PAGE_SIZE;
 
-            Bson filter = Filters.eq("ansewers.reported", true);
-            List<Document> result = collectionQuestions.find(filter).skip(pageOffset).limit(Constants.PAGE_SIZE).into(new ArrayList<>());
+            Bson filter = Filters.eq("answers.reported", true);
+            Bson project = Projections.include("_id", "answers.body", "answers.createdDate", "answers.author", "answers.score");
+            List<Document> result = collectionQuestions.find(filter).projection(project).skip(pageOffset).limit(Constants.PAGE_SIZE).into(new ArrayList<>());
+
+            System.out.println("result: "+result);
 
             for (Document document : result) {
-                reportedAnswers.add(new AnswerDTO(document.getString("_id"), document.getString("body"),
-                        document.getDate("createdDate"), document.getString("author"),
-                        document.getInteger("score"), document.getBoolean("accepted")));
+                for(Document ans : document.getList("answers", Document.class)){
+                    reportedAnswers.add(new AnswerDTO(document.getObjectId("_id").toString()+"_"+ans.getDate("createdDate").toInstant(), ans.getString("body"),
+                            ans.getDate("createdDate"), ans.getString("author"),
+                            ans.getInteger("score"), false));
+                }
+
             }
+
+            System.out.println("result: "+reportedAnswers);
 
             pageDTO.setCounter(reportedAnswers.size());
             pageDTO.setEntries(reportedAnswers);
@@ -348,17 +369,13 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             System.out.println("Errore nel parsing");
         }
 
-        System.out.println(createdDate);
-
         try (MongoClient myClient = getConnection()){
             MongoDatabase database = myClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
             Document question = collectionQuestion.find(Filters.eq("_id", new ObjectId(questionId))).first();
             List<Document> answers = (List<Document>) question.get("answers");
             for(Document answer : answers){
-                System.out.println("qui1");
                 Date date = answer.getDate("createdDate");
-                System.out.println(date+ " "+createdDate);
                 if(date.compareTo(createdDate) == 0){
                     return answer;
                 }
