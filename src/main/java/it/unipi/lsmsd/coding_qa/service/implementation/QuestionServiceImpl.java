@@ -2,6 +2,8 @@ package it.unipi.lsmsd.coding_qa.service.implementation;
 
 import it.unipi.lsmsd.coding_qa.dao.*;
 import it.unipi.lsmsd.coding_qa.dao.enums.DAORepositoryEnum;
+import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
+import it.unipi.lsmsd.coding_qa.dao.exception.DAONodeException;
 import it.unipi.lsmsd.coding_qa.dto.*;
 import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.model.Question;
@@ -79,8 +81,10 @@ public class QuestionServiceImpl implements QuestionService {
             // TODO SCALARE ANCHE SCORE DELL'UTENTE
             // TODO CONTROLLARE SE L'UTENTE HA ALTRE RISPOSTE SU QUELLA DOMANDA
             //questionNodeDAO.deleteAnsweredEdge(answer.getParentQuestionId(), answer.getAuthor());
-        } catch (Exception e){
+        } catch (DAOException e){
             throw new BusinessException(e);
+        } catch (DAONodeException d){
+            // rollback solo mongo
         }
     }
 

@@ -25,6 +25,7 @@ public class UserServiceImpl implements UserService {
         this.questionNodeDAO = DAOLocator.getQuestionNodeDAO(DAORepositoryEnum.NEO4J);
     }
     public RegisteredUser register(RegisteredUser user) throws BusinessException{
+        // dto -> built RegisteredUser -> dao -> dto
         try {
             /*userNodeDAO.create(user.getNickname());
             return userDAO.register(user);*/
