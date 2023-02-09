@@ -18,23 +18,9 @@ public interface QuestionService {
 
     void deleteQuestion(String questionId) throws BusinessException;
 
-    void addAnswer(String questionId, AnswerDTO answerDTO) throws BusinessException;
-
-    void updateAnswer(String answerId, String body) throws BusinessException;
-
-    void deleteAnswer(AnswerDTO answerDTO) throws BusinessException; // TODO aggiornamento score
-
-    boolean voteAnswer(String answerId, boolean voteType, String userId) throws BusinessException; // true: upvote, false: downvote
-
     void reportQuestion(String questionId, boolean report) throws BusinessException;
 
     PageDTO<QuestionDTO> getReportedQuestions(int page) throws BusinessException;
-
-    void reportAnswer(String answerId, boolean report) throws BusinessException;
-
-    PageDTO<AnswerDTO> getReportedAnswers() throws BusinessException;
-
-    boolean acceptAnswer(String answerId) throws BusinessException;
 
     QuestionPageDTO getQuestionInfo(String id) throws BusinessException;
 
