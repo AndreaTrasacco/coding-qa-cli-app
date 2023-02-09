@@ -84,7 +84,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
 
             // questionId_answerIndex
             String questionId = answer.getId().substring(0, answer.getId().indexOf('_'));
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZ");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
             Date createdDate = null;
             try {
                 createdDate = dateFormat.parse(answer.getId().substring(answer.getId().indexOf('_')+1));
@@ -92,16 +92,10 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
                 System.out.println("Errore nel parsing1"+e.getMessage());
             }
 
-            int answerIndex = findAnswerIndex(questionId, createdDate);
-            System.out.println("indice: "+answerIndex);
-
             collectionQuestion.updateOne(Filters.eq("_id", new ObjectId(questionId)),
-                    Updates.combine(Updates.set("answers." + answerIndex + ".body", answer.getBody()),
-                            Updates.set("answers." + answerIndex + ".author", answer.getAuthor()),
-                            Updates.set("answers." + answerIndex + ".score", answer.getScore()),
-                            Updates.set("answers." + answerIndex + ".voters", answer.getVoters()),
-                            Updates.set("answers." + answerIndex + ".accepted", answer.isAccepted()),
-                            Updates.set("answers." + answerIndex + ".reported", answer.isReported())));
+                    Updates.combine(Updates.set("answers.$[xxx].body", answer.getBody())),
+                    new UpdateOptions().arrayFilters(Arrays.asList( Filters.eq("xxx.createdDate", createdDate)))
+            );
             return answer;
         } catch(Exception e){
             throw new DAOException(e);
