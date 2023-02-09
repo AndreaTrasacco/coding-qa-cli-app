@@ -11,5 +11,5 @@ public interface UserDAO {
     UserDTO getInfo(String id) throws DAOException;
     int getScore(String id) throws DAOException;
     void updateScore(String nickname, int quantity) throws DAOException;
-    void delete(String id) throws DAOException;
+    void delete(String nickname) throws DAOException;
 }
