@@ -18,6 +18,7 @@ import java.util.*;
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Sorts.ascending;
 
 public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     @Override
@@ -117,14 +118,14 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     }
 
     @Override
-    public PageDTO<QuestionDTO> getReportedQuestions() throws DAOException {
+    public PageDTO<QuestionDTO> getReportedQuestions(int page) throws DAOException {
         PageDTO<QuestionDTO> reportedQuestions = new PageDTO<>();
         List<QuestionDTO> reportedQ = new ArrayList<>();
         try (MongoClient mongoClient = getConnection()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
-            collectionQuestions.find(eq("reported", true)).projection(fields(include("title", "author", "createdDate", "topic"))).forEach(doc -> {
+            collectionQuestions.find(eq("reported", true)).projection(fields(include("title", "author", "createdDate", "topic"))).sort(ascending("createdDate")).skip((page - 1) * Constants.PAGE_SIZE).limit(Constants.PAGE_SIZE).forEach(doc -> {
                 QuestionDTO temp = new QuestionDTO(doc.getObjectId("_id").toString(),
                         doc.getString("title"),
                         doc.getDate("createdDate"),

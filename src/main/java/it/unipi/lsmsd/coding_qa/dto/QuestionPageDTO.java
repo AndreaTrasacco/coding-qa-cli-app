@@ -14,9 +14,10 @@ public class QuestionPageDTO {
     private PageDTO<AnswerDTO> answers;
     private Date createdDate;
 
-    public QuestionPageDTO(){
+    public QuestionPageDTO() {
 
     }
+
     public QuestionPageDTO(String id, String title, String body, String topic, String author, PageDTO<AnswerDTO> answers, Date createdDate) {
         this.id = id;
         this.title = title;
@@ -25,6 +26,10 @@ public class QuestionPageDTO {
         this.author = author;
         this.answers = answers;
         this.createdDate = createdDate;
+    }
+
+    public QuestionPageDTO(String id, String title, String body, String topic, String author, Date createdDate) {
+        this(id, title, body, topic, author, null, createdDate);
     }
 
     public String getId() {
