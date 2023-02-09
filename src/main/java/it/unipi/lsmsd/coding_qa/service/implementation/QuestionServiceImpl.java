@@ -18,6 +18,7 @@ public class QuestionServiceImpl implements QuestionService {
     private QuestionDAO questionDAO;
     private AnswerDAO answerDAO;
     private QuestionNodeDAO questionNodeDAO;
+    private UserDAO userDAO;
 
     public QuestionServiceImpl(){
         this.questionDAO = DAOLocator.getQuestionDAO(DAORepositoryEnum.MONGODB);
@@ -35,9 +36,18 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void addAnswer(String questionId, Answer answer) throws BusinessException {
+    public void addAnswer(String questionId, AnswerDTO answerDTO) throws BusinessException {
         try {
+            Answer answer = new Answer(answerDTO.getId(), answerDTO.getBody(), answerDTO.getCreatedDate(),
+                    answerDTO.getAuthor(), answerDTO.getScore(), answerDTO.getVoters(), answerDTO.isAccepted(), false);
             answerDAO.create(questionId, answer);
+            questionNodeDAO.createAnswer(answer);
+        } catch (DAONodeException e){
+            try {
+                answerDAO.delete(answerDTO.getId());
+            } catch (DAOException ex) {
+                throw new BusinessException(ex);
+            }
         } catch (Exception e){
             throw new BusinessException(e);
         }
@@ -54,9 +64,9 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void updateAnswer(Answer answer) throws BusinessException {
+    public void updateAnswer(String answerId, String body) throws BusinessException {
         try {
-            //answerDAO.updateBody();
+            answerDAO.updateBody(answerId, body);
         } catch(Exception e){
             throw new BusinessException(e);
         }
@@ -75,23 +85,33 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void deleteAnswer(String answerId) throws BusinessException {
+    public void deleteAnswer(AnswerDTO answerDTO) throws BusinessException {
         try {
-            answerDAO.delete(answerId); // TODO METODO POTREBBE RESTITUIRE ID DOMANDA?? PER ESSERE USATO NEL GRAFO. E SCORE??
+            AnswerScoreDTO score = answerDAO.delete(answerDTO.getId());
+            userDAO.updateScore(score.getAuthor(), score.getScore());
+            questionNodeDAO.deleteAnswer(answerDTO.getId(), answerDTO.getAuthor());
+            // TODO METODO POTREBBE RESTITUIRE ID DOMANDA?? PER ESSERE USATO NEL GRAFO. E SCORE??
             // TODO SCALARE ANCHE SCORE DELL'UTENTE
             // TODO CONTROLLARE SE L'UTENTE HA ALTRE RISPOSTE SU QUELLA DOMANDA
             //questionNodeDAO.deleteAnsweredEdge(answer.getParentQuestionId(), answer.getAuthor());
-        } catch (DAOException e){
+        } catch (DAONodeException e){
+            String questionId = answerDTO.getId().substring(0, answerDTO.getId().indexOf('_'));
+            Answer answer = new Answer(answerDTO.getId(), answerDTO.getBody(), answerDTO.getCreatedDate(),
+                    answerDTO.getAuthor(), answerDTO.getScore(), answerDTO.getVoters(), answerDTO.isAccepted(), false);
+            try {
+                answerDAO.create(questionId, answer);
+            } catch (DAOException ex) {
+                throw new BusinessException(ex);
+            }
+        } catch(Exception e){
             throw new BusinessException(e);
-        } catch (DAONodeException d){
-            // rollback solo mongo
         }
     }
 
     @Override
-    public void voteAnswer(String answerId, boolean voteType) throws BusinessException {
+    public boolean voteAnswer(String answerId, boolean voteType, String userId) throws BusinessException {
         try {
-            //answerDAO.vote(answerId, voteType);
+            return answerDAO.vote(answerId, voteType, userId);
         } catch (Exception e){
             throw new BusinessException(e);
         }
@@ -107,9 +127,9 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void reportAnswer(String answerId) throws BusinessException { // TODO "UNREPORT" (ANCHE QUI AGGIUNGENDO PARAM)
+    public void reportAnswer(String answerId, boolean report) throws BusinessException {
         try {
-            answerDAO.report(answerId, true);
+            answerDAO.report(answerId, report);
         } catch (Exception e){
             throw new BusinessException(e);
         }
@@ -134,13 +154,22 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void acceptAnswer(String questionId, String answerId) throws BusinessException {
-        try {/*
-            answerDAO.accept(answerId);
-            questionNodeDAO.close(new Question(answer.getParentQuestionId()));*/
+    public boolean acceptAnswer(String answerId) throws BusinessException {
+        boolean success = false;
+        try {
+            String questionId = answerId.substring(0, answerId.indexOf('_'));
+            success = answerDAO.accept(answerId, true);
+            questionNodeDAO.updateClose(questionId, true);
+        } catch (DAONodeException e){
+            try {
+                answerDAO.accept(answerId, false);
+            } catch (DAOException ex) {
+                throw new BusinessException(ex);
+            }
         } catch (Exception e){
             throw new BusinessException(e);
         }
+        return success;
     }
 
     @Override
