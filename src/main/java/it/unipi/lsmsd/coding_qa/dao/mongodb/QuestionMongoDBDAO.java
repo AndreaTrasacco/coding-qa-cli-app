@@ -62,12 +62,24 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     }
 
     @Override
-    public void updateQuestion(Question question) throws DAOException {
-        //Only title, body and topic can be updated
+    public Question updateQuestion(Question question) throws DAOException {
+        //Only title, body and topic can be updated with this method
         try (MongoClient mongoClient = getConnection()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
-            collectionQuestions.updateOne(eq("_id", new ObjectId(question.getId())), Updates.combine(Updates.set("title", question.getTitle()), Updates.set("body", question.getBody()), Updates.set("topic", question.getTopic())));
+            Document doc = collectionQuestions.findOneAndUpdate(
+                    eq("_id", new ObjectId(question.getId())),
+                    Updates.combine(Updates.set("title", question.getTitle()), Updates.set("body", question.getBody()), Updates.set("topic", question.getTopic())),
+                    new FindOneAndUpdateOptions().projection(fields(excludeId(), include("title", "body", "topic"))));
+            Question oldQuestion = null;
+            if (doc != null) {
+                oldQuestion = new Question();
+                oldQuestion.setId(question.getId());
+                oldQuestion.setTitle(doc.getString("title"));
+                oldQuestion.setBody(doc.getString("body"));
+                oldQuestion.setTopic(doc.getString("topic"));
+            }
+            return oldQuestion;
         } catch (Exception ex) {
             throw new DAOException(ex);
         }
@@ -90,8 +102,8 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
             QuestionPageDTO questionPageDTO = new QuestionPageDTO();
-            Document doc = collectionQuestions.find(eq("_id", new ObjectId(id))).projection(fields(excludeId(),include("title","body","topic","author","createdDate"))).first();
-            if(doc == null) return null;
+            Document doc = collectionQuestions.find(eq("_id", new ObjectId(id))).projection(fields(excludeId(), include("title", "body", "topic", "author", "createdDate"))).first();
+            if (doc == null) return null;
             questionPageDTO.setId(id);
             questionPageDTO.setTitle(doc.getString("title"));
             questionPageDTO.setTopic(doc.getString("topic"));
