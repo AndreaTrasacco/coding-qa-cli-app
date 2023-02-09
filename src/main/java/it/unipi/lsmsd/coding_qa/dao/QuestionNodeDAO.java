@@ -3,6 +3,7 @@ package it.unipi.lsmsd.coding_qa.dao;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAONodeException;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
+import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.model.Question;
 
 public interface QuestionNodeDAO {
@@ -12,4 +13,6 @@ public interface QuestionNodeDAO {
     void updateClose(String questionId, boolean type) throws DAONodeException;
     PageDTO<QuestionDTO> viewCreatedQuestions(String nickname, int page) throws DAONodeException;
     PageDTO<QuestionDTO> viewAnsweredQuestions(String nickname, int page) throws DAONodeException;
+    void createAnswer(Answer answer) throws DAONodeException;
+    void deleteAnswer(String answerId, String author) throws DAONodeException;
 }

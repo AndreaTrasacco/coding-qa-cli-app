@@ -6,6 +6,7 @@ import it.unipi.lsmsd.coding_qa.dao.exception.DAONodeException;
 import it.unipi.lsmsd.coding_qa.dao.mongodb.QuestionMongoDBDAO;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
+import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.model.Question;
 import it.unipi.lsmsd.coding_qa.utils.Constants;
 import org.neo4j.driver.Record;
@@ -24,6 +25,11 @@ import java.util.List;
 import static org.neo4j.driver.Values.parameters;
 
 public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
+
+    /*public static void main(String[] args){
+
+    }*/
+
     public void create(Question question) throws DAONodeException {
         try (Session session = getSession()) {
             session.writeTransaction(tx -> {
@@ -148,6 +154,36 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
             qDAO.deleteQuestion(q.getId());
         } catch (Exception ex) {
             ex.printStackTrace();
+        }
+    }
+
+
+    public void createAnswer(Answer answer) throws DAONodeException {
+        String createQuery = "MATCH (u:User), (q:Question) WHERE u.nickname = nickname "+
+                "AND q.id = $questionId CREATE (u)-[:ANSWERED]->(q)";
+
+        try (Session session = getSession()) {
+            session.writeTransaction(tx -> {
+                tx.run(createQuery, parameters("nickname", answer.getAuthor(),
+                        "id", answer.getId().substring(0, answer.getId().indexOf('_')))).consume();
+                return null;
+            });
+        } catch (Exception ex) {
+            throw new DAONodeException(ex);
+        }
+    }
+
+    public void deleteAnswer(String answerId, String author) throws DAONodeException{
+        final String deleteQuery = "MATCH (u: User{nickname: $nickname})-[a:ANSWERED]->(q: Question{id: $id})" +
+                "DELETE a";
+        try(Session session = getSession()){
+            session.writeTransaction(tx -> {
+                tx.run(deleteQuery, parameters("nickname", author,
+                        "id", answerId.substring(0, answerId.indexOf('_'))));
+                return 1;
+            });
+        } catch (Exception ex) {
+            throw new DAONodeException(ex);
         }
     }
 }

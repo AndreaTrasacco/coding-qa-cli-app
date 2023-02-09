@@ -34,7 +34,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             answerDAO.updateBody(answer.getId(), answer.getBody());
             answerDAO.getCompleteAnswer(answer);
             // answerDAO.report(answer.getId(), true);
-            System.out.println(answerDAO.accept(answer.getId()));
+            //System.out.println(answerDAO.accept(answer.getId()));
             PageDTO<AnswerDTO> page = answerDAO.getReportedAnswers(1);
             System.out.println(answerDAO.vote(answer.getId(), true, "1"));
             System.out.println(answerDAO.vote(answer.getId(), false, "2"));
@@ -165,7 +165,8 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         }
     }
 
-    public boolean accept(String id) throws DAOException {
+    // TODO aggiunto accepted, non testata
+    public boolean accept(String id, boolean accepted) throws DAOException {
         // The method will accept the answer (and return true) if and only if there isn't already an accepted answer
         try (MongoClient myClient = getConnection()) {
             MongoDatabase database = myClient.getDatabase(DB_NAME);
@@ -174,7 +175,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             Date createdDate = getDateFromString(id.substring(id.indexOf('_') + 1));
             UpdateResult updateResult = collectionQuestion.updateOne(
                     and(eq("_id", new ObjectId(questionId)), ne("answers.accepted", true)),
-                    Updates.combine(Updates.set("answers.$[xxx].accepted", true)),
+                    Updates.combine(Updates.set("answers.$[xxx].accepted", accepted)),
                     new UpdateOptions().arrayFilters(Arrays.asList(eq("xxx.createdDate", createdDate)))
             );
             return (updateResult.getModifiedCount() == 1);
