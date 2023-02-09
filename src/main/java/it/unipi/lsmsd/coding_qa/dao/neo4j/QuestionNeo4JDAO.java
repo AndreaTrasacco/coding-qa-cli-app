@@ -26,9 +26,55 @@ import static org.neo4j.driver.Values.parameters;
 
 public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
 
-    /*public static void main(String[] args){
+    public static void main(String[] args) {
+        /*Question q = new Question();
+        q.setTitle("TITLE");
+        q.setBody("BODY");
+        q.setAuthor("AlexR");
+        q.setTopic("TOPIC");
+        Date cDate = new Date(System.currentTimeMillis());
+        q.setCreatedDate(cDate);
+        QuestionMongoDBDAO qDAO = new QuestionMongoDBDAO();
+        QuestionNeo4JDAO qNodeDAO = new QuestionNeo4JDAO();
+        try {
+            // test create
+            qDAO.createQuestion(q);
+            qNodeDAO.create(q);
+            // test update
+            q.setTitle("ELTIT");
+            qNodeDAO.update(q);
+            // test view created q
+            PageDTO<QuestionDTO> questions = qNodeDAO.viewCreatedQuestions("AlexR", 1);
+            System.out.println(questions.getCounter() == 5);
+            List<QuestionDTO> entries = questions.getEntries();
+            for (QuestionDTO qDTO : entries) {
+                System.out.println(qDTO.getCreatedDate());
+            }
+            // test view answered q
+            questions = qNodeDAO.viewAnsweredQuestions("AlexR", 1);
+            System.out.println(questions.getCounter() == 1);
+            System.out.println(questions.getEntries().get(0).getId().equals("63d171b409f8b5fdd264791d"));
+            // test update close
+            qNodeDAO.updateClose(q.getId(), true);
+            // test delete
+            qNodeDAO.delete(q.getId());
+            questions = qNodeDAO.viewCreatedQuestions("AlexR", 1);
+            System.out.println(questions.getCounter() == 4);
+            qDAO.deleteQuestion(q.getId());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }*/
 
-    }*/
+        QuestionNeo4JDAO qNodeDAO = new QuestionNeo4JDAO();
+        Answer answer = new Answer("63d171b509f8b5fdd2649bbc_.....", "aaa", new Date(), "tgdavies", 1, null, false, false);
+        //Answer answer = new Answer("63d171b609f8b5fdd264c2db_.....", "aaa", new Date(), "tgdavies", 1, null, false, false);
+        try {
+            //qNodeDAO.createAnswer(answer);
+            qNodeDAO.deleteAnswer(answer.getId(), answer.getAuthor());
+        } catch (DAONodeException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void create(Question question) throws DAONodeException {
         try (Session session = getSession()) {
@@ -117,55 +163,15 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
         return getQuestions(nickname, page, "ANSWERED");
     }
 
-    public static void main(String[] args) {
-        Question q = new Question();
-        q.setTitle("TITLE");
-        q.setBody("BODY");
-        q.setAuthor("AlexR");
-        q.setTopic("TOPIC");
-        Date cDate = new Date(System.currentTimeMillis());
-        q.setCreatedDate(cDate);
-        QuestionMongoDBDAO qDAO = new QuestionMongoDBDAO();
-        QuestionNeo4JDAO qNodeDAO = new QuestionNeo4JDAO();
-        try {
-            // test create
-            qDAO.createQuestion(q);
-            qNodeDAO.create(q);
-            // test update
-            q.setTitle("ELTIT");
-            qNodeDAO.update(q);
-            // test view created q
-            PageDTO<QuestionDTO> questions = qNodeDAO.viewCreatedQuestions("AlexR", 1);
-            System.out.println(questions.getCounter() == 5);
-            List<QuestionDTO> entries = questions.getEntries();
-            for (QuestionDTO qDTO : entries) {
-                System.out.println(qDTO.getCreatedDate());
-            }
-            // test view answered q
-            questions = qNodeDAO.viewAnsweredQuestions("AlexR", 1);
-            System.out.println(questions.getCounter() == 1);
-            System.out.println(questions.getEntries().get(0).getId().equals("63d171b409f8b5fdd264791d"));
-            // test update close
-            qNodeDAO.updateClose(q.getId(), true);
-            // test delete
-            qNodeDAO.delete(q.getId());
-            questions = qNodeDAO.viewCreatedQuestions("AlexR", 1);
-            System.out.println(questions.getCounter() == 4);
-            qDAO.deleteQuestion(q.getId());
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
 
     public void createAnswer(Answer answer) throws DAONodeException {
-        String createQuery = "MATCH (u:User), (q:Question) WHERE u.nickname = nickname "+
+        String createQuery = "MATCH (u:User), (q:Question) WHERE u.nickname = $nickname "+
                 "AND q.id = $questionId CREATE (u)-[:ANSWERED]->(q)";
 
         try (Session session = getSession()) {
             session.writeTransaction(tx -> {
                 tx.run(createQuery, parameters("nickname", answer.getAuthor(),
-                        "id", answer.getId().substring(0, answer.getId().indexOf('_')))).consume();
+                        "questionId", answer.getId().substring(0, answer.getId().indexOf('_')))).consume();
                 return null;
             });
         } catch (Exception ex) {

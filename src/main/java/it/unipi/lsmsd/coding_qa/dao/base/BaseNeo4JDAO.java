@@ -8,7 +8,7 @@ import org.neo4j.driver.Session;
 public abstract class BaseNeo4JDAO {
     private static final String NEO4J_URI = "neo4j://localhost:7687"; //TODO mettere l'uri giusto
     private static final String NEO4J_USER = "neo4j"; //TODO mettere username giusto
-    private static final String NEO4J_PASSWORD = "nicolo"; //TODO mettere password giusta
+    private static final String NEO4J_PASSWORD = "neo4j"; //TODO mettere password giusta
 
     private static Driver neo4jDriver;
 
