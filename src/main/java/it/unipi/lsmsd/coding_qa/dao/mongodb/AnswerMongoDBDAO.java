@@ -210,6 +210,22 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         }
     }
 
+    @Override
+    public void setDeletedUserAnswer(String nickname) throws DAOException {
+        try (MongoClient myClient = getConnection()) {
+            MongoDatabase database = myClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collectionQuestion = database.getCollection("questions");
+
+            collectionQuestion.updateMany(
+                    Filters.eq("answers.author", nickname),
+                    Updates.set("answers.$[xxx].author", "deletedUser"),
+                    new UpdateOptions().arrayFilters(Arrays.asList(eq("xxx.author", nickname)))
+            );
+        } catch (Exception e){
+            throw new DAOException(e);
+        }
+    }
+
     public PageDTO<AnswerDTO> getAnswersPage(int page, String questionId) throws DAOException {
         PageDTO<AnswerDTO> answersPage = new PageDTO<>();
         List<AnswerDTO> answers = new ArrayList<>();

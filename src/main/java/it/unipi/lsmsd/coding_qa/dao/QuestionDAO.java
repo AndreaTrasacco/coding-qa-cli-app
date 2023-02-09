@@ -23,4 +23,6 @@ public interface QuestionDAO {
     PageDTO<QuestionDTO> getReportedQuestions(int page) throws DAOException;
 
     PageDTO<QuestionDTO> searchQuestions(int page, String searchString, String topicFilter) throws DAOException;
+
+    void setDeletedUserQuestion(String nickname) throws DAOException;
 }

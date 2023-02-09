@@ -166,6 +166,21 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
         }
     }
 
+    @Override
+    public void setDeletedUserQuestion(String nickname) throws DAOException {
+        try (MongoClient mongoClient = getConnection()){
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
+            MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
+
+            collectionQuestions.updateMany(
+                    Filters.eq("author", nickname),
+                    Updates.set("author", "deletedUser")
+            );
+        } catch (Exception ex) {
+            throw new DAOException(ex);
+        }
+    }
+
     public static void main(String[] args) {
         Question q = new Question();
         q.setTitle("TITLE");
