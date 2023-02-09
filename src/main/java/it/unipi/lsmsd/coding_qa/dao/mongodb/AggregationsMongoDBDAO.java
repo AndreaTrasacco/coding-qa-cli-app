@@ -3,7 +3,6 @@ package it.unipi.lsmsd.coding_qa.dao.mongodb;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Accumulators;
 import it.unipi.lsmsd.coding_qa.dao.AggregationsDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
@@ -13,13 +12,11 @@ import it.unipi.lsmsd.coding_qa.dto.aggregations.TopicDTO;
 import javafx.util.Pair;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.bson.json.JsonWriterSettings;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.mongodb.client.model.Accumulators.*;
 import static com.mongodb.client.model.Aggregates.*;
@@ -29,7 +26,7 @@ import static com.mongodb.client.model.Sorts.*;
 
 public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements AggregationsDAO {
     @Override
-    public List<ExperienceLevelDTO> getExperienceLvlPerCountry() {
+    public List<ExperienceLevelDTO> getExperienceLvlPerCountry() throws DAOException {
         List<ExperienceLevelDTO> experienceLevelDTOList = new ArrayList<>();
         try (MongoClient mongoClient = getConnection()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
@@ -61,15 +58,13 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
                                     Arrays.asList(new Document("$divide", Arrays.asList("$$this.numUsers", "$total")), 100)))))))));
 
 
-            Bson project3 = new Document("$project", new Document( "levels.numUsers", 0));
+            Bson project3 = new Document("$project", new Document("levels.numUsers", 0));
             Bson sort = new Document("$sort", new Document("country", 1));
 
             collectionQuestions.aggregate(Arrays.asList(project1, group1, group2, project2, project3, sort)).forEach(doc -> {
-                System.out.println(doc.toJson(JsonWriterSettings.builder().indent(true).build()));
-
                 List<Pair<String, Double>> pairList = new ArrayList<>();
-                for(int i = 0; i < 3; i++){
-                    Pair<String, Double> pair = new Pair<>(doc.getString("levels."+i+".exp_level"), doc.getDouble("levels."+i+".percentage"));
+                for (Document level : doc.getList("levels", Document.class)){
+                    Pair<String, Double> pair = new Pair<>(level.getString("exp_level"), level.getDouble("percentage"));
                     pairList.add(pair);
                 }
                 ExperienceLevelDTO temp = new ExperienceLevelDTO(doc.getString("country"), pairList);
@@ -78,6 +73,8 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
             });
 
             return experienceLevelDTOList;
+        } catch (Exception ex) {
+            throw new DAOException(ex);
         }
     }
 
@@ -90,19 +87,19 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
             Bson match = match(exists("answers", true));
-            Bson project1 = project(fields(include("topic","title"),new Document("score", new Document("$sum", "$answers.score"))));
+            Bson project1 = project(fields(include("topic", "title"), new Document("score", new Document("$sum", "$answers.score"))));
             Bson sort1 = sort(descending("score"));
             Bson group = group("$topic", first("first", "$title"), first("firstScore", "$score"));
             Bson sort2 = sort(descending("firstScore"));
-            Bson project2 = project(fields(excludeId(), computed("topic", "_id"), include("first", "firstScore")));
+            Bson project2 = project(fields(excludeId(), computed("topic", "$_id"), include("first", "firstScore")));
 
             collectionQuestions.aggregate(Arrays.asList(match, project1, sort1, group, sort2, project2)).forEach(doc -> {
-                QuestionScoreDTO temp = new QuestionScoreDTO(doc.getString("title"), doc.getInteger("firstScore"), doc.getString("topic"));
+                QuestionScoreDTO temp = new QuestionScoreDTO(doc.getString("first"), doc.getInteger("firstScore"), doc.getString("topic"));
                 questionScoreDTOList.add(temp);
             });
 
             return questionScoreDTOList;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             throw new DAOException(ex);
         }
     }
@@ -117,19 +114,26 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
             LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
             LocalDateTime currentDate = LocalDateTime.now();
 
-            Bson match = match(and(exists("answers", true),gte("createdDate", sevenDaysAgo), lt("createdDate", currentDate)));
-            Bson project1 = project(fields(include("topic", "createdDate"), new Document("answerCount", new Document("$size", "$answers")))); // There are no helpers in java driver for $size operator so i use the notation with "new Document(..)"
+            Bson match = match(and(exists("answers", true), gte("createdDate", sevenDaysAgo), lt("createdDate", currentDate)));
+            Bson project1 = project(fields(include("topic", "createdDate"), new Document("answerCount", new Document("$size", "$answers")))); // There are no helpers in java driver for $size operator, so I use the notation with "new Document(..)"
             Bson group = group("$topic", sum("count", "$answerCount"));
             Bson sort = sort(descending("count"));
-            Bson project2 = project(fields(excludeId(), computed("_id", "topic")));
+            Bson project2 = project(fields(excludeId(), computed("topic", "$_id"), include("count")));
 
             collectionQuestions.aggregate(Arrays.asList(match, project1, group, sort, project2)).forEach(doc -> {
                 TopicDTO temp = new TopicDTO(doc.getString("topic"), doc.getInteger("count"));
                 topicDTOList.add(temp);
             });
             return topicDTOList;
-        } catch (Exception ex){
+        } catch (Exception ex) {
             throw new DAOException(ex);
         }
+    }
+
+    public static void main(String[] args) throws DAOException {
+        AggregationsMongoDBDAO aggDAO = new AggregationsMongoDBDAO();
+        List<ExperienceLevelDTO> experienceLevelDTOList = aggDAO.getExperienceLvlPerCountry();
+        List<QuestionScoreDTO> questionScoreDTOList = aggDAO.getUsefulQuestions();
+        List<TopicDTO> topicDTOList= aggDAO.getTopicRank();
     }
 }

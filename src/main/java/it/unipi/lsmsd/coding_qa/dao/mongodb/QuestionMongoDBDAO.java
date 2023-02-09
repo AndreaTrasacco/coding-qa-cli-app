@@ -14,12 +14,10 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
-import static com.mongodb.client.model.Sorts.*;
 
 public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     @Override
@@ -45,12 +43,11 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
         try (MongoClient mongoClient = getConnection()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
-            Bson project = project(fields(excludeId(), include("answers")));
-
-            Document deletedQAnswers = collectionQuestions.findOneAndDelete(eq("_id", new ObjectId(id))/*, new FindOneAndDeleteOptions().projection(project)*/);
+            Bson fields = fields(excludeId(), include("answers"));
+            Document deletedQAnswers = collectionQuestions.findOneAndDelete(eq("_id", new ObjectId(id)), new FindOneAndDeleteOptions().projection(fields));
             // For each answer in the deleted question
             List<AnswerScoreDTO> answerScores = new ArrayList<>();
-            if (deletedQAnswers.containsKey("answers")) {
+            if (deletedQAnswers != null && deletedQAnswers.containsKey("answers")) {
                 List<Document> answers = (ArrayList<Document>) deletedQAnswers.get("answers");
                 for (Document answer : answers) {
                     // Get author and score of the answer
@@ -123,6 +120,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
                         doc.getString("author"));
                 reportedQ.add(temp);
             });
+            reportedQuestions.setCounter(reportedQ.size());
             reportedQuestions.setEntries(reportedQ);
             return reportedQuestions;
         } catch (Exception ex) {
@@ -142,12 +140,11 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
             Bson eq = eq("topic", topicFilter);
             Bson text = text(searchString, options);
             Bson project = fields(include("title", "createdDate", "topic", "author"));
-            collectionQuestions.find(and(eq, text)).projection(project).sort(descending("createdDate")).skip(pageOffset).limit(Constants.PAGE_SIZE).forEach(doc -> {
+            collectionQuestions.find(and(eq, text)).projection(project).skip(pageOffset).limit(Constants.PAGE_SIZE).forEach(doc -> {
                 QuestionDTO temp = new QuestionDTO(doc.getObjectId("_id").toString(), doc.getString("title"),
                         doc.getDate("createdDate"), doc.getString("topic"), doc.getString("author"));
                 questionDTOList.add(temp);
             });
-
             pageDTO.setCounter(questionDTOList.size());
             pageDTO.setEntries(questionDTOList);
             return pageDTO;
@@ -167,7 +164,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
         QuestionMongoDBDAO qDAO = new QuestionMongoDBDAO();
         try {
             // test create and get q info
-            qDAO.createQuestion(q);
+            /*qDAO.createQuestion(q);
             QuestionPageDTO qPage = qDAO.getQuestionInfo(q.getId());
             System.out.println(qPage.getBody().equals(q.getBody()));
             // test update
@@ -181,11 +178,10 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
             System.out.println(page.getEntries().get(0).getId().equals(q.getId()));
             // test search
             page = qDAO.searchQuestions(1, "BODY", "TOPIC");
-            System.out.println(page.getEntries().get(0).getId().equals(q.getId()));
+            System.out.println(page.getEntries().get(0).getId().equals(q.getId()));*/
             // test delete
-            qDAO.deleteQuestion(q.getId());
-            qPage = qDAO.getQuestionInfo(q.getId());
-            System.out.println(qPage == null);
+            List<AnswerScoreDTO> answerScoreDTOS = qDAO.deleteQuestion("63d171b409f8b5fdd2647989");
+            System.out.println(answerScoreDTOS.size());
         } catch (Exception ex) {
             ex.printStackTrace();
         }

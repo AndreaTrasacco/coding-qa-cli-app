@@ -1,5 +1,6 @@
 package it.unipi.lsmsd.coding_qa.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -8,20 +9,15 @@ public class Answer {
     private String body;
     private Date createdDate;
     private String author;
-    private int score;
-    private List<String> voters;
-    private boolean accepted;
-    private boolean reported;
+    private int score = 0;
+    private List<String> voters = new ArrayList<>();
+    private boolean accepted = false;
+    private boolean reported = false;
 
-    public Answer(Answer answer){
-        this.id = answer.id;
-        this.body = answer.body;
-        this.createdDate = answer.createdDate;
-        this.author = answer.author;
-        this.score = answer.score;
-        this.voters = answer.voters;
-        this.accepted = answer.accepted;
-        this.reported = answer.reported;
+    public Answer(String body, Date createdDate, String author){
+        this.body = body;
+        this.createdDate = createdDate;
+        this.author = author;
     }
     public Answer(String id, String body, Date createdDate, String author, int score, List<String> voters, boolean accepted, boolean reported) {
         this.id = id;

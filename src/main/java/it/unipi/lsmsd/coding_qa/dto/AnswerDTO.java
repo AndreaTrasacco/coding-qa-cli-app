@@ -1,5 +1,6 @@
 package it.unipi.lsmsd.coding_qa.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -9,15 +10,25 @@ public class AnswerDTO {
     private Date createdDate;
     private String author;
     private int score;
+    private List<String> voters;
     private boolean accepted;
 
-    public AnswerDTO(String id, String body, Date createdDate, String author, int score, boolean accepted) {
+    public AnswerDTO(String id, String body, Date createdDate, String author, int score, List<String> voters, boolean accepted) {
         this.id = id;
         this.body = body;
         this.createdDate = createdDate;
         this.author = author;
         this.score = score;
+        this.voters = voters;
         this.accepted = accepted;
+    }
+
+    public AnswerDTO(String id, String body, Date createdDate, String author, int score, boolean accepted) {
+        this(id, body, createdDate, author, score, new ArrayList<>(), accepted);
+    }
+
+    public AnswerDTO(String id, String body, Date createdDate, String author, int score) {
+        this(id, body, createdDate, author, score, new ArrayList<>(), false);
     }
 
     public String getId() {
@@ -66,5 +77,13 @@ public class AnswerDTO {
 
     public void setAccepted(boolean accepted) {
         this.accepted = accepted;
+    }
+
+    public List<String> getVoters() {
+        return voters;
+    }
+
+    public void setVoters(List<String> voters) {
+        this.voters = voters;
     }
 }

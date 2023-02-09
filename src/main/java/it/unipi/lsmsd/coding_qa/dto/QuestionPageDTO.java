@@ -11,13 +11,13 @@ public class QuestionPageDTO {
     private String body;
     private String topic;
     private String author;
-    private PageDTO<Answer> answers;
+    private PageDTO<AnswerDTO> answers;
     private Date createdDate;
 
     public QuestionPageDTO(){
 
     }
-    public QuestionPageDTO(String id, String title, String body, String topic, String author, PageDTO<Answer> answers, Date createdDate) {
+    public QuestionPageDTO(String id, String title, String body, String topic, String author, PageDTO<AnswerDTO> answers, Date createdDate) {
         this.id = id;
         this.title = title;
         this.body = body;
@@ -67,11 +67,11 @@ public class QuestionPageDTO {
         this.author = author;
     }
 
-    public PageDTO<Answer> getAnswers() {
+    public PageDTO<AnswerDTO> getAnswers() {
         return answers;
     }
 
-    public void setAnswers(PageDTO<Answer> answers) {
+    public void setAnswers(PageDTO<AnswerDTO> answers) {
         this.answers = answers;
     }
 

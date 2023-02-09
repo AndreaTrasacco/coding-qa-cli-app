@@ -4,6 +4,10 @@ public class AnswerScoreDTO {
     private String author;
     private int score;
 
+    public AnswerScoreDTO() {
+
+    }
+
     public AnswerScoreDTO(String author, int score) {
         this.author = author;
         this.score = score;

@@ -54,7 +54,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public void updateAnswer(Answer answer) throws BusinessException {
         try {
-            answerDAO.update(answer);
+            //answerDAO.updateBody();
         } catch(Exception e){
             throw new BusinessException(e);
         }
@@ -103,9 +103,9 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public void reportAnswer(String answerId) throws BusinessException {
+    public void reportAnswer(String answerId) throws BusinessException { // TODO "UNREPORT" (ANCHE QUI AGGIUNGENDO PARAM)
         try {
-            answerDAO.report(answerId);
+            answerDAO.report(answerId, true);
         } catch (Exception e){
             throw new BusinessException(e);
         }

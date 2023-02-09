@@ -8,7 +8,7 @@ import it.unipi.lsmsd.coding_qa.dto.aggregations.TopicDTO;
 import java.util.List;
 
 public interface AggregationsDAO {
-    List<ExperienceLevelDTO> getExperienceLvlPerCountry(); // TODO RISCRIVERE METODO --> GROUP BY SU PIU CAMPI VA FATTO DEFINENDO DOCUMENTO
+    List<ExperienceLevelDTO> getExperienceLvlPerCountry() throws DAOException;
     List<QuestionScoreDTO> getUsefulQuestions() throws DAOException;
     List<TopicDTO> getTopicRank() throws DAOException;
 }
