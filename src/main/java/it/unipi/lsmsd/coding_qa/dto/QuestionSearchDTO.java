@@ -7,6 +7,11 @@ public class QuestionSearchDTO {
     public QuestionSearchDTO() {
     }
 
+    public QuestionSearchDTO(String text, String topic){
+        this.text = text;
+        this.topic = topic;
+    }
+
     public String getText() {
         return text;
     }
