@@ -98,7 +98,7 @@ public class UserDTO {
                 "\n\t* Birth Date: " + birthdate +
                 "\n\t* Country: " + country +
                 "\n\t* Created Date: " + createdDate +
-                ((website.equals("")) ? "" : "\n\t* Website='" + website) +
+                ((website == null || website.equals("")) ? "" : "\n\t* Website='" + website + "'") +
                 "\n\t* Total score=" + score +
                 "\n****************************************************************************************************\n";
     }

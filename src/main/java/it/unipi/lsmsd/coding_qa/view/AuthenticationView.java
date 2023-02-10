@@ -22,7 +22,7 @@ public class AuthenticationView {
             System.out.println("\t[4] Exit");
             System.out.println("Input: ");
             choice = scanner.nextInt();
-        } while (choice < 1 && choice > 4);
+        } while (choice < 1 || choice > 4);
         if (choice == 4)
             System.out.println("############################################### EXIT ###############################################");
         return choice;

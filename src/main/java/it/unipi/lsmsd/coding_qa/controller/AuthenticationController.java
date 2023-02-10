@@ -42,7 +42,7 @@ public class AuthenticationController {
         authView.showLogoutMessage();
     }
 
-    private String encryptPassword(byte[] hash) {
+    public static String encryptPassword(byte[] hash) {
         StringBuilder hexString = new StringBuilder(2 * hash.length);
         for (int i = 0; i < hash.length; i++) {
             String hex = Integer.toHexString(0xff & hash[i]);
