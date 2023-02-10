@@ -16,16 +16,6 @@ import java.util.Date;
 public class AppTest 
     extends TestCase
 {
-
-    public static void main(String[] args){
-        AnswerDAO answerDAO = new AnswerMongoDBDAO();
-        try {
-            answerDAO.create("1", new Answer("1", "a", new Date(), "a", 1, new ArrayList<>(), false, false));
-        } catch(Exception e){
-            System.out.println(e.getMessage());
-        }
-    }
-
     /**
      * Create the test case
      *

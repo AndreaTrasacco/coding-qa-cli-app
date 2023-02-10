@@ -5,7 +5,6 @@ import it.unipi.lsmsd.coding_qa.dao.enums.DAORepositoryEnum;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAONodeException;
 import it.unipi.lsmsd.coding_qa.dto.*;
-import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.model.Question;
 import it.unipi.lsmsd.coding_qa.service.QuestionService;
 import it.unipi.lsmsd.coding_qa.service.exception.BusinessException;
@@ -16,13 +15,11 @@ import java.util.List;
 public class QuestionServiceImpl implements QuestionService {
 
     private QuestionDAO questionDAO;
-    private AnswerDAO answerDAO;
     private QuestionNodeDAO questionNodeDAO;
     private UserDAO userDAO;
 
     public QuestionServiceImpl() {
         this.questionDAO = DAOLocator.getQuestionDAO(DAORepositoryEnum.MONGODB);
-        this.answerDAO = DAOLocator.getAnswerDAO(DAORepositoryEnum.MONGODB);
         this.questionNodeDAO = DAOLocator.getQuestionNodeDAO(DAORepositoryEnum.NEO4J);
         userDAO = DAOLocator.getUserDAO(DAORepositoryEnum.MONGODB);
     }
@@ -81,15 +78,13 @@ public class QuestionServiceImpl implements QuestionService {
     @Override
     public void deleteQuestion(String questionId) throws BusinessException { // TODO ROLLBACK
         try {
-            List<AnswerScoreDTO> answersScores = questionDAO.deleteQuestion(questionId);// TODO VA MODIFICATO LO SCORE DEGLI UTENTI DELLE RISPOSTE
-            for (AnswerScoreDTO answerScoreDTO : answersScores) {
-                // userDAO.updateScore
-            }
-            // for each answer decrease/increase score of author
-            //questionNodeDAO.deleteIngoingEdges(question);
-            //questionNodeDAO.delete(question);
-        } catch (Exception e) {
-            throw new BusinessException(e);
+            Question oldQuestion = questionNodeDAO.delete(questionId);
+            questionDAO.deleteQuestion(questionId);
+        } catch (DAOException ex){
+            //questionNodeDAO.create();
+        }
+        catch (Exception ex) {
+            throw new BusinessException(ex);
         }
     }
 
@@ -125,6 +120,15 @@ public class QuestionServiceImpl implements QuestionService {
     public PageDTO<QuestionDTO> searchQuestions(int page, String searchString, String topicFilter) throws BusinessException {
         try {
             return questionDAO.searchQuestions(page, searchString, topicFilter);
+        } catch (Exception e) {
+            throw new BusinessException(e);
+        }
+    }
+
+    @Override
+    public PageDTO<QuestionDTO> browseQuestions(int page) throws BusinessException {
+        try {
+            return questionDAO.browseQuestions(page);
         } catch (Exception e) {
             throw new BusinessException(e);
         }

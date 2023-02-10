@@ -6,7 +6,7 @@ import java.util.List;
 
 public class AnswerDTO {
     private String id;
-    private String body;
+    private String body = "";
     private Date createdDate;
     private String author;
     private int score;
@@ -85,5 +85,17 @@ public class AnswerDTO {
 
     public void setVoters(List<String> voters) {
         this.voters = voters;
+    }
+
+    @Override
+    public String toString() {
+        String acc = "";
+        if(accepted)
+            acc = "********************************************* ACCEPTED *********************************************\n";
+        return acc + "\t* Author: " + author +
+                "\n\t* Score: " + score +
+                ((body.equals("")) ? "" : "\n\t* Body:\n" + body) +
+                "\n\t[" + createdDate + "]\n" +
+                "****************************************************************************************************\n";
     }
 }

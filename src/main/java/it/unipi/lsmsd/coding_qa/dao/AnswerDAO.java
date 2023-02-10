@@ -17,5 +17,4 @@ public interface AnswerDAO {
     boolean vote(String id, boolean voteType, String idVoter) throws DAOException; // true: upvote, false: downvote
     boolean accept(String id, boolean accepted) throws DAOException; // Accepting an answer means closing the question
     PageDTO<AnswerDTO> getReportedAnswers(int page) throws DAOException;
-    void setDeletedUserAnswer(String nickname) throws DAOException;
 }

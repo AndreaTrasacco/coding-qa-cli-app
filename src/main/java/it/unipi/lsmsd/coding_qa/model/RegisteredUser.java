@@ -6,8 +6,8 @@ public class RegisteredUser extends User{
     private Date birthdate;
     private String country;
     private Date createdDate;
-    private String website;
-    private int score;
+    private String website = "";
+    private int score = 0;
 
     public RegisteredUser(){
 

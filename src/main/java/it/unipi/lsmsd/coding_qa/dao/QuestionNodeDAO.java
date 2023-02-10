@@ -11,7 +11,7 @@ public interface QuestionNodeDAO {
 
     void update(Question question) throws DAONodeException;
 
-    void delete(String id) throws DAONodeException;
+    Question delete(String id) throws DAONodeException;
 
     void updateClose(String questionId, boolean type) throws DAONodeException;
 

@@ -2,8 +2,7 @@ package it.unipi.lsmsd.coding_qa.service;
 
 import it.unipi.lsmsd.coding_qa.dto.AnswerDTO;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionPageDTO;
+import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.service.exception.BusinessException;
 
 public interface AnswerService { // TODO fare test
@@ -17,7 +16,11 @@ public interface AnswerService { // TODO fare test
 
     void reportAnswer(String answerId, boolean report) throws BusinessException;
 
-    PageDTO<AnswerDTO> getReportedAnswers() throws BusinessException;
+    PageDTO<AnswerDTO> getReportedAnswers(int page) throws BusinessException;
 
     boolean acceptAnswer(String answerId) throws BusinessException;
+
+    PageDTO<AnswerDTO> getAnswersPage(int page, String questionId) throws BusinessException;
+
+    void getCompleteAnswer(AnswerDTO answerDTO) throws BusinessException;
 }

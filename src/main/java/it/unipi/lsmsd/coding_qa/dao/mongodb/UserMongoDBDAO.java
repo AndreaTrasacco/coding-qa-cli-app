@@ -36,8 +36,10 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
                     .append("birthdate", user.getBirthdate())
                     .append("country", user.getCountry())
                     .append("createdDate", user.getCreatedDate())
-                    .append("website", user.getWebsite())
                     .append("score", user.getScore());
+            String website = user.getWebsite();
+            if(!website.equals(""))
+                docUser.append("website", user.getWebsite());
             InsertOneResult result = collectionUser.insertOne(docUser);
             user.setId(docUser.getObjectId("_id").toString());
         } catch (Exception e){
@@ -70,7 +72,8 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
                 user.setFullName(temp.getString("fullName"));
                 user.setEncPassword(encPassword);
                 user.setScore(temp.getInteger("score"));
-                user.setWebsite(temp.getString("website"));
+                if(temp.containsKey("website"))
+                    user.setWebsite(temp.getString("website"));
                 user.setBirthdate(temp.getDate("createdDate"));
                 user.setCreatedDate(temp.getDate("createdDate"));
                 user.setCountry(temp.getString("country"));
@@ -91,13 +94,14 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
                             Updates.set("encPassword", user.getEncPassword()),
                             Updates.set("birthdate", user.getBirthdate()),
                             Updates.set("country", user.getCountry()),
-                            Updates.set("website", user.getWebsite())));
+                            Updates.set("website", user.getWebsite()))); // TODO user potrebbe non avere website (lasciare così)
 
             RegisteredUser oldUser = null;
             if(doc != null){
                 oldUser = new RegisteredUser();
                 oldUser.setFullName(doc.getString("fullName"));
-                oldUser.setWebsite(doc.getString("website"));
+                if(doc.containsKey("website"))
+                    oldUser.setWebsite(doc.getString("website"));
                 oldUser.setBirthdate(doc.getDate("birthdate"));
                 oldUser.setCountry(doc.getString("country"));
                 oldUser.setEncPassword(doc.getString("encPassword"));
@@ -132,7 +136,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
                     userDoc.getDate("birthdate"),
                     userDoc.getString("country"),
                     userDoc.getDate("createdDate"),
-                    userDoc.getString("website"),
+                    userDoc.containsKey("website") ? userDoc.getString("website") : "",
                     userDoc.getInteger("score"));
 
             return user;
@@ -181,20 +185,4 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
             throw new DAOException(e);
         }
     }
-
-    // TODO funzione per convertire la stringa in formato criptato, mettere dentro il controller
-    /*
-    private static String bytesToHex(byte[] hash) {
-        StringBuilder hexString = new StringBuilder(2 * hash.length);
-        for (int i = 0; i < hash.length; i++) {
-            String hex = Integer.toHexString(0xff & hash[i]);
-            if(hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
-    }
-*/
-
 }

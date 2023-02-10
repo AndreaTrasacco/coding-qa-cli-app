@@ -11,7 +11,7 @@ public class QuestionPageDTO {
     private String body;
     private String topic;
     private String author;
-    private PageDTO<AnswerDTO> answers;
+    private PageDTO<AnswerDTO> answers = null;
     private Date createdDate;
 
     public QuestionPageDTO() {
@@ -86,5 +86,17 @@ public class QuestionPageDTO {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    @Override
+    public String toString() { // TODO CREARE UN ALTRO METODO showAnswers
+        return "************************************************* QUESTION *****************************************\n" +
+                "\t* Author: " + author +
+                "\n\t* Title: " + title +
+                "\n\t* Topic: " + topic +
+                "\n\t* Body:\n" + body +
+                "\n\t[" + createdDate + "]\n" +
+                "****************************************************************************************************\n" +
+                ((answers != null) ? "************************************************ ANSWERS *******************************************\n" + answers : "");
     }
 }

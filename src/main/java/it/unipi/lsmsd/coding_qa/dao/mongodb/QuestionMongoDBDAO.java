@@ -19,6 +19,7 @@ import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
 import static com.mongodb.client.model.Sorts.ascending;
+import static com.mongodb.client.model.Sorts.descending;
 
 public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     @Override
@@ -40,23 +41,31 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     }
 
     @Override
-    public List<AnswerScoreDTO> deleteQuestion(String id) throws DAOException {
-        try (MongoClient mongoClient = getConnection()) {
+    public void deleteQuestion(String id) throws DAOException { // TODO TESTARE
+        try (MongoClient mongoClient = getConnection(); ClientSession session = mongoClient.startSession()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
+            MongoCollection<Document> collectionUsers = mongoDatabase.getCollection("users");
             Bson fields = fields(excludeId(), include("answers"));
-            Document deletedQAnswers = collectionQuestions.findOneAndDelete(eq("_id", new ObjectId(id)), new FindOneAndDeleteOptions().projection(fields));
-            // For each answer in the deleted question
-            List<AnswerScoreDTO> answerScores = new ArrayList<>();
-            if (deletedQAnswers != null && deletedQAnswers.containsKey("answers")) {
-                List<Document> answers = (ArrayList<Document>) deletedQAnswers.get("answers");
-                for (Document answer : answers) {
-                    // Get author and score of the answer
-                    if (answer.getInteger("score") != 0)
-                        answerScores.add(new AnswerScoreDTO(answer.getString("author"), answer.getInteger("score")));
+            session.startTransaction();
+            try {
+                Document deletedQAnswers = collectionQuestions.findOneAndDelete(session, eq("_id", new ObjectId(id)), new FindOneAndDeleteOptions().projection(fields));
+                // For each answer in the deleted question --> get score and update the score of the author of the answer
+                if (deletedQAnswers != null && deletedQAnswers.containsKey("answers")) {
+                    List<Document> answers = (ArrayList<Document>) deletedQAnswers.get("answers");
+                    for (Document answer : answers) {
+                        // Update score of the author of the answer
+                        if (answer.getInteger("score") != 0) {
+                            collectionUsers.updateOne(session, Filters.eq("nickname", answer.getString("author")),
+                                    Updates.inc("score", answer.getInteger("score") * (-1)));
+                        }
+                    }
                 }
+                session.commitTransaction();
+            } catch (Exception ex) {
+                session.abortTransaction();
+                throw new DAOException(ex);
             }
-            return answerScores;
         } catch (Exception ex) {
             throw new DAOException(ex);
         }
@@ -166,16 +175,22 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
         }
     }
 
-    @Override
-    public void setDeletedUserQuestion(String nickname) throws DAOException {
-        try (MongoClient mongoClient = getConnection()){
+    public PageDTO<QuestionDTO> browseQuestions(int page) throws DAOException {
+        PageDTO<QuestionDTO> pageDTO = new PageDTO<>();
+        List<QuestionDTO> questionDTOList = new ArrayList<>();
+        try (MongoClient mongoClient = getConnection()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
-
-            collectionQuestions.updateMany(
-                    Filters.eq("author", nickname),
-                    Updates.set("author", "deletedUser")
-            );
+            int pageOffset = (page - 1) * Constants.PAGE_SIZE;
+            Bson project = fields(include("title", "createdDate", "topic", "author"));
+            collectionQuestions.find().projection(project).sort(descending("createdDate")).skip(pageOffset).limit(Constants.PAGE_SIZE).forEach(doc -> {
+                QuestionDTO temp = new QuestionDTO(doc.getObjectId("_id").toString(), doc.getString("title"),
+                        doc.getDate("createdDate"), doc.getString("topic"), doc.getString("author"));
+                questionDTOList.add(temp);
+            });
+            pageDTO.setCounter(questionDTOList.size());
+            pageDTO.setEntries(questionDTOList);
+            return pageDTO;
         } catch (Exception ex) {
             throw new DAOException(ex);
         }
@@ -208,8 +223,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
             page = qDAO.searchQuestions(1, "BODY", "TOPIC");
             System.out.println(page.getEntries().get(0).getId().equals(q.getId()));*/
             // test delete
-            List<AnswerScoreDTO> answerScoreDTOS = qDAO.deleteQuestion("63d171b409f8b5fdd2647989");
-            System.out.println(answerScoreDTOS.size());
+            qDAO.deleteQuestion("63d171b409f8b5fdd2647989"); // TODO TESTARE CON TRANSACTION
         } catch (Exception ex) {
             ex.printStackTrace();
         }

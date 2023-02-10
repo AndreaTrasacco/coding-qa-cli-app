@@ -14,11 +14,16 @@ public class Answer {
     private boolean accepted = false;
     private boolean reported = false;
 
-    public Answer(String body, Date createdDate, String author){
+    public Answer() {
+
+    }
+
+    public Answer(String body, Date createdDate, String author) {
         this.body = body;
         this.createdDate = createdDate;
         this.author = author;
     }
+
     public Answer(String id, String body, Date createdDate, String author, int score, List<String> voters, boolean accepted, boolean reported) {
         this.id = id;
         this.body = body;

@@ -56,4 +56,13 @@ public class QuestionDTO {
     public void setAuthor(String author) {
         this.author = author;
     }
+
+    @Override
+    public String toString() {
+        return "\t* Author: " + author +
+                "\n\t* Title: " + title +
+                "\n\t* Topic: " + topic +
+                "\n\t[" + createdDate + "]\n" +
+                "****************************************************************************************************\n";
+    }
 }

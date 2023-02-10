@@ -1,8 +1,8 @@
 package it.unipi.lsmsd.coding_qa.dto;
 
-import java.util.List;
+import java.util.*;
 
-public class PageDTO <T>{
+public class PageDTO<T> {
 
     List<T> entries;
     int counter;
@@ -21,5 +21,17 @@ public class PageDTO <T>{
 
     public void setCounter(int counter) {
         this.counter = counter;
+    }
+
+    @Override
+    public String toString() {
+        String output = "";
+        if (counter == 0)
+            output = "*********************************************** EMPTY **********************************************";
+        else {
+            for (int i = 1; i <= counter; i++)
+                output += "************************************************ " + i + " ***********************************************\n" + entries.get(i - 1);
+        }
+        return output;
     }
 }

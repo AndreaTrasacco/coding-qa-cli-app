@@ -89,4 +89,17 @@ public class UserDTO {
     public void setScore(int score) {
         this.score = score;
     }
+
+    @Override
+    public String toString() {
+        return "******************************************* USER PROFILE *******************************************\n" +
+                "\t* Full Name: " + fullName +
+                "\n\t* Nickname: " + nickname +
+                "\n\t* Birth Date: " + birthdate +
+                "\n\t* Country: " + country +
+                "\n\t* Created Date: " + createdDate +
+                ((website.equals("")) ? "" : "\n\t* Website='" + website) +
+                "\n\t* Total score=" + score +
+                "\n****************************************************************************************************\n";
+    }
 }

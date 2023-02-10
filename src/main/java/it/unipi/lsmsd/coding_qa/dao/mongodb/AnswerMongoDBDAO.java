@@ -27,7 +27,7 @@ import static com.mongodb.client.model.Projections.*;
 public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
     public static void main(String[] args) {
         AnswerMongoDBDAO answerDAO = new AnswerMongoDBDAO();
-        try {
+        try {/*
             Answer answer = new Answer("BODY", new Date(System.currentTimeMillis()), "AUTHOR");
             answerDAO.create("63d171b409f8b5fdd2647926", answer);
             answer.setBody("YDOB");
@@ -41,7 +41,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             System.out.println(answerDAO.vote(answer.getId(), false, "2"));
             // AnswerScoreDTO answerScoreDTO = answerDAO.delete(answer.getId());
             page = answerDAO.getAnswersPage(1, "63d171b409f8b5fdd2647926");
-            System.out.println("END MAIN");
+            System.out.println("END MAIN");*/
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -196,7 +196,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             collectionQuestions.find(filter).projection(project).skip(pageOffset).limit(Constants.PAGE_SIZE).forEach(doc -> {
                 for (Document ans : doc.getList("answers", Document.class)) {
                     reportedAnswers.add(new AnswerDTO(doc.getObjectId("_id").toString() + "_" + ans.getDate("createdDate").toInstant(),
-                            ans.getString("body"),
+                            "",
                             ans.getDate("createdDate"),
                             ans.getString("author"),
                             ans.getInteger("score")));
@@ -206,22 +206,6 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
             pageDTO.setEntries(reportedAnswers);
             return pageDTO;
         } catch (Exception e) {
-            throw new DAOException(e);
-        }
-    }
-
-    @Override
-    public void setDeletedUserAnswer(String nickname) throws DAOException {
-        try (MongoClient myClient = getConnection()) {
-            MongoDatabase database = myClient.getDatabase(DB_NAME);
-            MongoCollection<Document> collectionQuestion = database.getCollection("questions");
-
-            collectionQuestion.updateMany(
-                    Filters.eq("answers.author", nickname),
-                    Updates.set("answers.$[xxx].author", "deletedUser"),
-                    new UpdateOptions().arrayFilters(Arrays.asList(eq("xxx.author", nickname)))
-            );
-        } catch (Exception e){
             throw new DAOException(e);
         }
     }

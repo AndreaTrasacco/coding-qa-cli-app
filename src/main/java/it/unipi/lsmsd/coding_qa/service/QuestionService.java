@@ -26,6 +26,8 @@ public interface QuestionService {
 
     PageDTO<QuestionDTO> searchQuestions(int page, String searchString, String topicFilter) throws BusinessException;
 
+    PageDTO<QuestionDTO> browseQuestions(int page) throws BusinessException;
+
     PageDTO<QuestionDTO> viewCreatedQuestions(String nickname, int page) throws BusinessException;
 
     PageDTO<QuestionDTO> viewAnsweredQuestions(String nickname, int page) throws BusinessException;

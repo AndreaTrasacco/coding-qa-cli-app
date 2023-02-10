@@ -11,15 +11,20 @@ import java.util.List;
 
 public interface UserService {
     UserDTO register(UserRegistrationDTO user) throws BusinessException;
+
     UserDTO login(String username, String encPassword) throws BusinessException;
-    // getUserInfo
+
     UserDTO getInfo(String id) throws BusinessException;
-    // updateInfo or update for each field
+
     void updateInfo(UserRegistrationDTO userRegistrationDTO) throws BusinessException;
-    // follow
+
     void follow(String myself, String userToFollow) throws BusinessException;
-    // delete
+
+    void unfollow(String myself, String userToUnFollow) throws BusinessException;
+
     void delete(RegisteredUser user) throws BusinessException;
-    // getFollowerList
+
     PageDTO<String> getFollowerList(RegisteredUser user) throws BusinessException;
+
+    int getScore(String userId) throws BusinessException;
 }
