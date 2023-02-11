@@ -7,7 +7,7 @@ import it.unipi.lsmsd.coding_qa.model.*;
 public interface UserDAO {
     void register(RegisteredUser user) throws DAOException;
     User authenticate(String username, String encPassword) throws DAOException;
-    RegisteredUser updateInfo(RegisteredUser user) throws DAOException;
+    void updateInfo(RegisteredUser user) throws DAOException;
     UserDTO getInfo(String nickname) throws DAOException;
     int getScore(String id) throws DAOException;
     void updateScore(String nickname, int quantity) throws DAOException;

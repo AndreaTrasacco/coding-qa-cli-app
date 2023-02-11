@@ -5,11 +5,11 @@ import java.util.Scanner;
 public class AdminView {
     private Scanner scanner = new Scanner(System.in);
 
-    public static void main(String [] args)
-    {
+    public static void main(String[] args) {
         AdminView adminView = new AdminView();
         adminView.mainMenuAdmin();
     }
+
     public int mainMenuAdmin() {
         System.out.println("\n########################################## ADMIN MAIN MENU #########################################");
         int choice;
@@ -19,12 +19,12 @@ public class AdminView {
             System.out.println("\t[3] Go to analytics menu");
             System.out.println("\t[4] Browse questions");
             System.out.println("\t[5] Search question");
-            System.out.println("\t[6] Log out");
-            System.out.println("\t[7] Exit");
+            System.out.println("\t[6] Exit");
             System.out.println("Input: ");
-            choice = Integer.parseInt(scanner.nextLine());;
-        } while (choice < 1 || choice > 7);
-        if(choice == 6)
+            choice = Integer.parseInt(scanner.nextLine());
+            ;
+        } while (choice < 1 || choice > 6);
+        if (choice == 6)
             System.out.println("############################################### EXIT ###############################################");
         return choice;
     }
@@ -33,7 +33,7 @@ public class AdminView {
         System.out.println("########################################### USER DELETED ###########################################");
     }
 
-    public int adminQuestionMenu(){
+    public int adminQuestionMenu() {
         System.out.println("####################################### ADMIN QUESTION MENU ########################################");
         int choice;
         do {
@@ -42,14 +42,15 @@ public class AdminView {
             System.out.println("\t[3] Open author's profile");
             System.out.println("\t[4] Exit");
             System.out.println("Input: ");
-            choice = Integer.parseInt(scanner.nextLine());;
+            choice = Integer.parseInt(scanner.nextLine());
+            ;
         } while (choice < 1 || choice > 4);
         if (choice == 4)
             System.out.println("############################################### EXIT ###############################################");
         return choice;
     }
 
-    public int adminReportedQuestionMenu(){
+    public int adminReportedQuestionMenu() {
         System.out.println("################################### ADMIN REPORTED QUESTION MENU ###################################");
         int choice;
         do {
@@ -58,14 +59,15 @@ public class AdminView {
             System.out.println("\t[3] Go to the previous page");
             System.out.println("\t[4] Exit from reported questions");
             System.out.println("Input: ");
-            choice = Integer.parseInt(scanner.nextLine());;
+            choice = Integer.parseInt(scanner.nextLine());
+            ;
         } while (choice < 1 || choice > 4);
         if (choice == 4)
             System.out.println("############################################### EXIT ###############################################");
         return choice;
     }
 
-    public int adminReportedAnswersMenu(){
+    public int adminReportedAnswersMenu() {
         System.out.println("################################### ADMIN REPORTED ANSWERS MENU ###################################");
         int choice;
         do {
@@ -74,14 +76,15 @@ public class AdminView {
             System.out.println("\t[3] Go to the previous page");
             System.out.println("\t[4] Exit from reported answers");
             System.out.println("Input: ");
-            choice = Integer.parseInt(scanner.nextLine());;
+            choice = Integer.parseInt(scanner.nextLine());
+            ;
         } while (choice < 1 || choice > 4);
         if (choice == 4)
             System.out.println("############################################### EXIT ###############################################");
         return choice;
     }
 
-    public int adminAnswerMenu(){
+    public int adminAnswerMenu() {
         System.out.println("####################################### ADMIN ANSWER MENU ########################################");
         int choice;
         do {
@@ -90,7 +93,8 @@ public class AdminView {
             System.out.println("\t[3] Open author's profile");
             System.out.println("\t[4] Exit");
             System.out.println("Input: ");
-            choice = Integer.parseInt(scanner.nextLine());;
+            choice = Integer.parseInt(scanner.nextLine());
+            ;
         } while (choice < 1 || choice > 4);
         if (choice == 4)
             System.out.println("############################################### EXIT ###############################################");
