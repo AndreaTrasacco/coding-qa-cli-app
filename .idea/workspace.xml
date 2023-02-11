@@ -4,13 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7a80ea41-8b1b-40fc-abb8-1008547220f9" name="Changes" comment="Corrected 1st aggregation">
+    <list default="true" id="7a80ea41-8b1b-40fc-abb8-1008547220f9" name="Changes" comment="Added MainView, RegisteredUserView, AdminView">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/base/BaseMongoDBDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/base/BaseMongoDBDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/mongodb/UserMongoDBDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/mongodb/UserMongoDBDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/neo4j/SuggestionsNeo4JDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/neo4j/SuggestionsNeo4JDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/neo4j/UserNeo4JDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/neo4j/UserNeo4JDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dto/UserDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dto/UserDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dto/AnswerDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dto/AnswerDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dto/QuestionModifyDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dto/QuestionModifyDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/service/QuestionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/service/QuestionService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/service/implementation/QuestionServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/service/implementation/QuestionServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/view/AdminView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/view/AdminView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/view/QuestionView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/view/QuestionView.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,12 +52,15 @@
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit3&quot;,
     &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit3&quot;: &quot;junit.framework.TestCase&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/nicol/IdeaProjects/coding_qa&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/nicol/Documents/lsmsd/ecommerce_app&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.runner&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;SDKs&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.Mappings&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
@@ -71,9 +76,22 @@
       <recent name="it.unipi.lsmsd.coding_qa.dao" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.UserMongoDBDAO">
-    <configuration name="UserMongoDBDAO" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.dao.mongodb.UserMongoDBDAO" />
+  <component name="RunManager" selected="Application.RegisteredUserView">
+    <configuration name="AdminView" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.view.AdminView" />
+      <module name="coding_qa" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="it.unipi.lsmsd.coding_qa.view.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AnswerMongoDBDAO" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.dao.mongodb.AnswerMongoDBDAO" />
       <module name="coding_qa" />
       <extension name="coverage">
         <pattern>
@@ -85,12 +103,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserNeo4JDAO" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.dao.neo4j.UserNeo4JDAO" />
+    <configuration name="AuthenticationView" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.view.AuthenticationView" />
       <module name="coding_qa" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="it.unipi.lsmsd.coding_qa.dao.neo4j.*" />
+          <option name="PATTERN" value="it.unipi.lsmsd.coding_qa.view.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -98,60 +116,39 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="SuggestionsNeo4JDAOTest.testQuestionsToAnswer" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="MainView" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.view.MainView" />
       <module name="coding_qa" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="it.unipi.lsmsd.coding_qa.dao.neo4j.*" />
+          <option name="PATTERN" value="it.unipi.lsmsd.coding_qa.view.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="it.unipi.lsmsd.coding_qa.dao.neo4j" />
-      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.dao.neo4j.SuggestionsNeo4JDAOTest" />
-      <option name="METHOD_NAME" value="testQuestionsToAnswer" />
-      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="UserMongoDBDAOTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="RegisteredUserView" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.view.RegisteredUserView" />
       <module name="coding_qa" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="it.unipi.lsmsd.coding_qa.dao.mongodb.*" />
+          <option name="PATTERN" value="it.unipi.lsmsd.coding_qa.view.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="it.unipi.lsmsd.coding_qa.dao.mongodb" />
-      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.dao.mongodb.UserMongoDBDAOTest" />
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="UserMongoDBDAOTest.testRegister" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="coding_qa" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="it.unipi.lsmsd.coding_qa.dao.mongodb.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="it.unipi.lsmsd.coding_qa.dao.mongodb" />
-      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.dao.mongodb.UserMongoDBDAOTest" />
-      <option name="METHOD_NAME" value="testRegister" />
-      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.UserNeo4JDAO" />
-        <item itemvalue="Application.UserMongoDBDAO" />
-        <item itemvalue="JUnit.UserMongoDBDAOTest.testRegister" />
-        <item itemvalue="JUnit.UserMongoDBDAOTest" />
-        <item itemvalue="JUnit.SuggestionsNeo4JDAOTest.testQuestionsToAnswer" />
+        <item itemvalue="Application.RegisteredUserView" />
+        <item itemvalue="Application.MainView" />
+        <item itemvalue="Application.AdminView" />
+        <item itemvalue="Application.AuthenticationView" />
+        <item itemvalue="Application.AnswerMongoDBDAO" />
       </list>
     </recent_temporary>
   </component>
@@ -176,7 +173,13 @@
       <workItem from="1675597179865" duration="16968000" />
       <workItem from="1675698747669" duration="9776000" />
       <workItem from="1675785605565" duration="12070000" />
-      <workItem from="1675871747849" duration="5267000" />
+      <workItem from="1675871747849" duration="11817000" />
+      <workItem from="1675926079052" duration="298000" />
+      <workItem from="1675957325959" duration="40000" />
+      <workItem from="1675958065204" duration="11821000" />
+      <workItem from="1676045751809" duration="10784000" />
+      <workItem from="1676128040688" duration="6694000" />
+      <workItem from="1676136619193" duration="911000" />
     </task>
     <task id="LOCAL-00001" summary="Packaging 1">
       <created>1675020274919</created>
@@ -304,7 +307,49 @@
       <option name="project" value="LOCAL" />
       <updated>1675797652231</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="Corrected UserNodeDAO">
+      <created>1675877344278</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1675877344278</updated>
+    </task>
+    <task id="LOCAL-00020" summary="Corrected UserNodeDAO">
+      <created>1675884928215</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1675884928215</updated>
+    </task>
+    <task id="LOCAL-00021" summary="Corrected update AnswerMongoDBDAO">
+      <created>1675926272862</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1675926272862</updated>
+    </task>
+    <task id="LOCAL-00022" summary="Added UserService, corrected UserDAO">
+      <created>1675969933609</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1675969933609</updated>
+    </task>
+    <task id="LOCAL-00023" summary="Corrected UserDAO">
+      <created>1675970506117</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1675970506117</updated>
+    </task>
+    <task id="LOCAL-00024" summary="Added MainView, RegisteredUserView, AdminView">
+      <created>1676056412922</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1676056412922</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -338,6 +383,11 @@
     <MESSAGE value="Corrected UserDAO and SuggestionsDAO" />
     <MESSAGE value="Tested UserDAO and SuggestionsNeo4JDAO" />
     <MESSAGE value="Corrected 1st aggregation" />
-    <option name="LAST_COMMIT_MESSAGE" value="Corrected 1st aggregation" />
+    <MESSAGE value="Corrected UserNodeDAO" />
+    <MESSAGE value="Corrected update AnswerMongoDBDAO" />
+    <MESSAGE value="Added UserService, corrected UserDAO" />
+    <MESSAGE value="Corrected UserDAO" />
+    <MESSAGE value="Added MainView, RegisteredUserView, AdminView" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added MainView, RegisteredUserView, AdminView" />
   </component>
 </project>

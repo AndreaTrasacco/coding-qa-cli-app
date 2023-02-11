@@ -1,9 +1,18 @@
 package it.unipi.lsmsd.coding_qa.dto;
 
 public class QuestionModifyDTO {
+    String id;
     String title;
     String body;
     String topic;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;

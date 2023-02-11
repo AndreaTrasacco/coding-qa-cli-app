@@ -48,13 +48,14 @@ public class QuestionServiceImpl implements QuestionService {
 
 
     @Override
-    public void updateQuestion(QuestionPageDTO questionPageDTO) throws BusinessException {
+    public void updateQuestion(QuestionModifyDTO questionModifyDTO) throws BusinessException {
         Question oldQuestion = null;
         try {
             Question question = new Question();
-            question.setTitle(questionPageDTO.getTitle());
-            question.setBody(questionPageDTO.getBody());
-            question.setTopic(questionPageDTO.getTopic());
+            question.setId(questionModifyDTO.getId());
+            question.setTitle(questionModifyDTO.getTitle());
+            question.setBody(questionModifyDTO.getBody());
+            question.setTopic(questionModifyDTO.getTopic());
             oldQuestion = questionDAO.updateQuestion(question);
             questionNodeDAO.update(question);
         } catch (DAONodeException e) { // Update of question node failed --> Rollback updating the question with the old question

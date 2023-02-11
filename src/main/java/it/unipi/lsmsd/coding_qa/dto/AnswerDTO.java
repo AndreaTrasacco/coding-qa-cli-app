@@ -13,6 +13,9 @@ public class AnswerDTO {
     private List<String> voters;
     private boolean accepted;
 
+    public AnswerDTO() {
+    }
+
     public AnswerDTO(String id, String body, Date createdDate, String author, int score, List<String> voters, boolean accepted) {
         this.id = id;
         this.body = body;

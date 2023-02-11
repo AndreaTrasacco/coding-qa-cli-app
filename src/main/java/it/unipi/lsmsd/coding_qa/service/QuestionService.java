@@ -1,9 +1,6 @@
 package it.unipi.lsmsd.coding_qa.service;
 
-import it.unipi.lsmsd.coding_qa.dto.AnswerDTO;
-import it.unipi.lsmsd.coding_qa.dto.PageDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionPageDTO;
+import it.unipi.lsmsd.coding_qa.dto.*;
 import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.model.Question;
 import it.unipi.lsmsd.coding_qa.model.User;
@@ -14,7 +11,7 @@ import java.util.List;
 public interface QuestionService {
     void createQuestion(QuestionPageDTO questionPageDTO) throws BusinessException;
 
-    void updateQuestion(QuestionPageDTO questionPageDTO) throws BusinessException;
+    void updateQuestion(QuestionModifyDTO questionModifyDTO) throws BusinessException;
 
     void deleteQuestion(String questionId) throws BusinessException;
 

@@ -79,15 +79,14 @@ public class QuestionView {
         System.out.println("########################################### QUESTION MENU ##########################################");
         do {
             System.out.println("\t[1] Answer");
-            System.out.println("\t[2] Report");
-            System.out.println("\t[3] Browse answers");
-            System.out.println("\t[4] Close");
-            System.out.println("\t[5] Delete");
-            System.out.println("\t[6] Exit");
+            System.out.println("\t[2] Browse answers");
+            System.out.println("\t[3] Delete");
+            System.out.println("\t[4] Update");
+            System.out.println("\t[5] Exit");
             System.out.println("Input: ");
             choice = Integer.parseInt(scanner.nextLine());;
-        } while (choice < 1 || choice > 6);
-        if(choice == 6)
+        } while (choice < 1 || choice > 5);
+        if(choice == 5)
             System.out.println("############################################### EXIT ###############################################");
 
         return choice;

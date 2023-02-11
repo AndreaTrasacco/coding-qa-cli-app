@@ -19,10 +19,11 @@ public class AdminView {
             System.out.println("\t[3] Go to analytics menu");
             System.out.println("\t[4] Browse questions");
             System.out.println("\t[5] Search question");
-            System.out.println("\t[6] Exit");
+            System.out.println("\t[6] Log out");
+            System.out.println("\t[7] Exit");
             System.out.println("Input: ");
             choice = Integer.parseInt(scanner.nextLine());;
-        } while (choice < 1 || choice > 6);
+        } while (choice < 1 || choice > 7);
         if(choice == 6)
             System.out.println("############################################### EXIT ###############################################");
         return choice;
