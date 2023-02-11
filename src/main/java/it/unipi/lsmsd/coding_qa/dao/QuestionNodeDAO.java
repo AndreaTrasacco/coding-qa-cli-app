@@ -11,13 +11,15 @@ public interface QuestionNodeDAO {
 
     void update(Question question) throws DAONodeException;
 
-    Question delete(String id) throws DAONodeException;
+    void delete(String id) throws DAONodeException;
 
     void updateClose(String questionId, boolean type) throws DAONodeException;
 
     PageDTO<QuestionDTO> viewCreatedQuestions(String nickname, int page) throws DAONodeException;
 
     PageDTO<QuestionDTO> viewAnsweredQuestions(String nickname, int page) throws DAONodeException;
+
     void createAnswer(Answer answer) throws DAONodeException;
+
     void deleteAnswer(String answerId, String author) throws DAONodeException;
 }

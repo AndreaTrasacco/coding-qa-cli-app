@@ -11,8 +11,8 @@ public class AdminView {
         adminView.mainMenuAdmin();
     }
     public int mainMenuAdmin() {
-        System.out.println("########################################## MAIN ADMIN MENU #########################################");
-        int choice = -1;
+        System.out.println("\n########################################## ADMIN MAIN MENU #########################################");
+        int choice;
         do {
             System.out.println("\t[1] Browse reported questions");
             System.out.println("\t[2] Browse reported answers");
@@ -21,23 +21,9 @@ public class AdminView {
             System.out.println("\t[5] Search question");
             System.out.println("\t[6] Exit");
             System.out.println("Input: ");
-            choice = scanner.nextInt();
+            choice = Integer.parseInt(scanner.nextLine());;
         } while (choice < 1 || choice > 6);
         if(choice == 6)
-            System.out.println("############################################### EXIT ###############################################");
-        return choice;
-    }
-
-    public int adminUserProfileMenu(){
-        System.out.println("##################################### ADMIN USER PROFILE MENU ######################################");
-        int choice;
-        do {
-            System.out.println("\t[1] Delete user");
-            System.out.println("\t[2] Exit");
-            System.out.println("Input: ");
-            choice = scanner.nextInt();
-        } while (choice < 1 || choice > 2);
-        if (choice == 2)
             System.out.println("############################################### EXIT ###############################################");
         return choice;
     }
@@ -51,23 +37,63 @@ public class AdminView {
         int choice;
         do {
             System.out.println("\t[1] Delete question");
-            System.out.println("\t[2] Choose an answer to delete");
-            System.out.println("\t[3] Exit");
+            System.out.println("\t[2] Toggle report");
+            System.out.println("\t[3] Open author's profile");
+            System.out.println("\t[4] Exit");
             System.out.println("Input: ");
-            choice = scanner.nextInt();
-        } while (choice < 1 || choice > 3);
-        if (choice == 3)
+            choice = Integer.parseInt(scanner.nextLine());;
+        } while (choice < 1 || choice > 4);
+        if (choice == 4)
             System.out.println("############################################### EXIT ###############################################");
         return choice;
     }
 
-    public void deleteAnswer(int maxAnswer){
-        int i;
-        do{
-            System.out.println("\tType the number of the answer to delete: ");
-            i = scanner.nextInt();
-        } while (i < 0 || i > maxAnswer);
-        System.out.println("########################################## ANSWER DELETED ##########################################");
+    public int adminReportedQuestionMenu(){
+        System.out.println("################################### ADMIN REPORTED QUESTION MENU ###################################");
+        int choice;
+        do {
+            System.out.println("\t[1] Open a question");
+            System.out.println("\t[2] Go to the next page");
+            System.out.println("\t[3] Go to the previous page");
+            System.out.println("\t[4] Exit from reported questions");
+            System.out.println("Input: ");
+            choice = Integer.parseInt(scanner.nextLine());;
+        } while (choice < 1 || choice > 4);
+        if (choice == 4)
+            System.out.println("############################################### EXIT ###############################################");
+        return choice;
+    }
+
+    public int adminReportedAnswersMenu(){
+        System.out.println("################################### ADMIN REPORTED ANSWERS MENU ###################################");
+        int choice;
+        do {
+            System.out.println("\t[1] Read answer");
+            System.out.println("\t[2] Go to the next page");
+            System.out.println("\t[3] Go to the previous page");
+            System.out.println("\t[4] Exit from reported answers");
+            System.out.println("Input: ");
+            choice = Integer.parseInt(scanner.nextLine());;
+        } while (choice < 1 || choice > 4);
+        if (choice == 4)
+            System.out.println("############################################### EXIT ###############################################");
+        return choice;
+    }
+
+    public int adminAnswerMenu(){
+        System.out.println("####################################### ADMIN ANSWER MENU ########################################");
+        int choice;
+        do {
+            System.out.println("\t[1] Delete answer");
+            System.out.println("\t[2] Toggle report");
+            System.out.println("\t[3] Open author's profile");
+            System.out.println("\t[4] Exit");
+            System.out.println("Input: ");
+            choice = Integer.parseInt(scanner.nextLine());;
+        } while (choice < 1 || choice > 4);
+        if (choice == 4)
+            System.out.println("############################################### EXIT ###############################################");
+        return choice;
     }
 
     public void deleteQuestionMessage() {

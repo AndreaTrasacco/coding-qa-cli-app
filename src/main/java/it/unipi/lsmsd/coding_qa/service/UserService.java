@@ -14,7 +14,7 @@ public interface UserService {
 
     UserDTO login(String username, String encPassword) throws BusinessException;
 
-    UserDTO getInfo(String id) throws BusinessException;
+    UserDTO getInfo(String nickname) throws BusinessException;
 
     void updateInfo(UserRegistrationDTO userRegistrationDTO) throws BusinessException;
 
@@ -22,9 +22,9 @@ public interface UserService {
 
     void unfollow(String myself, String userToUnFollow) throws BusinessException;
 
-    void delete(RegisteredUser user) throws BusinessException;
+    void delete(String id, String nickname) throws BusinessException;
 
-    PageDTO<String> getFollowerList(RegisteredUser user) throws BusinessException;
+    PageDTO<String> getFollowerList(String nickname) throws BusinessException;
 
     int getScore(String userId) throws BusinessException;
 }

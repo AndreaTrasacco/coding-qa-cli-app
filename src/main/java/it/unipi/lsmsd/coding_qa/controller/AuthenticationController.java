@@ -11,7 +11,7 @@ import it.unipi.lsmsd.coding_qa.view.AuthenticationView;
 public class AuthenticationController {
     private AuthenticationView authView = new AuthenticationView();
     private UserService userService;
-    private UserDTO loggedUser = null; // TODO RIFLETTERE
+    private UserDTO loggedUser = null;
 
     public AuthenticationController() {
         userService = ServiceLocator.getUserService();
@@ -19,23 +19,28 @@ public class AuthenticationController {
 
     public int start() { // do .. while
         int choice = authView.initialMenu();
-        try {
-            switch (choice) {
-                case 1: // sign up
-                    UserRegistrationDTO userRegistrationDTO = authView.signUp();
-                    userRegistrationDTO.setEncPassword(encryptPassword(userRegistrationDTO.getEncPassword().getBytes()));
-                    loggedUser = userService.register(authView.signUp());
-                    break;
-                case 2: // login
-                    UserLoginDTO userLoginDTO = authView.login();
+        switch (choice) {
+            case 1: // sign up
+                UserRegistrationDTO userRegistrationDTO = authView.signUp();
+                userRegistrationDTO.setEncPassword(encryptPassword(userRegistrationDTO.getEncPassword().getBytes()));
+                try {
+                    loggedUser = userService.register(userRegistrationDTO);
+                } catch (BusinessException e) {
+                    System.out.println("!!!! ERROR DURING SIGN UP !!!!");
+                }
+                break;
+            case 2: // login
+                UserLoginDTO userLoginDTO = authView.login();
+                try {
                     loggedUser = userService.login(userLoginDTO.getNickname(), userLoginDTO.getPassword());
+                } catch (BusinessException e) {
+                    {
+                        System.out.println("!!!! ERROR DURING LOG IN !!!!");
+                    }
                     break;
-            }
-            return choice;
-        } catch (BusinessException e) {
-            System.out.println(e.getMessage()); // TODO CAMBIARE E METTERE NEI CASE ??
-            return -1;
+                }
         }
+        return choice;
     }
 
     public void logout() {

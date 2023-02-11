@@ -5,9 +5,8 @@ import it.unipi.lsmsd.coding_qa.dao.enums.DAORepositoryEnum;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAONodeException;
 import it.unipi.lsmsd.coding_qa.dto.AnswerDTO;
-import it.unipi.lsmsd.coding_qa.dto.AnswerScoreDTO;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionPageDTO;
+import it.unipi.lsmsd.coding_qa.dto.VoteDTO;
 import it.unipi.lsmsd.coding_qa.model.Answer;
 import it.unipi.lsmsd.coding_qa.service.AnswerService;
 import it.unipi.lsmsd.coding_qa.service.exception.BusinessException;
@@ -17,12 +16,10 @@ import java.util.Date;
 public class AnswerServiceImpl implements AnswerService {
     private AnswerDAO answerDAO;
     private QuestionNodeDAO questionNodeDAO;
-    private UserDAO userDAO;
 
     public AnswerServiceImpl() {
         this.answerDAO = DAOLocator.getAnswerDAO(DAORepositoryEnum.MONGODB);
         this.questionNodeDAO = DAOLocator.getQuestionNodeDAO(DAORepositoryEnum.NEO4J);
-        userDAO = DAOLocator.getUserDAO(DAORepositoryEnum.MONGODB);
     }
 
     @Override
@@ -57,32 +54,27 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public void deleteAnswer(AnswerDTO answerDTO) throws BusinessException {
+        String questionId = null;
         try {
-            AnswerScoreDTO score = answerDAO.delete(answerDTO.getId());
-            userDAO.updateScore(score.getAuthor(), score.getScore());
-            questionNodeDAO.deleteAnswer(answerDTO.getId(), answerDTO.getAuthor());
-            // TODO METODO POTREBBE RESTITUIRE ID DOMANDA?? PER ESSERE USATO NEL GRAFO. E SCORE??
-            // TODO SCALARE ANCHE SCORE DELL'UTENTE
-            // TODO CONTROLLARE SE L'UTENTE HA ALTRE RISPOSTE SU QUELLA DOMANDA
-        } catch (DAONodeException e) {
-            String questionId = answerDTO.getId().substring(0, answerDTO.getId().indexOf('_'));
-            Answer answer = new Answer(answerDTO.getId(), answerDTO.getBody(), answerDTO.getCreatedDate(),
-                    answerDTO.getAuthor(), answerDTO.getScore(), answerDTO.getVoters(), answerDTO.isAccepted(), false);
+            questionId = answerDAO.delete(answerDTO.getId());
+            questionNodeDAO.deleteAnswer(questionId, answerDTO.getAuthor());
+        } catch (
+                DAONodeException ex) { // If there is an error in deletion of Answer with "question node" -> retry deletion
             try {
-                answerDAO.create(questionId, answer); // TODO NON RICREA VOTERS ECC... PROBLEMA
-            } catch (DAOException ex) {
-                throw new BusinessException(ex);
+                if (questionId != null)
+                    questionNodeDAO.deleteAnswer(questionId, answerDTO.getAuthor());
+            } catch (Exception e) {
+                throw new BusinessException(e);
             }
-        } catch (Exception e) {
-            throw new BusinessException(e);
+        } catch (Exception ex) {
+            throw new BusinessException(ex);
         }
     }
 
     @Override
-    public boolean voteAnswer(String answerId, boolean voteType, String userId) throws BusinessException {
+    public boolean voteAnswer(VoteDTO voteDTO) throws BusinessException {
         try {
-            return answerDAO.vote(answerId, voteType, userId);
-            // TODO VA MODIFICATO LO SCORE DELL'UTENTE!! -> FARE IN UNA TRANSACTION DENTRO VOTE (PRIMA TESTARE TRANSACTION IN QUESTION)
+            return answerDAO.vote(voteDTO.getAnswerId(), voteDTO.getVoteType(), voteDTO.getVoterId(), voteDTO.getAnswerOwner());
         } catch (Exception e) {
             throw new BusinessException(e);
         }
@@ -108,21 +100,21 @@ public class AnswerServiceImpl implements AnswerService {
 
     @Override
     public boolean acceptAnswer(String answerId) throws BusinessException {
-        boolean success = false;
         try {
-            String questionId = answerId.substring(0, answerId.indexOf('_')); // TODO QUESTA COSA DIPENDE DA MONGO - MODIFICARE (FARE RITORNARE DA ACCEPT LA QUESTION ID E SE NULL E' COME SE FOSSE SUCCESS = FALSE)
-            success = answerDAO.accept(answerId, true);
-            questionNodeDAO.updateClose(questionId, true);
+            String questionId = answerDAO.accept(answerId, true);
+            if (questionId != null)
+                questionNodeDAO.updateClose(questionId, true);
+            return (questionId != null);
         } catch (DAONodeException e) {
             try {
                 answerDAO.accept(answerId, false);
+                return false;
             } catch (DAOException ex) {
                 throw new BusinessException(ex);
             }
         } catch (Exception e) {
             throw new BusinessException(e);
         }
-        return success;
     }
 
     @Override

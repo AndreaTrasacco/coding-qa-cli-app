@@ -44,7 +44,7 @@ public class QuestionView {
             System.out.println("\t[3] Browse answers");
             System.out.println("\t[4] Exit");
             System.out.println("Input: ");
-            choice = scanner.nextInt();
+            choice = Integer.parseInt(scanner.nextLine());;
         } while (choice < 1 || choice > 4);
         if(choice == 4)
             System.out.println("############################################### EXIT ###############################################");
@@ -66,7 +66,7 @@ public class QuestionView {
             System.out.println("\t[1] Browse answers");
             System.out.println("\t[2] Exit");
             System.out.println("Input: ");
-            choice = scanner.nextInt();
+            choice = Integer.parseInt(scanner.nextLine());;
         } while (choice < 1 || choice > 2);
         if(choice == 2)
             System.out.println("############################################### EXIT ###############################################");
@@ -85,7 +85,7 @@ public class QuestionView {
             System.out.println("\t[5] Delete");
             System.out.println("\t[6] Exit");
             System.out.println("Input: ");
-            choice = scanner.nextInt();
+            choice = Integer.parseInt(scanner.nextLine());;
         } while (choice < 1 || choice > 6);
         if(choice == 6)
             System.out.println("############################################### EXIT ###############################################");
@@ -102,7 +102,7 @@ public class QuestionView {
             System.out.println("\t[3] Previous page");
             System.out.println("\t[4] Exit");
             System.out.println("Input: ");
-            choice = scanner.nextInt();
+            choice = Integer.parseInt(scanner.nextLine());;
         } while (choice < 1 || choice > 4);
         if(choice == 4)
             System.out.println("############################################### EXIT ###############################################");
@@ -114,7 +114,7 @@ public class QuestionView {
         int index;
         do{
             System.out.println("Digit the question index: ");
-            index = scanner.nextInt();
+            index = Integer.parseInt(scanner.nextLine());;
         } while(index < 1 || index > pageDTO.getCounter());
         return index;
     }
@@ -129,7 +129,7 @@ public class QuestionView {
             System.out.println("\t[4] Previous Page");
             System.out.println("\t[5] Exit");
             System.out.println("Input: ");
-            choice = scanner.nextInt();
+            choice = Integer.parseInt(scanner.nextLine());;
         } while (choice < 1 || choice > 5);
         if(choice == 5)
             System.out.println("############################################### EXIT ###############################################");
@@ -137,7 +137,7 @@ public class QuestionView {
         return choice;
     }
 
-    public int menuInAnswerPageNonLogged(){
+    public int menuInAnswerPageNotLogged(){
         int choice;
         System.out.println("############################################ ANSWER MENU ###########################################");
         do {
@@ -145,7 +145,7 @@ public class QuestionView {
             System.out.println("\t[2] Previous Page");
             System.out.println("\t[3] Exit");
             System.out.println("Input: ");
-            choice = scanner.nextInt();
+            choice = Integer.parseInt(scanner.nextLine());;
         } while (choice < 1 || choice > 3);
         if(choice == 3)
             System.out.println("############################################### EXIT ###############################################");
@@ -165,21 +165,12 @@ public class QuestionView {
             System.out.println("\t[6] Previous Page");
             System.out.println("\t[7] Exit");
             System.out.println("Input: ");
-            choice = scanner.nextInt();
+            choice = Integer.parseInt(scanner.nextLine());;
         } while (choice < 1 || choice > 7);
         if(choice == 6)
             System.out.println("############################################### EXIT ###############################################");
 
         return choice;
-    }
-
-    public int specifyAnswerIndex(PageDTO<AnswerDTO> pageDTO){
-        int index;
-        do{
-            System.out.println("Digit the answer index: ");
-            index = scanner.nextInt();
-        } while(index < 1 || index > pageDTO.getCounter());
-        return index;
     }
 
     public int menuInVoteAnswer(){
@@ -190,7 +181,7 @@ public class QuestionView {
         System.out.println("Press [1] for upvote\nPress[2] for downvote");
         do {
             System.out.println("Input: ");
-            choice = scanner.nextInt();
+            choice = Integer.parseInt(scanner.nextLine());;
         } while (choice < 1 || choice > 2);
 
         return choice;
@@ -244,16 +235,8 @@ public class QuestionView {
         System.out.println("########################################## QUESTION DELETED ########################################");
     }
 
-    public void viewQuestion(QuestionDTO questionDTO){
-        System.out.println(questionDTO.toString());
-    }
-
-    public void viewQuestionsPage(PageDTO<QuestionDTO> pageDTO){
-        System.out.println(pageDTO.toString());
-    }
-
     public void viewAnswer(AnswerDTO answerDTO){
-        System.out.println(answerDTO.toString());
+        System.out.println(answerDTO);
     }
 
     public void reportAnswer(){
@@ -271,9 +254,4 @@ public class QuestionView {
     public void voteAnswer(){
         System.out.println("############################################ ANSWER VOTED ##########################################");
     }
-
-    public void viewAnswersPage(PageDTO<AnswerDTO> pageDTO){
-        System.out.println(pageDTO.toString());
-    }
-
 }

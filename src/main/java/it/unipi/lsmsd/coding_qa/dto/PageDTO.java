@@ -4,8 +4,8 @@ import java.util.*;
 
 public class PageDTO<T> {
 
-    List<T> entries;
-    int counter;
+    List<T> entries = new ArrayList<>();
+    int counter = 0;
 
     public List<T> getEntries() {
         return entries;

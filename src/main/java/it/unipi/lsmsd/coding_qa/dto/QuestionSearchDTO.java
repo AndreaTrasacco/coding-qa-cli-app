@@ -1,5 +1,7 @@
 package it.unipi.lsmsd.coding_qa.dto;
 
+import it.unipi.lsmsd.coding_qa.utils.Constants;
+
 public class QuestionSearchDTO {
     private String text;
     private String topic;
@@ -24,7 +26,11 @@ public class QuestionSearchDTO {
         return topic;
     }
 
-    public void setTopic(String topic) { // TODO FAR RITORNARE BOOLEAN IN MODO DA CONTROLLARE (NEL METODO) SE IL TOPIC E' VALIDO
-        this.topic = topic;
+    public boolean setTopic(String topic) {
+        if(Constants.TOPICS.contains(topic)){
+            this.topic = topic;
+            return true;
+        }
+        return false;
     }
 }

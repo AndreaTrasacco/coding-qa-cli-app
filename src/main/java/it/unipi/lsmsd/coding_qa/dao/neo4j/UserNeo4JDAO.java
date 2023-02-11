@@ -4,7 +4,6 @@ import it.unipi.lsmsd.coding_qa.dao.UserNodeDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseNeo4JDAO;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAONodeException;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
-import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
 import org.neo4j.driver.*;
 
 import java.util.ArrayList;
@@ -68,26 +67,6 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
         return pageDTO;
     }
 
-    /*@Override
-    public List<String> getFollowers(String nickname) {
-        List<String> followerList;
-        final String listOfUser = "MATCH (u: User)<-[:FOLLOW]-(u1: User)" +
-                "WHERE u.nickname = $nickname" +
-                "RETURN u1.nickname as Nickname";
-        try(Session session = getSession()){
-            followerList = session.readTransaction( (TransactionWork<List<String>>) tx -> {
-                Result result = tx.run(listOfUser, parameters("nickname", nickname));
-                ArrayList<String> users = new ArrayList<>();
-                while(result.hasNext()){
-                    Record user = result.next();
-                    users.add(user.get("Nickname").asString());
-                }
-                return users;
-            });
-        }
-        return followerList;
-    }*/
-
     //this method create the follow relationship
     @Override
     public void followUser(String myNickname, String userToFollow) throws DAONodeException {
@@ -102,32 +81,6 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
             throw new DAONodeException(e);
         }
     }
-
-    // delete the relationship CREATED
-    /*@Override
-    public void deleteCreated(String nickname, String id) {
-        final String deleteQuestion = "MATCH (u: User{nickname: $nickname})-[:CREATED]->(q: Question{id: $id})" +
-                "DELETE q";
-        try(Session session = getSession()){
-            session.writeTransaction(tx -> {
-               tx.run(deleteQuestion, parameters("nickname", nickname, "id", id));
-               return 1;
-            });
-        }
-    }*/
-
-    // delete the relationship ANSWERED
-    /*@Override
-    public void deleteAnswered(String nickname, String id) {
-        final String deleteQuestion = "MATCH (u: User{nickname: $nickname})-[:ANSWERED]->(q: Question{id: $id})" +
-                "DELETE q";
-        try(Session session = getSession()){
-            session.writeTransaction(tx -> {
-                tx.run(deleteQuestion, parameters("nickname", nickname, "id", id));
-                return 1;
-            });
-        }
-    }*/
 
     @Override
     public void deleteFollowed(String myNickname, String userToUnfollow) throws DAONodeException {

@@ -2,7 +2,6 @@ package it.unipi.lsmsd.coding_qa.service.implementation;
 
 import it.unipi.lsmsd.coding_qa.dao.*;
 import it.unipi.lsmsd.coding_qa.dao.enums.DAORepositoryEnum;
-import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAONodeException;
 import it.unipi.lsmsd.coding_qa.dto.*;
 import it.unipi.lsmsd.coding_qa.model.Question;
@@ -10,18 +9,15 @@ import it.unipi.lsmsd.coding_qa.service.QuestionService;
 import it.unipi.lsmsd.coding_qa.service.exception.BusinessException;
 
 import java.util.Date;
-import java.util.List;
 
 public class QuestionServiceImpl implements QuestionService {
 
-    private QuestionDAO questionDAO;
-    private QuestionNodeDAO questionNodeDAO;
-    private UserDAO userDAO;
+    private final QuestionDAO questionDAO;
+    private final QuestionNodeDAO questionNodeDAO;
 
     public QuestionServiceImpl() {
         this.questionDAO = DAOLocator.getQuestionDAO(DAORepositoryEnum.MONGODB);
         this.questionNodeDAO = DAOLocator.getQuestionNodeDAO(DAORepositoryEnum.NEO4J);
-        userDAO = DAOLocator.getUserDAO(DAORepositoryEnum.MONGODB);
     }
 
     @Override
@@ -61,8 +57,7 @@ public class QuestionServiceImpl implements QuestionService {
             question.setTopic(questionPageDTO.getTopic());
             oldQuestion = questionDAO.updateQuestion(question);
             questionNodeDAO.update(question);
-        } catch (
-                DAONodeException e) { // Update of question node failed --> Rollback updating the question with the old question
+        } catch (DAONodeException e) { // Update of question node failed --> Rollback updating the question with the old question
             try {
                 if (oldQuestion != null) {
                     questionDAO.updateQuestion(oldQuestion);
@@ -70,24 +65,26 @@ public class QuestionServiceImpl implements QuestionService {
             } catch (Exception ex) {
                 throw new BusinessException(ex);
             }
-        } catch (Exception e) {
-            throw new BusinessException(e);
-        }
-    }
-
-    @Override
-    public void deleteQuestion(String questionId) throws BusinessException { // TODO ROLLBACK
-        try {
-            Question oldQuestion = questionNodeDAO.delete(questionId);
-            questionDAO.deleteQuestion(questionId);
-        } catch (DAOException ex){
-            //questionNodeDAO.create();
-        }
-        catch (Exception ex) {
+        } catch (Exception ex) {
             throw new BusinessException(ex);
         }
     }
 
+    @Override
+    public void deleteQuestion(String questionId) throws BusinessException {
+        try {
+            questionDAO.deleteQuestion(questionId);
+            questionNodeDAO.delete(questionId);
+        } catch (DAONodeException ex) { // If there is an error in deletion of node Question -> retry deletion
+            try {
+                questionNodeDAO.delete(questionId);
+            } catch (DAONodeException e) {
+                throw new BusinessException(e);
+            }
+        } catch (Exception ex) {
+            throw new BusinessException(ex);
+        }
+    }
 
     @Override
     public void reportQuestion(String questionId, boolean report) throws BusinessException {

@@ -16,11 +16,6 @@ import it.unipi.lsmsd.coding_qa.model.User;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-
 import static com.mongodb.client.model.Projections.include;
 
 public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
@@ -32,7 +27,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
             MongoCollection<Document> collectionUser = database.getCollection("users");
             Document docUser = new Document("nickname", user.getNickname())
                     .append("fullName", user.getFullName())
-                    .append("encPassword", user.getEncPassword())
+                    .append("password", user.getEncPassword())
                     .append("birthdate", user.getBirthdate())
                     .append("country", user.getCountry())
                     .append("createdDate", user.getCreatedDate())
@@ -41,7 +36,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
             if(!website.equals(""))
                 docUser.append("website", user.getWebsite());
             InsertOneResult result = collectionUser.insertOne(docUser);
-            user.setId(docUser.getObjectId("_id").toString());
+            user.setId(result.getInsertedId().toString());
         } catch (Exception e){
             throw new DAOException(e);
         }
@@ -53,7 +48,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionUser = database.getCollection("users");
             Document temp = collectionUser.find(Filters.and(Filters.eq("nickname", username),
-                    Filters.eq("encPassword", encPassword))).first();
+                    Filters.eq("password", encPassword))).first();
             if (temp == null) {
                 return null;
             }
@@ -91,10 +86,10 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
             MongoCollection<Document> collectionUser = database.getCollection("users");
             Document doc = collectionUser.findOneAndUpdate(Filters.eq("nickname", user.getNickname()),
                     Updates.combine(Updates.set("fullName", user.getFullName()),
-                            Updates.set("encPassword", user.getEncPassword()),
+                            Updates.set("password", user.getEncPassword()),
                             Updates.set("birthdate", user.getBirthdate()),
                             Updates.set("country", user.getCountry()),
-                            Updates.set("website", user.getWebsite()))); // TODO user potrebbe non avere website (lasciare così)
+                            Updates.set("website", user.getWebsite())));
 
             RegisteredUser oldUser = null;
             if(doc != null){
@@ -104,7 +99,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
                     oldUser.setWebsite(doc.getString("website"));
                 oldUser.setBirthdate(doc.getDate("birthdate"));
                 oldUser.setCountry(doc.getString("country"));
-                oldUser.setEncPassword(doc.getString("encPassword"));
+                oldUser.setEncPassword(doc.getString("password"));
                 oldUser.setScore(doc.getInteger("score"));
                 oldUser.setCreatedDate(doc.getDate("createdDate"));
                 oldUser.setId(user.getId());
@@ -117,11 +112,11 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
     }
 
     @Override
-    public UserDTO getInfo(String id) throws DAOException {
+    public UserDTO getInfo(String nickname) throws DAOException {
         try(MongoClient mongoClient = getConnection()) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionUser = database.getCollection("users");
-            Document userDoc = collectionUser.find(Filters.eq("_id", new ObjectId(id))).first();
+            Document userDoc = collectionUser.find(Filters.eq("nickname", nickname)).first();
             if (userDoc == null) {
                 return null;
             }

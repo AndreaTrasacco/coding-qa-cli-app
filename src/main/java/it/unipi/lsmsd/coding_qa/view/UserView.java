@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Scanner;
 
-public class RegisteredUserView {
+public class UserView {
     private Scanner scanner = new Scanner(System.in);
 
     public int otherUserProfileMenu(){
@@ -23,7 +23,7 @@ public class RegisteredUserView {
             System.out.println("\t[4] Browse user's answered questions");
             System.out.println("\t[5] Exit");
             System.out.println("Input: ");
-            choice = scanner.nextInt();
+            choice = Integer.parseInt(scanner.nextLine());;
         } while (choice < 1 || choice > 5);
         if (choice == 5)
             System.out.println("############################################### EXIT ###############################################");
@@ -41,7 +41,7 @@ public class RegisteredUserView {
             System.out.println("\t[5] Browse followed users");
             System.out.println("\t[6] Exit");
             System.out.println("Input: ");
-            choice = scanner.nextInt();
+            choice = Integer.parseInt(scanner.nextLine());;
         } while (choice < 1 || choice > 6);
         if (choice == 6)
             System.out.println("############################################### EXIT ###############################################");
@@ -83,23 +83,40 @@ public class RegisteredUserView {
             return;
         }
         System.out.println("* Month of birth date: ");
-        int month = scanner.nextInt();
+        int month = Integer.parseInt(scanner.nextLine());;
         System.out.println("* Day of birth date: ");
-        int day = scanner.nextInt();
+        int day = Integer.parseInt(scanner.nextLine());;
         userRegistrationDTO.setBirthdate(new Date(Integer.parseInt(year) - 1900, month - 1, day));
     }
 
     public int browseFollowedUsers(PageDTO<String> users){
         System.out.println("########################################## FOLLOWED USERS ##########################################");
+        System.out.println(users);
         int choice;
         do {
             System.out.println("\t[1] Choose a user to view");
             System.out.println("\t[2] Go to the next page");
-            System.out.println("\t[3] Exit");
+            System.out.println("\t[3] Go to the previous page");
+            System.out.println("\t[4] Exit");
             System.out.println("Input: ");
-            choice = scanner.nextInt();
-        } while (choice < 1 || choice > 3);
-        if (choice == 3)
+            choice = Integer.parseInt(scanner.nextLine());;
+        } while (choice < 1 || choice > 4);
+        if (choice == 4)
+            System.out.println("############################################### EXIT ###############################################");
+        return choice;
+    }
+
+    public int adminUserProfile(UserDTO userDTO){
+        System.out.println(userDTO);
+        System.out.println("#################################### USER PROFILE MENU (ADMIN) #####################################");
+        int choice;
+        do {
+            System.out.println("\t[1] Delete user");
+            System.out.println("\t[2] Exit");
+            System.out.println("Input: ");
+            choice = Integer.parseInt(scanner.nextLine());;
+        } while (choice < 1 || choice > 2);
+        if (choice == 2)
             System.out.println("############################################### EXIT ###############################################");
         return choice;
     }
@@ -110,6 +127,6 @@ public class RegisteredUserView {
 
     public static void main(String [] args)
     {
-        RegisteredUserView registeredUserView = new RegisteredUserView();
+        UserView userView = new UserView();
     }
 }

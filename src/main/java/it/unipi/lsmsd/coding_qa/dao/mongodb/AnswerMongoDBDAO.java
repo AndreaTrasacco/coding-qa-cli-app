@@ -27,21 +27,20 @@ import static com.mongodb.client.model.Projections.*;
 public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
     public static void main(String[] args) {
         AnswerMongoDBDAO answerDAO = new AnswerMongoDBDAO();
-        try {/*
-            Answer answer = new Answer("BODY", new Date(System.currentTimeMillis()), "AUTHOR");
-            answerDAO.create("63d171b409f8b5fdd2647926", answer);
-            answer.setBody("YDOB");
-            answerDAO.updateBody(answer.getId(), answer.getBody());
-            answerDAO.getCompleteAnswer(answer);
+        try {
+            // Answer answer = new Answer("BODY", new Date(System.currentTimeMillis()), "AUTHOR");
+            // answerDAO.create("63d171b409f8b5fdd264791f", answer);
+            // System.out.println(answer.getId());
             // answerDAO.report(answer.getId(), true);
-            //System.out.println(answerDAO.accept(answer.getId()));
-            PageDTO<AnswerDTO> page = answerDAO.getReportedAnswers(1);
-            System.out.println(answerDAO.vote(answer.getId(), true, "1"));
-            System.out.println(answerDAO.vote(answer.getId(), false, "2"));
-            System.out.println(answerDAO.vote(answer.getId(), false, "2"));
+            // System.out.println(answerDAO.accept(answer.getId()));
+            // PageDTO<AnswerDTO> page = answerDAO.getReportedAnswers(1);
+            // System.out.println(answerDAO.vote(answer.getId(), true, "1"));
+            // System.out.println(answerDAO.vote(answer.getId(), false, "2"));
+            // System.out.println(answerDAO.vote(answer.getId(), false, "2"));
             // AnswerScoreDTO answerScoreDTO = answerDAO.delete(answer.getId());
-            page = answerDAO.getAnswersPage(1, "63d171b409f8b5fdd2647926");
-            System.out.println("END MAIN");*/
+            // page = answerDAO.getAnswersPage(1, "63d171b409f8b5fdd2647926");
+            // System.out.println("END MAIN");
+            System.out.println(answerDAO.accept("63d171b409f8b5fdd264792c_2022-12-01T00:22:05.490Z", true));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -103,24 +102,39 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         }
     }
 
-    public AnswerScoreDTO delete(String id) throws DAOException {
-        try (MongoClient myClient = getConnection()) {
-            MongoDatabase database = myClient.getDatabase(DB_NAME);
-            MongoCollection<Document> collectionQuestion = database.getCollection("questions");
-            // Structure of answer id : questionId_createdDate
-            String questionId = id.substring(0, id.indexOf('_'));
-            Date createdDate = getDateFromString(id.substring(id.indexOf('_') + 1));
-            Document docBefore = collectionQuestion.findOneAndUpdate(
-                    eq("_id", new ObjectId(questionId)),
-                    Updates.combine(Updates.pull("answers", new Document("createdDate", createdDate))),
-                    new FindOneAndUpdateOptions().projection(fields(excludeId(), Projections.elemMatch("answers", and(eq("createdDate", createdDate), ne("score", 0)))))
-            );
-            if (docBefore != null && docBefore.containsKey("answers")) {
-                for (Document ansDoc : docBefore.getList("answers", Document.class)) {
-                    return new AnswerScoreDTO(ansDoc.getString("author"), ansDoc.getInteger("score"));
+    public String delete(String id) throws DAOException { // The method returns the question id of the deleted answer
+        try (MongoClient mongoClient = getConnection(); ClientSession session = mongoClient.startSession()) {
+            MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
+
+            TransactionBody txnBody = (TransactionBody<String>) () -> {
+                MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
+                MongoCollection<Document> collectionUsers = mongoDatabase.getCollection("users");
+                // Structure of answer id : questionId_createdDate
+                String questionId = id.substring(0, id.indexOf('_'));
+                Date createdDate;
+                try {
+                    createdDate = getDateFromString(id.substring(id.indexOf('_') + 1));
+                } catch (ParseException ex) {
+                    throw new RuntimeException(ex);
                 }
+                // After deletion of answer --> get score and update the score of the author of the answer
+                Document docBefore = collectionQuestions.findOneAndUpdate(
+                        eq("_id", new ObjectId(questionId)),
+                        Updates.combine(Updates.pull("answers", new Document("createdDate", createdDate))),
+                        new FindOneAndUpdateOptions().projection(fields(excludeId(), Projections.elemMatch("answers", and(eq("createdDate", createdDate), ne("score", 0)))))
+                );
+                if (docBefore != null && docBefore.containsKey("answers")) {
+                    Document ansDoc = docBefore.getList("answers", Document.class).get(0);
+                    collectionUsers.updateOne(eq("nickname", ansDoc.getString("author")),
+                    Updates.inc("score", ansDoc.getInteger("score") * (-1)));
+                }
+                return questionId;
+            };
+            try {
+                return (String) session.withTransaction(txnBody, txnOptions);
+            } catch (Exception ex) {
+                throw new DAOException(ex);
             }
-            return null;
         } catch (Exception e) {
             throw new DAOException(e);
         }
@@ -142,43 +156,56 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
         }
     }
 
-    public boolean vote(String id, boolean voteType, String idVoter) throws DAOException {
+    public boolean vote(String id, boolean voteType, String idVoter, String owner) throws DAOException {
         // The method will vote the answer (and return true) if and only if idVoter is not already in the voters of the answer
-        try (MongoClient myClient = getConnection()) {
-            MongoDatabase database = myClient.getDatabase(DB_NAME);
-            MongoCollection<Document> collectionQuestion = database.getCollection("questions");
+        try (MongoClient mongoClient = getConnection(); ClientSession session = mongoClient.startSession()) {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             int increment = voteType ? 1 : -1;
             String questionId = id.substring(0, id.indexOf('_'));
             Date createdDate = getDateFromString(id.substring(id.indexOf('_') + 1));
-            UpdateResult updateResult = collectionQuestion.updateOne(
-                    eq("_id", new ObjectId(questionId)),
-                    Updates.combine(
-                            Updates.inc("answers.$[xxx].score", increment),
-                            Updates.push("answers.$[xxx].voters", idVoter)
-                    ),
-                    new UpdateOptions().arrayFilters(Arrays.asList(and(eq("xxx.createdDate", createdDate),
-                            ne("xxx.voters", idVoter))))
-            );
-            return (updateResult.getModifiedCount() == 1);
+
+            TransactionBody txnBody = (TransactionBody<Boolean>) () -> {
+                MongoCollection<Document> collectionQuestions = database.getCollection("questions");
+                MongoCollection<Document> collectionUsers = database.getCollection("users");
+                UpdateResult updateResult = collectionQuestions.updateOne(
+                        session,
+                        eq("_id", new ObjectId(questionId)),
+                        Updates.combine(
+                                Updates.inc("answers.$[xxx].score", increment),
+                                Updates.push("answers.$[xxx].voters", idVoter)
+                        ),
+                        new UpdateOptions().arrayFilters(Arrays.asList(and(eq("xxx.createdDate", createdDate),
+                                ne("xxx.voters", idVoter))))
+                );
+                if(updateResult.getModifiedCount() == 1){
+                    collectionUsers.updateOne(
+                            session,
+                            eq("nickname", owner),
+                            Updates.inc("score", increment)
+                    );
+                }
+                return (updateResult.getModifiedCount() == 1);
+            };
+            return (Boolean) session.withTransaction(txnBody, txnOptions);
         } catch (Exception e) {
             throw new DAOException(e);
         }
     }
 
-    // TODO aggiunto accepted, non testata
-    public boolean accept(String id, boolean accepted) throws DAOException {
-        // The method will accept the answer (and return true) if and only if there isn't already an accepted answer
+    public String accept(String id, boolean accepted) throws DAOException {
+        // The method will accept the answer (and return the questionId) if and only if there isn't already an accepted answer
+        // If there is already an accepted answer the method will return null
         try (MongoClient myClient = getConnection()) {
             MongoDatabase database = myClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
             String questionId = id.substring(0, id.indexOf('_'));
             Date createdDate = getDateFromString(id.substring(id.indexOf('_') + 1));
             UpdateResult updateResult = collectionQuestion.updateOne(
-                    and(eq("_id", new ObjectId(questionId)), ne("answers.accepted", true)),
+                    and(eq("_id", new ObjectId(questionId)), ne("answers.accepted", accepted)),
                     Updates.combine(Updates.set("answers.$[xxx].accepted", accepted)),
                     new UpdateOptions().arrayFilters(Arrays.asList(eq("xxx.createdDate", createdDate)))
             );
-            return (updateResult.getModifiedCount() == 1);
+            return (updateResult.getModifiedCount() == 1) ? questionId : null;
         } catch (Exception e) {
             throw new DAOException(e);
         }

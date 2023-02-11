@@ -2,12 +2,10 @@ package it.unipi.lsmsd.coding_qa.service.implementation;
 
 import it.unipi.lsmsd.coding_qa.dao.*;
 import it.unipi.lsmsd.coding_qa.dao.enums.DAORepositoryEnum;
-import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAONodeException;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.UserDTO;
 import it.unipi.lsmsd.coding_qa.dto.UserRegistrationDTO;
-import it.unipi.lsmsd.coding_qa.model.Admin;
 import it.unipi.lsmsd.coding_qa.model.RegisteredUser;
 import it.unipi.lsmsd.coding_qa.model.User;
 import it.unipi.lsmsd.coding_qa.service.UserService;
@@ -51,15 +49,13 @@ public class UserServiceImpl implements UserService {
             userDTO.setCreatedDate(registeredUser.getCreatedDate());
 
             return userDTO;
-        } catch (DAOException exMongo) {
-            throw new BusinessException(exMongo);
-        } catch (DAONodeException exNeo) {
+        } catch (DAONodeException ex) {
             try {
                 userDAO.delete(registeredUser.getId());
             } catch (Exception e) {
                 throw new BusinessException(e);
             }
-            throw new BusinessException(exNeo);
+            throw new BusinessException(ex);
         } catch (Exception e) {
             throw new BusinessException(e);
         }
@@ -87,9 +83,9 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public UserDTO getInfo(String id) throws BusinessException {
+    public UserDTO getInfo(String nickname) throws BusinessException {
         try {
-            return userDAO.getInfo(id);
+            return userDAO.getInfo(nickname);
         } catch (Exception e) {
             throw new BusinessException(e);
         }
@@ -127,27 +123,25 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void delete(RegisteredUser user) throws BusinessException {
+    public void delete(String id, String nickname) throws BusinessException {
         try {
-            userDAO.delete(user.getId());
-            userNodeDAO.delete(user.getNickname());
-        } catch (DAOException exMongo) {
-            throw new BusinessException(exMongo);
-        } catch (DAONodeException exNeo) {
+            userDAO.delete(id);
+            userNodeDAO.delete(nickname);
+        } catch (DAONodeException ex) { // If there is a failure in the deletion of node User --> retry deletion
             try {
-                // TODO CORREGGERE CON CREAZIONE USER IN MONGO, PUO SERVIRE FAR RESTITUIRE QUALCOSA A DELETE
+                userNodeDAO.delete(nickname);
             } catch (Exception e) {
                 throw new BusinessException(e);
             }
-            throw new BusinessException(exNeo);
-        } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException(ex);
+        } catch (Exception ex) {
+            throw new BusinessException(ex);
         }
     }
 
-    public PageDTO<String> getFollowerList(RegisteredUser user) throws BusinessException {
+    public PageDTO<String> getFollowerList(String nickname) throws BusinessException {
         try {
-            return userNodeDAO.getFollowingList(user.getNickname());
+            return userNodeDAO.getFollowingList(nickname);
         } catch (Exception e) {
             throw new BusinessException(e);
         }

@@ -105,13 +105,9 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
         }
     }
 
-    public Question delete(String id) throws DAONodeException {
+    public void delete(String id) throws DAONodeException {
         try (Session session = getSession()) {
             session.writeTransaction(tx -> {
-                /*String deleteQuestion = "MATCH (q:Question{ id : $id}) " +
-                        "WITH q, q.title AS title, q.createdDate AS cDate, q.topic AS topic, q.closed AS closed\n" +
-                        "DETACH DELETE j\n" +
-                        "RETURN industry, name";*/ // TODO - FARE ASSUNZIONE, QUESTA DELETE CANCELLA ANCHE ARCHI!! (EVENTUALMENTE NON MODIFICARE FUNZ RITORNARE VOID)
                 String deleteQuestion = "MATCH (q:Question{ id : $id}) DETACH DELETE q";
                 tx.run(deleteQuestion, parameters("id", id)).consume();
                 return null;
@@ -119,7 +115,6 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
         } catch (Exception ex) {
             throw new DAONodeException(ex);
         }
-        return null;
     }
 
     public void updateClose(String questionId, boolean type) throws DAONodeException {

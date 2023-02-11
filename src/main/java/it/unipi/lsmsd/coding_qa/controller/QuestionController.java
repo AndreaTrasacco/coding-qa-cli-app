@@ -13,6 +13,14 @@ public class QuestionController {
         answerService = ServiceLocator.getAnswerService();
     }
 
+    // Browse e search for admin, logged, notlogged (VALUTARE SE TROPPO DUPICATO)
+
+    public void browseAdmin() { // TODO
+    }
+
+    public void searchAdmin() { // TODO
+    }
+
     // menu se logged oppure no
     // operazioni varie anche tutto in un solo metodo se basta
 }

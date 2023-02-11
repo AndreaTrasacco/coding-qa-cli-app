@@ -21,7 +21,7 @@ public class AuthenticationView {
             System.out.println("\t[3] Go to main menu without logging in");
             System.out.println("\t[4] Exit");
             System.out.println("Input: ");
-            choice = scanner.nextInt();
+            choice = Integer.parseInt(scanner.nextLine());
         } while (choice < 1 || choice > 4);
         if (choice == 4)
             System.out.println("############################################### EXIT ###############################################");
@@ -38,13 +38,12 @@ public class AuthenticationView {
         System.out.println("* Full Name: ");
         userDTO.setFullName(scanner.nextLine());
         System.out.println("* Year of birth date: ");
-        int year = scanner.nextInt();
+        int year = Integer.parseInt(scanner.nextLine());
         System.out.println("* Month of birth date: ");
-        int month = scanner.nextInt();
+        int month = Integer.parseInt(scanner.nextLine());
         System.out.println("* Day of birth date: ");
-        int day = scanner.nextInt();
+        int day = Integer.parseInt(scanner.nextLine());
         userDTO.setBirthdate(new Date(year - 1900, month - 1, day));
-        scanner.nextLine(); // to read '\n' leaved in buffer after nextInt() TODO ATTENZIONE
         System.out.println("Possible Countries: " + Arrays.toString(Constants.COUNTRIES.toArray()));
         String country;
         do {
