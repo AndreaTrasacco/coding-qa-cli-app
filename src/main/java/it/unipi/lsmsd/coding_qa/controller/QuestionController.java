@@ -1,5 +1,6 @@
 package it.unipi.lsmsd.coding_qa.controller;
 
+import it.unipi.lsmsd.coding_qa.dto.AnswerDTO;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionSearchDTO;
@@ -36,6 +37,52 @@ public class QuestionController {
                 mainView.viewPage(pageDTO);
                 switch(questionView.browseQuestionsMenu()){
                     case 1:
+                        //int index = questionView.specifyQuestionIndex(pageDTO); // TODO eliminare metodo specifyQuestionIndex?
+                        int index = mainView.inputMessageWithPaging("Select a question", pageDTO.getCounter());
+                        questionService.getQuestionInfo(pageDTO.getEntries().get(index).getId());
+                        switch(userType){
+                            case 0: adminView.adminQuestionMenu(); break;
+                            case 1: questionView.menuInQuestionPageLogged(); break;
+                            case 2: questionView.menuInQuestionPageNonLogged(); break;
+                            case 3: questionView.menuInQuestionPageOwner();
+                        }
+
+                        break;
+                    case 2:
+                        if (pageDTO.getCounter() == Constants.PAGE_SIZE)
+                            page++;
+                        else
+                            mainView.showMessage("!!!! THIS IS THE LAST PAGE !!!!");
+                        break;
+                    case 3:
+                        if (page > 1)
+                            page--;
+                        else
+                            mainView.showMessage("!!!! THIS IS THE FIRST PAGE !!!!");
+                        break;
+                    case 4:
+                        search(userType);
+                        break;
+                    case 5:
+                        return;
+                }
+            } while(true);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+            System.exit(1);
+        }
+    }
+
+    public void search(int userType) { // 0: Owner, 1: Logged, 2: NonLogged, 3: Owner
+        try{
+            int page = 1;
+            do {
+                QuestionSearchDTO questionSearchDTO = new QuestionSearchDTO();
+                questionView.search(questionSearchDTO);
+                PageDTO<QuestionDTO> pageDTO = questionService.searchQuestions(1, questionSearchDTO.getText(), questionSearchDTO.getTopic());
+                mainView.viewPage(pageDTO);
+                switch(questionView.searchQuestionsMenu()){
+                    case 1:
                         int index = questionView.specifyQuestionIndex(pageDTO);
                         questionService.getQuestionInfo(pageDTO.getEntries().get(index).getId());
                         switch(userType){
@@ -68,13 +115,19 @@ public class QuestionController {
         }
     }
 
-    public void search() {
-        try{ // TODO next/previous page (manca un menù in QuestionView?)
-            int page = 1;
-            QuestionSearchDTO questionSearchDTO = new QuestionSearchDTO();
-            questionView.search(questionSearchDTO);
-            PageDTO<QuestionDTO> pageDTO = questionService.searchQuestions(1,questionSearchDTO.getText(), questionSearchDTO.getTopic() );
-            mainView.viewPage(pageDTO);
+    public void menuAnswersLogged(int userType){ // 0: Admin, 1: Logged, 2: NonLogged, 3: Owner
+        try{
+            do{
+                int page = 1;
+                PageDTO<AnswerDTO> pageDTO = new PageDTO<>();
+                switch(questionView.menuInAnswerPageLogged()){
+                    case 1:
+                        int index = mainView.inputMessageWithPaging("Select a question", pageDTO.getCounter());
+                        break;
+                    case 2:
+
+                }
+            } while(true);
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             System.exit(1);

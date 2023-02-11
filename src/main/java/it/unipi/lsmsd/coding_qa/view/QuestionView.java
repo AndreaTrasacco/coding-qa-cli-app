@@ -92,7 +92,7 @@ public class QuestionView {
         return choice;
     }
 
-    public int browseQuestionsMenu(){
+    public int searchQuestionsMenu(){
         int choice;
         System.out.println("######################################## BROWSE QUESTION MENU ######################################");
         do {
@@ -100,6 +100,24 @@ public class QuestionView {
             System.out.println("\t[2] Next page");
             System.out.println("\t[3] Previous page");
             System.out.println("\t[4] Exit");
+            System.out.println("Input: ");
+            choice = Integer.parseInt(scanner.nextLine());;
+        } while (choice < 1 || choice > 4);
+        if(choice == 4)
+            System.out.println("############################################### EXIT ###############################################");
+
+        return choice;
+    }
+
+    public int browseQuestionsMenu(){
+        int choice;
+        System.out.println("######################################## BROWSE QUESTION MENU ######################################");
+        do {
+            System.out.println("\t[1] View Question");
+            System.out.println("\t[2] Next page");
+            System.out.println("\t[3] Previous page");
+            System.out.println("\t[4] Search question");
+            System.out.println("\t[5] Exit");
             System.out.println("Input: ");
             choice = Integer.parseInt(scanner.nextLine());;
         } while (choice < 1 || choice > 4);

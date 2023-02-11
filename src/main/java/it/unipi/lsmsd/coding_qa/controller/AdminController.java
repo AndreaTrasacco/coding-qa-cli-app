@@ -37,7 +37,7 @@ public class AdminController {
                     questionController.browse(0);
                     break;
                 case 5: // search questions
-                    questionController.search();
+                    questionController.search(0);
                     break;
                 case 6: // exit from the application
                     return;
