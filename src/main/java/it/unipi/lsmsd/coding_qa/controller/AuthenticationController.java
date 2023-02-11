@@ -29,14 +29,13 @@ public class AuthenticationController {
             switch (choice) {
                 case 1: // sign up
                     UserRegistrationDTO userRegistrationDTO = authView.signUp();
-                    System.out.println(userRegistrationDTO.getEncPassword());
                     userRegistrationDTO.setEncPassword(encryptPassword(userRegistrationDTO.getEncPassword()));
                     loggedUser = userService.register(userRegistrationDTO);
                     mainView.showMessage("#### REGISTERED ####");
                     break;
                 case 2: // login
                     UserLoginDTO userLoginDTO = authView.login();
-                    loggedUser = userService.login(userLoginDTO.getNickname(), userLoginDTO.getPassword());
+                    loggedUser = userService.login(userLoginDTO.getNickname(), encryptPassword(userLoginDTO.getPassword()));
                     if(loggedUser != null)
                         mainView.showMessage("#### LOGGED IN ####");
                     else

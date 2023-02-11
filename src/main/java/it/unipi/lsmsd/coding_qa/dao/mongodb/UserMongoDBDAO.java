@@ -80,32 +80,16 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
     }
 
     @Override
-    public RegisteredUser updateInfo(RegisteredUser user) throws DAOException {
+    public void updateInfo(RegisteredUser user) throws DAOException {
         try(MongoClient mongoClient = getConnection()) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionUser = database.getCollection("users");
-            Document doc = collectionUser.findOneAndUpdate(Filters.eq("nickname", user.getNickname()),
+            collectionUser.updateOne(Filters.eq("nickname", user.getNickname()),
                     Updates.combine(Updates.set("fullName", user.getFullName()),
                             Updates.set("password", user.getEncPassword()),
                             Updates.set("birthdate", user.getBirthdate()),
                             Updates.set("country", user.getCountry()),
                             Updates.set("website", user.getWebsite())));
-
-            RegisteredUser oldUser = null;
-            if(doc != null){
-                oldUser = new RegisteredUser();
-                oldUser.setFullName(doc.getString("fullName"));
-                if(doc.containsKey("website"))
-                    oldUser.setWebsite(doc.getString("website"));
-                oldUser.setBirthdate(doc.getDate("birthdate"));
-                oldUser.setCountry(doc.getString("country"));
-                oldUser.setEncPassword(doc.getString("password"));
-                oldUser.setScore(doc.getInteger("score"));
-                oldUser.setCreatedDate(doc.getDate("createdDate"));
-                oldUser.setId(user.getId());
-                oldUser.setNickname(doc.getString("nickname"));
-            }
-            return oldUser;
         } catch(Exception e){
             throw new DAOException(e);
         }

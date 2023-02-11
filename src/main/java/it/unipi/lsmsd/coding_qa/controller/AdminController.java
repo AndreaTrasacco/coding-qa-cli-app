@@ -34,10 +34,10 @@ public class AdminController {
                     analyticsController.start();
                     break;
                 case 4: // browse questions
-                    questionController.browseAdmin();
+                    questionController.browse(0);
                     break;
                 case 5: // search questions
-                    questionController.searchAdmin();
+                    questionController.search();
                     break;
                 case 6: // exit from the application
                     return;
