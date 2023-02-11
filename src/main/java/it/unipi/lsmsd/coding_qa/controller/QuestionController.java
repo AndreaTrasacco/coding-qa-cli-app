@@ -37,8 +37,12 @@ public class QuestionController {
                 switch(questionView.browseQuestionsMenu()){
                     case 1:
                         //int index = questionView.specifyQuestionIndex(pageDTO); // TODO eliminare metodo specifyQuestionIndex?
-                        int index = mainView.inputMessageWithPaging("Select a question", pageDTO.getCounter());
-                        questionService.getQuestionInfo(pageDTO.getEntries().get(index).getId());
+                        int index = mainView.inputMessageWithPaging("Select a question", pageDTO.getCounter())-1;
+                        QuestionDTO questionDTO = pageDTO.getEntries().get(index);
+                        questionService.getQuestionInfo(questionDTO.getId());
+                        if(questionDTO.getAuthor() == AuthenticationController.getLoggedUser().getNickname()){
+                            userType = 3;
+                        }
                         switch(userType){
                             case 0: adminView.adminQuestionMenu(); break;
                             case 1: questionView.menuInQuestionPageLogged(); break;
@@ -82,7 +86,12 @@ public class QuestionController {
                 mainView.viewPage(pageDTO);
                 switch(questionView.searchQuestionsMenu()){
                     case 1:
-                        int index = questionView.specifyQuestionIndex(pageDTO);
+                        int index = questionView.specifyQuestionIndex(pageDTO)-1;
+                        QuestionDTO questionDTO = pageDTO.getEntries().get(index);
+                        questionService.getQuestionInfo(questionDTO.getId());
+                        if(questionDTO.getAuthor() == AuthenticationController.getLoggedUser().getNickname()){
+                            userType = 3;
+                        }
                         questionService.getQuestionInfo(pageDTO.getEntries().get(index).getId());
                         switch(userType){
                             case 0: adminView.adminQuestionMenu(); break;
@@ -114,17 +123,37 @@ public class QuestionController {
         }
     }
 
-    public void menuAnswersLogged(int userType){ // 0: Admin, 1: Logged, 2: NonLogged, 3: Owner
+    public void menuAnswersLogged(int userType, String questionId){ // 0: Admin, 1: Logged, 2: NonLogged, 3: Owner
         try{
             do{
                 int page = 1;
-                PageDTO<AnswerDTO> pageDTO = new PageDTO<>();
+                PageDTO<AnswerDTO> pageDTO = answerService.getAnswersPage(page, questionId);
+                mainView.viewPage(pageDTO);
                 switch(questionView.menuInAnswerPageLogged()){
                     case 1:
-                        int index = mainView.inputMessageWithPaging("Select a question", pageDTO.getCounter());
+                        int index = mainView.inputMessageWithPaging("Select a question", pageDTO.getCounter())-1;
+                        answerService.getCompleteAnswer(pageDTO.getEntries().get(index));
+                        switch(userType){
+                            case 0: adminView.adminAnswerMenu(); break;
+                            case 1: questionView.menuInAnswerPageLogged(); break;
+                            case 2: questionView.menuInAnswerPageNotLogged(); break;
+                            case 3: questionView.menuInAnswerPageOwner();
+                        }
                         break;
                     case 2:
-
+                        if (pageDTO.getCounter() == Constants.PAGE_SIZE)
+                            page++;
+                        else
+                            mainView.showMessage("!!!! THIS IS THE LAST PAGE !!!!");
+                        break;
+                    case 3:
+                        if (page > 1)
+                            page--;
+                        else
+                            mainView.showMessage("!!!! THIS IS THE FIRST PAGE !!!!");
+                        break;
+                    case 4:
+                        return;
                 }
             } while(true);
         } catch (Exception ex) {
@@ -232,6 +261,14 @@ public class QuestionController {
             System.out.println(e.getMessage());
             System.exit(1);
         }
+    }
+
+    public void browseCreatedQuestions(String nickname){
+
+    }
+
+    public void browseAnsweredQuestions(String nickname){
+
     }
 
     // menu se logged oppure no
