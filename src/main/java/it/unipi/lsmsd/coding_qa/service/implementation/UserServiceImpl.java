@@ -53,11 +53,11 @@ public class UserServiceImpl implements UserService {
             try {
                 userDAO.delete(registeredUser.getId());
             } catch (Exception e) {
-                throw new BusinessException(e);
+                throw new BusinessException("Error in the registration");
             }
-            throw new BusinessException(ex);
+            throw new BusinessException("Error in the registration");
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in the registration");
         }
     }
 
@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
             }
             return userDTO;
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in login");
         }
     }
 
@@ -87,7 +87,7 @@ public class UserServiceImpl implements UserService {
         try {
             return userDAO.getInfo(nickname);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in getting information");
         }
     }
 
@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
             registeredUser.setFullName(userRegistrationDTO.getFullName());
             userDAO.updateInfo(registeredUser);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in updating information");
         }
     }
 
@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
         try {
             userNodeDAO.followUser(myself, userToFollow);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error following the user");
         }
     }
 
@@ -119,7 +119,7 @@ public class UserServiceImpl implements UserService {
         try {
             userNodeDAO.deleteFollowed(myself, userToUnFollow);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error unfollowing the user");
         }
     }
 
@@ -131,11 +131,11 @@ public class UserServiceImpl implements UserService {
             try {
                 userNodeDAO.delete(nickname);
             } catch (Exception e) {
-                throw new BusinessException(e);
+                throw new BusinessException("Error in deleting the user");
             }
-            throw new BusinessException(ex);
+            throw new BusinessException("Error in deleting the user");
         } catch (Exception ex) {
-            throw new BusinessException(ex);
+            throw new BusinessException("Error in deleting the user");
         }
     }
 
@@ -143,7 +143,7 @@ public class UserServiceImpl implements UserService {
         try {
             return userNodeDAO.getFollowingList(nickname);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error getting follower list");
         }
     }
 
@@ -152,7 +152,7 @@ public class UserServiceImpl implements UserService {
         try {
             return userDAO.getScore(userId);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error getting the score");
         }
     }
 }

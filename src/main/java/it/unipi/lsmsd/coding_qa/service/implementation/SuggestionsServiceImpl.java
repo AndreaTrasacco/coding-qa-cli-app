@@ -20,7 +20,7 @@ public class SuggestionsServiceImpl implements SuggestionsService {
         try {
             return suggestionsDAO.questionsToRead(page, nickname);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error getting suggested questions to read");
         }
     }
 
@@ -28,7 +28,7 @@ public class SuggestionsServiceImpl implements SuggestionsService {
         try {
             return suggestionsDAO.questionsToAnswer(page, nickname);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error getting suggested questions to answer");
         }
     }
 }

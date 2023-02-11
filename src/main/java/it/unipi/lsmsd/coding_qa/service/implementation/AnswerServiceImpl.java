@@ -36,10 +36,10 @@ public class AnswerServiceImpl implements AnswerService {
             try {
                 answerDAO.delete(answerDTO.getId());
             } catch (DAOException ex) {
-                throw new BusinessException(ex);
+                throw new BusinessException("Error in adding the answer");
             }
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in adding the answer");
         }
     }
 
@@ -48,7 +48,7 @@ public class AnswerServiceImpl implements AnswerService {
         try {
             answerDAO.updateBody(answerId, body);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in updating the answer");
         }
     }
 
@@ -64,10 +64,10 @@ public class AnswerServiceImpl implements AnswerService {
                 if (questionId != null)
                     questionNodeDAO.deleteAnswer(questionId, answerDTO.getAuthor());
             } catch (Exception e) {
-                throw new BusinessException(e);
+                throw new BusinessException("Error in deleting the answer");
             }
         } catch (Exception ex) {
-            throw new BusinessException(ex);
+            throw new BusinessException("Error in deleting the answer");
         }
     }
 
@@ -76,7 +76,7 @@ public class AnswerServiceImpl implements AnswerService {
         try {
             return answerDAO.vote(voteDTO.getAnswerId(), voteDTO.getVoteType(), voteDTO.getVoterId(), voteDTO.getAnswerOwner());
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in voting the answer");
         }
     }
 
@@ -85,7 +85,7 @@ public class AnswerServiceImpl implements AnswerService {
         try {
             answerDAO.report(answerId, report);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in reporting the answer");
         }
     }
 
@@ -94,7 +94,7 @@ public class AnswerServiceImpl implements AnswerService {
         try {
             return answerDAO.getReportedAnswers(page);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in getting the reported answers");
         }
     }
 
@@ -110,10 +110,10 @@ public class AnswerServiceImpl implements AnswerService {
                 answerDAO.accept(answerId, false);
                 return false;
             } catch (DAOException ex) {
-                throw new BusinessException(ex);
+                throw new BusinessException("Error in accepting the answer");
             }
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in accepting the answer");
         }
     }
 
@@ -122,7 +122,7 @@ public class AnswerServiceImpl implements AnswerService {
         try {
             return answerDAO.getAnswersPage(page, questionId);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in getting the answers page");
         }
     }
 
@@ -140,7 +140,7 @@ public class AnswerServiceImpl implements AnswerService {
             answerDTO.setScore(answer.getScore());
             answerDTO.setAccepted(answer.isAccepted());
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in getting the answer");
         }
     }
 }

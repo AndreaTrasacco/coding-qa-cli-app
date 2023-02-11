@@ -24,7 +24,7 @@ public class AggregationsServiceImpl implements AggregationsService {
         try {
             return aggregationsDAO.getExperienceLvlPerCountry();
         } catch (Exception e){
-            throw new BusinessException(e);
+            throw new BusinessException("Error computing analytics: Get experience level per country");
         }
     }
 
@@ -33,7 +33,7 @@ public class AggregationsServiceImpl implements AggregationsService {
         try {
             return aggregationsDAO.getUsefulQuestions();
         } catch (Exception e){
-            throw new BusinessException(e);
+            throw new BusinessException("Error computing analytics: Get useful questions");
         }
     }
 
@@ -42,7 +42,7 @@ public class AggregationsServiceImpl implements AggregationsService {
         try {
             return aggregationsDAO.getTopicRank();
         } catch (Exception e){
-            throw new BusinessException(e);
+            throw new BusinessException("Error computing analytics: Get topic rank");
         }
     }
 }

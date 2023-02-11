@@ -39,10 +39,10 @@ public class QuestionServiceImpl implements QuestionService {
                     questionDAO.deleteQuestion(questionId);
                 }
             } catch (Exception ex) {
-                throw new BusinessException(ex);
+                throw new BusinessException("Error in creating the question");
             }
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in creating the question");
         }
     }
 
@@ -63,10 +63,10 @@ public class QuestionServiceImpl implements QuestionService {
                     questionDAO.updateQuestion(oldQuestion);
                 }
             } catch (Exception ex) {
-                throw new BusinessException(ex);
+                throw new BusinessException("Error in updating the question");
             }
         } catch (Exception ex) {
-            throw new BusinessException(ex);
+            throw new BusinessException("Error in updating the question");
         }
     }
 
@@ -79,10 +79,10 @@ public class QuestionServiceImpl implements QuestionService {
             try {
                 questionNodeDAO.delete(questionId);
             } catch (DAONodeException e) {
-                throw new BusinessException(e);
+                throw new BusinessException("Error in deleting the question");
             }
         } catch (Exception ex) {
-            throw new BusinessException(ex);
+            throw new BusinessException("Error in deleting the question");
         }
     }
 
@@ -91,7 +91,7 @@ public class QuestionServiceImpl implements QuestionService {
         try {
             questionDAO.reportQuestion(questionId, report);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in reporting the question");
         }
     }
 
@@ -100,7 +100,7 @@ public class QuestionServiceImpl implements QuestionService {
         try {
             return questionDAO.getReportedQuestions(page);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in getting the reported questions");
         }
     }
 
@@ -109,7 +109,7 @@ public class QuestionServiceImpl implements QuestionService {
         try {
             return questionDAO.getQuestionInfo(id);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in getting the question");
         }
     }
 
@@ -118,7 +118,7 @@ public class QuestionServiceImpl implements QuestionService {
         try {
             return questionDAO.searchQuestions(page, searchString, topicFilter);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in searching questions");
         }
     }
 
@@ -127,7 +127,7 @@ public class QuestionServiceImpl implements QuestionService {
         try {
             return questionDAO.browseQuestions(page);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error in browsing questions");
         }
     }
 
@@ -136,7 +136,7 @@ public class QuestionServiceImpl implements QuestionService {
         try {
             return questionNodeDAO.viewCreatedQuestions(nickname, page);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error viewing created questions");
         }
     }
 
@@ -145,7 +145,7 @@ public class QuestionServiceImpl implements QuestionService {
         try {
             return questionNodeDAO.viewAnsweredQuestions(nickname, page);
         } catch (Exception e) {
-            throw new BusinessException(e);
+            throw new BusinessException("Error viewing answered questions");
         }
     }
 }
