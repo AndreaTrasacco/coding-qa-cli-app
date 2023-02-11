@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7a80ea41-8b1b-40fc-abb8-1008547220f9" name="Changes" comment="Corrected UpdateQuestion">
+    <list default="true" id="7a80ea41-8b1b-40fc-abb8-1008547220f9" name="Changes" comment="Corrected QuestionView">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/view/QuestionView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/view/QuestionView.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -174,7 +173,7 @@
       <workItem from="1675958065204" duration="11821000" />
       <workItem from="1676045751809" duration="10784000" />
       <workItem from="1676128040688" duration="6694000" />
-      <workItem from="1676136619193" duration="2209000" />
+      <workItem from="1676136619193" duration="3950000" />
     </task>
     <task id="LOCAL-00001" summary="Packaging 1">
       <created>1675020274919</created>
@@ -351,7 +350,14 @@
       <option name="project" value="LOCAL" />
       <updated>1676137598609</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="Corrected QuestionView">
+      <created>1676138843874</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1676138843874</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -391,6 +397,7 @@
     <MESSAGE value="Corrected UserDAO" />
     <MESSAGE value="Added MainView, RegisteredUserView, AdminView" />
     <MESSAGE value="Corrected UpdateQuestion" />
-    <option name="LAST_COMMIT_MESSAGE" value="Corrected UpdateQuestion" />
+    <MESSAGE value="Corrected QuestionView" />
+    <option name="LAST_COMMIT_MESSAGE" value="Corrected QuestionView" />
   </component>
 </project>

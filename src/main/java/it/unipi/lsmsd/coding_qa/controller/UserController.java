@@ -30,13 +30,61 @@ public class UserController {
         int choice = userView.selfUserProfileMenu();
         do{
             switch (choice) {
-                case 1:
-                    browseYourQuestion();
+                case 1: // browse your question
+                    questionController.browseYourQuestion();
+                    break;
+                case 2: // browse your answer
+
+                    break;
+                case 3: // show your info
+                    showYourInfo();
+                    break;
+                case 4: // update your profile
+                    updateYourProfile();
+                    break;
+                case 5: // browse followed user
+                    browseFollowedUser();
+                    break;
+                case 6: // go back
+                    return;
             }
         } while (true);
     }
 
-    private void browseYourQuestion() {
+    private void browseFollowedUser() {
+        try{
+            int page;
+            int pageAns;
+        } catch(Exception e){
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    private void updateYourProfile() {
+        try{
+            UserDTO userDTO = authenticationController.getLoggedUser();
+            UserRegistrationDTO userRegistrationDTO = new UserRegistrationDTO();
+            userRegistrationDTO.setNickname(userDTO.getNickname());
+            userView.updateProfile(userRegistrationDTO);
+            userService.updateInfo(userRegistrationDTO);
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    private void showYourInfo() {
+        try{
+            UserDTO userDTO = authenticationController.getLoggedUser();
+            userService.getInfo(userDTO.getNickname());
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    private void browseYourQuestion() { //TODO DA COPIARE
         try {
             int page = 1;
             int pageAns = 1;
@@ -61,8 +109,29 @@ public class UserController {
                                 switch (questionView.menuInAnswerPageLogged()){
                                     case 1:  // select an answer
                                         int ansNumber = mainView.inputMessageWithPaging("Specify the answer number", pageDTO.getCounter());
-                                        switch (questionView.menuInAnswer()){
 
+                                        switch (questionView.menuInAnswer()){
+                                            case 1:  // Upvote
+                                                VoteDTO voteDTO = new VoteDTO();
+                                                voteDTO.setAnswerId(pageDTOAns.getEntries().get(ansNumber - 1).getId());
+                                                voteDTO.setVoteType(true);
+                                                voteDTO.setAnswerOwner(pageDTOAns.getEntries().get(ansNumber - 1).getAuthor());
+                                                voteDTO.setVoterId(userDTO.getId());
+                                                answerService.voteAnswer(voteDTO);
+                                                break;
+                                            case 2:  // Downvote
+                                                VoteDTO voteDTO1 = new VoteDTO();
+                                                voteDTO1.setAnswerId(pageDTOAns.getEntries().get(ansNumber - 1).getId());
+                                                voteDTO1.setVoteType(false);
+                                                voteDTO1.setAnswerOwner(pageDTOAns.getEntries().get(ansNumber - 1).getAuthor());
+                                                voteDTO1.setVoterId(userDTO.getId());
+                                                answerService.voteAnswer(voteDTO1);
+                                                break;
+                                            case 3:  // Report
+                                                answerService.reportAnswer(pageDTOAns.getEntries().get(ansNumber - 1).getId(), true);
+                                                break;
+                                            case 4:  // go back
+                                                return;
                                         }
                                         break;
                                     case 2:  // go to the next page
