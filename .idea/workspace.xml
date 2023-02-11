@@ -4,14 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7a80ea41-8b1b-40fc-abb8-1008547220f9" name="Changes" comment="Added MainView, RegisteredUserView, AdminView">
+    <list default="true" id="7a80ea41-8b1b-40fc-abb8-1008547220f9" name="Changes" comment="Corrected UpdateQuestion">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dto/AnswerDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dto/AnswerDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dto/QuestionModifyDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dto/QuestionModifyDTO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/service/QuestionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/service/QuestionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/service/implementation/QuestionServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/service/implementation/QuestionServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/view/AdminView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/view/AdminView.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/view/QuestionView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/view/QuestionView.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -179,7 +174,7 @@
       <workItem from="1675958065204" duration="11821000" />
       <workItem from="1676045751809" duration="10784000" />
       <workItem from="1676128040688" duration="6694000" />
-      <workItem from="1676136619193" duration="911000" />
+      <workItem from="1676136619193" duration="2209000" />
     </task>
     <task id="LOCAL-00001" summary="Packaging 1">
       <created>1675020274919</created>
@@ -349,7 +344,14 @@
       <option name="project" value="LOCAL" />
       <updated>1676056412922</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="Corrected UpdateQuestion">
+      <created>1676137598609</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1676137598609</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -388,6 +390,7 @@
     <MESSAGE value="Added UserService, corrected UserDAO" />
     <MESSAGE value="Corrected UserDAO" />
     <MESSAGE value="Added MainView, RegisteredUserView, AdminView" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added MainView, RegisteredUserView, AdminView" />
+    <MESSAGE value="Corrected UpdateQuestion" />
+    <option name="LAST_COMMIT_MESSAGE" value="Corrected UpdateQuestion" />
   </component>
 </project>

@@ -120,17 +120,33 @@ public class QuestionView {
 
     public int menuInAnswerPageLogged(){
         int choice;
-        System.out.println("############################################ ANSWER MENU ###########################################");
+        System.out.println("####################################### BROWSE ANSWER MENU #########################################");
         do {
-            System.out.println("\t[1] Vote");
-            System.out.println("\t[2] Report");
-            System.out.println("\t[3] Next Page");
-            System.out.println("\t[4] Previous Page");
-            System.out.println("\t[5] Exit");
+            System.out.println("\t[1] Select an answer");
+            System.out.println("\t[2] Next Page");
+            System.out.println("\t[3] Previous Page");
+            System.out.println("\t[4] Exit");
             System.out.println("Input: ");
             choice = Integer.parseInt(scanner.nextLine());;
-        } while (choice < 1 || choice > 5);
-        if(choice == 5)
+        } while (choice < 1 || choice > 4);
+        if(choice == 4)
+            System.out.println("############################################### EXIT ###############################################");
+
+        return choice;
+    }
+
+    public int menuInAnswer(){
+        int choice;
+        System.out.println("########################################### ANSWER MENU ############################################");
+        do {
+            System.out.println("\t[1] Upvote");
+            System.out.println("\t[2] Downvote");
+            System.out.println("\t[3] Report");
+            System.out.println("\t[4] Exit");
+            System.out.println("Input: ");
+            choice = Integer.parseInt(scanner.nextLine());;
+        } while (choice < 1 || choice > 4);
+        if(choice == 4)
             System.out.println("############################################### EXIT ###############################################");
 
         return choice;
