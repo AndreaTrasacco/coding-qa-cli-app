@@ -49,7 +49,7 @@ public class MainView {
         return choice;
     }
 
-    public int inputMessageWithPaging(String message, int size){ // TODO CANCELLARE SE NON USATA
+    public int inputMessageWithPaging(String message, int size){
         int number;
         do {
             System.out.println("\t* " + message + ": ");
@@ -68,6 +68,6 @@ public class MainView {
     }
 
     public void view(Object o){
-        System.out.println(o.toString());
+        System.out.println(o);
     }
 }

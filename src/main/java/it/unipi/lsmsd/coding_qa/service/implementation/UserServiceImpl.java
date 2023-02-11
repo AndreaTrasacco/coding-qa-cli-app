@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public UserDTO login(String username, String encPassword) throws BusinessException {
+    public UserDTO login(String username, String encPassword) throws BusinessException { // It returns null if authentication fails
         try {
             User user = userDAO.authenticate(username, encPassword);
             if (user == null)
