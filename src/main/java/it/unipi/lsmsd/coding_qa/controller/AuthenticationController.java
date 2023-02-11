@@ -17,7 +17,7 @@ public class AuthenticationController {
     private AuthenticationView authView = new AuthenticationView();
     private MainView mainView = new MainView();
     private UserService userService;
-    private UserDTO loggedUser = null;
+    private static UserDTO loggedUser = null;
 
     public AuthenticationController() {
         userService = ServiceLocator.getUserService();
@@ -74,11 +74,11 @@ public class AuthenticationController {
         return hexString.toString();
     }
 
-    public UserDTO getLoggedUser() {
+    public static UserDTO getLoggedUser() {
         return loggedUser;
     }
 
-    public String getLoggedUserNickname() {
+    public static String getLoggedUserNickname() {
         return loggedUser.getNickname();
     }
 

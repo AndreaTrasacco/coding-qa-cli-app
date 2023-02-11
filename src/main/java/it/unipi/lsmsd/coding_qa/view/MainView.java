@@ -35,16 +35,16 @@ public class MainView {
         do {
             System.out.println("\t[1] Browse questions");
             System.out.println("\t[2] Search question");
-            System.out.println("\t[4] Publish new question");
-            System.out.println("\t[5] Browse suggested questions to answer");
-            System.out.println("\t[6] Browse suggested questions to read");
-            System.out.println("\t[7] Open your profile menu");
-            System.out.println("\t[8] Go to analytics menu");
-            System.out.println("\t[9] Exit");
+            System.out.println("\t[3] Publish new question");
+            System.out.println("\t[4] Browse suggested questions to answer");
+            System.out.println("\t[5] Browse suggested questions to read");
+            System.out.println("\t[6] Open your profile");
+            System.out.println("\t[7] Go to analytics menu");
+            System.out.println("\t[8] Exit");
             System.out.println("Input: ");
             choice = Integer.parseInt(scanner.nextLine());;
-        } while (choice < 1 || choice > 9);
-        if(choice == 9)
+        } while (choice < 1 || choice > 8);
+        if(choice == 8)
             System.out.println("############################################### EXIT ###############################################");
         return choice;
     }
