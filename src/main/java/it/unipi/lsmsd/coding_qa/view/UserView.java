@@ -30,6 +30,22 @@ public class UserView {
         return choice;
     }
 
+    public int otherUserProfileMenuFollowed(){
+        System.out.println("######################################## USER PROFILE MENU #########################################");
+        int choice;
+        do {
+            System.out.println("\t[1] Unfollow user");
+            System.out.println("\t[2] Browse user's created questions");
+            System.out.println("\t[3] Browse user's answered questions");
+            System.out.println("\t[4] Exit");
+            System.out.println("Input: ");
+            choice = Integer.parseInt(scanner.nextLine());;
+        } while (choice < 1 || choice > 4);
+        if (choice == 4)
+            System.out.println("############################################### EXIT ###############################################");
+        return choice;
+    }
+
     public int selfUserProfileMenu(){
         System.out.println("######################################### YOUR PROFILE MENU ########################################");
         int choice;

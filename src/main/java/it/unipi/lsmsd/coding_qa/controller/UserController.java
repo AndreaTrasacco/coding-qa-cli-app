@@ -13,6 +13,7 @@ import it.unipi.lsmsd.coding_qa.view.UserView;
 public class UserController {
     private UserService userService;
     private QuestionService questionService;
+    private QuestionController questionController;
     private AnswerService answerService;
     private UserView userView = new UserView();
     private QuestionView questionView = new QuestionView();
@@ -27,14 +28,15 @@ public class UserController {
     public void openSelfProfile(){ // PARAMETRO PUO ESSERE UTILE (OPPURE FUNZIONE SEPARATA)?? Admin può cancellare utente
         // call show profile
         // .. menu on the profile (use cases diagram)
-        int choice = userView.selfUserProfileMenu();
+        UserDTO userDTO = authenticationController.getLoggedUser();
         do{
+            int choice = userView.selfUserProfileMenu();
             switch (choice) {
                 case 1: // browse your question
-                    questionController.browseYourQuestion();
+                    questionController.browseYourQuestions();
                     break;
                 case 2: // browse your answer
-
+                    questionController.browseAnsweredQuestions(userDTO.getNickname());
                     break;
                 case 3: // show your info
                     showYourInfo();
@@ -53,8 +55,45 @@ public class UserController {
 
     private void browseFollowedUser() {
         try{
-            int page;
-            int pageAns;
+            int page = 1;
+            do{
+                UserDTO userDTO = authenticationController.getLoggedUser();
+                PageDTO<String> pageDTO = userService.getFollowerList(userDTO.getNickname());
+                if (pageDTO.getCounter() == 0) return;
+                switch (userView.browseFollowedUsers(pageDTO)){
+                    case 1: // choose a user to view
+                        int number = mainView.inputMessageWithPaging("Specify the user number", pageDTO.getCounter());
+                        userService.getInfo(pageDTO.getEntries().get(number - 1));
+                        switch (userView.otherUserProfileMenuFollowed()){
+                            case 1: // unfollow user
+                                userService.unfollow(userDTO.getNickname(), pageDTO.getEntries().get(number - 1));
+                                return;
+                            case 2: // browse user's created questions
+                                questionController.browseCreatedQuestions(pageDTO.getEntries().get(number - 1));
+                                break;
+                            case 3: // browse user's created answers
+                                questionController.browseCreatedAnswers(pageDTO.getEntries().get(number - 1));
+                                break;
+                            case 4: // go back
+                                return;
+                        }
+                        break;
+                    case 2: // go to the next page
+                        if (pageDTO.getCounter() == Constants.PAGE_SIZE)
+                            page++;
+                        else
+                            mainView.showMessage("!!!! THIS IS THE LAST PAGE !!!!");
+                        break;
+                    case 3: // go to the previous page
+                        if (page > 1)
+                            page--;
+                        else
+                            mainView.showMessage("!!!! THIS IS THE FIRST PAGE !!!!");
+                        break;
+                    case 4:
+                        return;
+                }
+            } while(true);
         } catch(Exception e){
             System.out.println(e.getMessage());
             System.exit(1);
@@ -185,10 +224,46 @@ public class UserController {
     }
 
     public void openProfileIfAdmin(UserDTO userDTO) { // TODO
-        userView.adminUserProfile(userDTO);
+        try {
+            int choice = userView.adminUserProfile(userDTO);
+            switch (choice){
+                case 1: // delete user
+                    userService.delete(userDTO.getId(), userDTO.getNickname());
+                    break;
+                case 2: // go back
+                    return;
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
     }
 
-    // update
+    public void openUserProfile(UserDTO userDTO) { // TODO
+        try {
+            int choice = userView.otherUserProfileMenu();
+            UserDTO myself = authenticationController.getLoggedUser();
+            switch (choice){
+                case 1: // follow user
+                    userService.follow(myself.getNickname(), userDTO.getNickname());
+                    break;
+                case 2: // unfollow user
+                    userService.unfollow(myself.getNickname(), userDTO.getNickname());
+                    break;
+                case 3:
+                    questionController.browseCreatedQuestions(userDTO.getNickname());
+                    break;
+                case 4: // go back
+                    questionController.browseAnsweredQuestions(userDTO.getNickname());
+                    break;
+                case 5:
+                    return;
+            }
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            System.exit(1);
+        }
+    }
 
     public static void main(String args[]){
 
