@@ -75,7 +75,7 @@ public class UserView {
         System.out.println("* Password (Press Enter if you don't want to change it): ");
         String password = scanner.nextLine();
         if(!password.equals("")){
-            userRegistrationDTO.setEncPassword(AuthenticationController.encryptPassword(password.getBytes()));
+            userRegistrationDTO.setEncPassword(AuthenticationController.encryptPassword(password));
         }
         System.out.println("* Year of birth date (Press Enter if you don't want to change it): ");
         String year = scanner.nextLine();

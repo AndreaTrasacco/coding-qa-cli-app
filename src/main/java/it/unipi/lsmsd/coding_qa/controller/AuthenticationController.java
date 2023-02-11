@@ -7,9 +7,15 @@ import it.unipi.lsmsd.coding_qa.service.ServiceLocator;
 import it.unipi.lsmsd.coding_qa.service.UserService;
 import it.unipi.lsmsd.coding_qa.service.exception.BusinessException;
 import it.unipi.lsmsd.coding_qa.view.AuthenticationView;
+import it.unipi.lsmsd.coding_qa.view.MainView;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class AuthenticationController {
     private AuthenticationView authView = new AuthenticationView();
+    private MainView mainView = new MainView();
     private UserService userService;
     private UserDTO loggedUser = null;
 
@@ -18,36 +24,46 @@ public class AuthenticationController {
     }
 
     public int start() { // do .. while
-        int choice = authView.initialMenu();
-        switch (choice) {
-            case 1: // sign up
-                UserRegistrationDTO userRegistrationDTO = authView.signUp();
-                userRegistrationDTO.setEncPassword(encryptPassword(userRegistrationDTO.getEncPassword().getBytes()));
-                try {
+        try {
+            int choice = authView.initialMenu();
+            switch (choice) {
+                case 1: // sign up
+                    UserRegistrationDTO userRegistrationDTO = authView.signUp();
+                    System.out.println(userRegistrationDTO.getEncPassword());
+                    userRegistrationDTO.setEncPassword(encryptPassword(userRegistrationDTO.getEncPassword()));
                     loggedUser = userService.register(userRegistrationDTO);
-                } catch (BusinessException e) {
-                    System.out.println("!!!! ERROR DURING SIGN UP !!!!");
-                }
-                break;
-            case 2: // login
-                UserLoginDTO userLoginDTO = authView.login();
-                try {
-                    loggedUser = userService.login(userLoginDTO.getNickname(), userLoginDTO.getPassword());
-                } catch (BusinessException e) {
-                    {
-                        System.out.println("!!!! ERROR DURING LOG IN !!!!");
-                    }
+                    mainView.showMessage("#### REGISTERED ####");
                     break;
-                }
+                case 2: // login
+                    UserLoginDTO userLoginDTO = authView.login();
+                    loggedUser = userService.login(userLoginDTO.getNickname(), userLoginDTO.getPassword());
+                    if(loggedUser != null)
+                        mainView.showMessage("#### LOGGED IN ####");
+                    else
+                        mainView.showMessage("#### LOG IN FAILED ####");
+                    break;
+            }
+            return choice;
+        } catch (BusinessException e) {
+            System.out.println(e.getMessage());
+            System.exit(1);
+            return -1;
         }
-        return choice;
     }
 
     public void logout() {
         authView.showLogoutMessage();
     }
 
-    public static String encryptPassword(byte[] hash) {
+    public static String encryptPassword(String originalString) {
+        MessageDigest digest = null;
+        try {
+            digest = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("!!!! ERROR DURING PASSWORD ENCRYPTION !!!!");
+            System.exit(1);
+        }
+        byte[] hash = digest.digest(originalString.getBytes(StandardCharsets.UTF_8));
         StringBuilder hexString = new StringBuilder(2 * hash.length);
         for (int i = 0; i < hash.length; i++) {
             String hex = Integer.toHexString(0xff & hash[i]);
@@ -65,5 +81,9 @@ public class AuthenticationController {
 
     public String getLoggedUserNickname() {
         return loggedUser.getNickname();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(encryptPassword("admin"));
     }
 }

@@ -59,10 +59,10 @@ public class AdminController {
                         mainView.view(questionPageDTO);
                         switch (adminView.adminQuestionMenu()) {
                             case 1: // delete question
-                                questionService.deleteQuestion(pageDTO.getEntries().get(number - 1).getId());
+                                questionService.deleteQuestion(questionPageDTO.getId());
                                 break;
                             case 2: // toggle the report from the question
-                                questionService.reportQuestion(pageDTO.getEntries().get(number - 1).getId(), false);
+                                questionService.reportQuestion(questionPageDTO.getId(), false);
                                 break;
                             case 3: // open user profile
                                 userController.openProfileIfAdmin(userService.getInfo(questionPageDTO.getAuthor()));
