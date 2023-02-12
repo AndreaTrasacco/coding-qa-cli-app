@@ -3,6 +3,7 @@ package it.unipi.lsmsd.coding_qa.view;
 import it.unipi.lsmsd.coding_qa.dto.*;
 import it.unipi.lsmsd.coding_qa.utils.Constants;
 
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class QuestionView {
@@ -241,11 +242,12 @@ public class QuestionView {
             body += (!text.equals("")) ? (text + '\n') : "";
         } while(!text.equals(""));
         questionPageDTO.setBody(body);
+        System.out.println("Possible topics: " + Arrays.toString(Constants.TOPICS.toArray()));
         String topic;
         do {
             System.out.println("* Topic: ");
             topic = scanner.nextLine();
-        } while (!Constants.COUNTRIES.contains(topic) || !topic.equals(""));
+        } while (!Constants.TOPICS.contains(topic) || topic.equals(""));
         questionPageDTO.setTopic(topic);
     }
 }
