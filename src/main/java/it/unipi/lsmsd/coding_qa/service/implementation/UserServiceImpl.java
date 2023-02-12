@@ -94,6 +94,7 @@ public class UserServiceImpl implements UserService {
     public void updateInfo(UserRegistrationDTO userRegistrationDTO) throws BusinessException {
         try {
             RegisteredUser registeredUser = new RegisteredUser();
+            registeredUser.setNickname(userRegistrationDTO.getNickname());
             registeredUser.setCountry(userRegistrationDTO.getCountry());
             registeredUser.setWebsite(userRegistrationDTO.getWebsite());
             registeredUser.setEncPassword(userRegistrationDTO.getEncPassword());
