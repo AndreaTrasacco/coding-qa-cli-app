@@ -172,10 +172,10 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
                         eq("_id", new ObjectId(questionId)),
                         Updates.combine(
                                 Updates.inc("answers.$[xxx].score", increment),
-                                Updates.push("answers.$[xxx].voters", idVoter)
+                                Updates.push("answers.$[xxx].voters", new ObjectId(idVoter))
                         ),
                         new UpdateOptions().arrayFilters(Arrays.asList(and(eq("xxx.createdDate", createdDate),
-                                ne("xxx.voters", idVoter))))
+                                ne("xxx.voters", new ObjectId(idVoter)))))
                 );
                 if(updateResult.getModifiedCount() == 1){
                     collectionUsers.updateOne(
@@ -256,7 +256,9 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
                         accepted = ansDoc.getBoolean("accepted");
                     List<String> voters = new ArrayList<>();
                     if(ansDoc.containsKey("voters")){
-                        voters = new ArrayList<>(ansDoc.getList("voters", String.class));
+                        for(ObjectId voter : ansDoc.getList("voters", ObjectId.class)){
+                            voters.add(voter.toString());
+                        }
                     }
                     AnswerDTO answer = new AnswerDTO(doc.getObjectId("_id").toString() + "_" + ansDoc.getDate("createdDate").toInstant(),
                             ansDoc.getString("body"),
