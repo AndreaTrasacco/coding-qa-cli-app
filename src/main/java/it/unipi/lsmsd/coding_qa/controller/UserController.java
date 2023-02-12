@@ -10,18 +10,12 @@ import it.unipi.lsmsd.coding_qa.view.QuestionView;
 import it.unipi.lsmsd.coding_qa.view.UserView;
 
 public class UserController {
-    private UserService userService;
-    private QuestionController questionController = new QuestionController();
-    private AuthenticationController authenticationController = new AuthenticationController();
-    private UserView userView = new UserView();
-    private QuestionView questionView = new QuestionView();
-    private MainView mainView = new MainView();
+    private static UserService userService = ServiceLocator.getUserService();
+    private static UserView userView = new UserView();
+    private static QuestionView questionView = new QuestionView();
+    private static MainView mainView = new MainView();
 
-    public UserController() {
-        userService = ServiceLocator.getUserService();
-    }
-
-    public void openSelfProfile() { // TODO TESTARE
+    public static void openSelfProfile() { // TODO TESTARE
         try {
             UserDTO loggedUser = AuthenticationController.getLoggedUser();
             mainView.showMessage("########################################### YOUR PROFILE ###########################################");
@@ -29,10 +23,10 @@ public class UserController {
             do {
                 switch (userView.selfUserProfileMenu()) {
                     case 1: // browse your questions
-                        questionController.browseYourQuestions();
+                        QuestionController.browseYourQuestions();
                         break;
                     case 2: // browse your answers
-                        questionController.browseCreatedOrAnsweredQuestions(loggedUser.getNickname(), false);
+                        QuestionController.browseCreatedOrAnsweredQuestions(loggedUser.getNickname(), false);
                         break;
                     case 3: // update your profile
                         updateYourProfile();
@@ -50,7 +44,7 @@ public class UserController {
         }
     }
 
-    private void browseFollowedUser() { // TODO TESTARE
+    private static void browseFollowedUser() { // TODO TESTARE
         try {
             int page = 1;
             do {
@@ -84,7 +78,7 @@ public class UserController {
         }
     }
 
-    private void updateYourProfile() { // TODO TESTARE
+    private static void updateYourProfile() { // TODO TESTARE
         try {
             UserDTO userDTO = AuthenticationController.getLoggedUser();
             UserRegistrationDTO userRegistrationDTO = new UserRegistrationDTO();
@@ -103,7 +97,7 @@ public class UserController {
         }
     }
 
-    public void openProfileIfAdmin(UserDTO userDTO) {  // TODO TESTARE
+    public static void openProfileIfAdmin(UserDTO userDTO) {  // TODO TESTARE
         try {
             switch (userView.adminUserProfile(userDTO)) {
                 case 1: // delete user
@@ -116,7 +110,7 @@ public class UserController {
         }
     }
 
-    private void openUserProfile(UserDTO userDTO) { // TODO TESTARE
+    private static void openUserProfile(UserDTO userDTO) { // TODO TESTARE
         try {
             UserDTO loggedUser = AuthenticationController.getLoggedUser();
             switch (userView.otherUserProfileMenu()) {
@@ -133,10 +127,10 @@ public class UserController {
                         mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
                     break;
                 case 3: // browse created q
-                    questionController.browseCreatedOrAnsweredQuestions(userDTO.getNickname(), true);
+                    QuestionController.browseCreatedOrAnsweredQuestions(userDTO.getNickname(), true);
                     break;
                 case 4: // browse answered q
-                    questionController.browseCreatedOrAnsweredQuestions(userDTO.getNickname(), false);
+                    QuestionController.browseCreatedOrAnsweredQuestions(userDTO.getNickname(), false);
                     break;
             }
         } catch (Exception e) {
@@ -145,7 +139,7 @@ public class UserController {
         }
     }
 
-    public void openProfile(String nickname) throws BusinessException {  // TODO TESTARE
+    public static void openProfile(String nickname) throws BusinessException {  // TODO TESTARE
         UserDTO userDTO = userService.getInfo(nickname);
         if (AuthenticationController.getLoggedUserNickname().equals("admin")) // admin
             openProfileIfAdmin(userDTO);

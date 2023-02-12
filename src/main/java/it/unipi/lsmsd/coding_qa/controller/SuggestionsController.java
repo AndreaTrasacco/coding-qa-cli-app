@@ -11,18 +11,12 @@ import it.unipi.lsmsd.coding_qa.view.MainView;
 import it.unipi.lsmsd.coding_qa.view.SuggestionsView;
 
 public class SuggestionsController {
-    private QuestionController questionController = new QuestionController();
-    private SuggestionsView suggestionsView = new SuggestionsView();
-    private MainView mainView = new MainView();
-    private SuggestionsService suggestionsService;
-    private QuestionService questionService;
+    private static SuggestionsView suggestionsView = new SuggestionsView();
+    private static MainView mainView = new MainView();
+    private static SuggestionsService suggestionsService = ServiceLocator.getSuggestionService();
+    private static QuestionService questionService = ServiceLocator.getQuestionService();
 
-    public SuggestionsController() { // TODO TESTARE
-        suggestionsService = ServiceLocator.getSuggestionService();
-        questionService = ServiceLocator.getQuestionService();
-    }
-
-    public void browseSuggestedQuestions(boolean type) { // type: true for suggested Q to read ; false for suggested Q to answer
+    public static void browseSuggestedQuestions(boolean type) { // type: true for suggested Q to read ; false for suggested Q to answer
         try {
             int page = 1;
             do {
@@ -38,7 +32,7 @@ public class SuggestionsController {
                         else {
                             int number = mainView.inputMessageWithPaging("Specify the question number", pageDTO.getCounter());
                             QuestionPageDTO questionPageDTO = questionService.getQuestionInfo(pageDTO.getEntries().get(number - 1).getId());
-                            questionController.questionPageLogged(questionPageDTO);
+                            QuestionController.questionPageLogged(questionPageDTO);
                         }
                         break;
                     case 2: // Go to the next page
