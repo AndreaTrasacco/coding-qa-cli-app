@@ -137,8 +137,7 @@ public class QuestionController {
     }
 
     public void browseYourQuestions() { // TODO MANCANO ALCUNE CHIAMATE AL SERVICE
-        /*
-        try {
+        /*try {
             int page = 1;
             int pageAns = 1;
             do {
@@ -232,7 +231,7 @@ public class QuestionController {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.exit(1);
-        } */
+        }*/
     }
 
     public void browseCreatedOrAnsweredQuestions(String nickname, boolean type) throws Exception { //type : true for created q | false for answered q TODO TESTARE
@@ -279,13 +278,11 @@ public class QuestionController {
         QuestionPageDTO questionPageDTO = questionService.getQuestionInfo(questionId);
         switch (userType) {
             case 0: // Admin
+            case 2: // NotLogged
                 questionPageNotLoggedOrAdmin(questionPageDTO, userType);
                 break;
             case 1: // Logged (not owner of the question
                 questionPageLogged(questionPageDTO);
-                break;
-            case 2: // NotLogged
-                questionPageNotLoggedOrAdmin(questionPageDTO, userType);
                 break;
             case 3: // Owner of question
                 questionPageOwner(questionPageDTO);
@@ -325,7 +322,7 @@ public class QuestionController {
                 break;
             case 4: // Modify answer --> possible only if the logged user is the author of the answer
                 if (loggedUser.getNickname().equals(answerDTO.getAuthor()))
-                    updateAnser();
+                    updateAnswer();
                 else
                     mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
                 break;
@@ -347,11 +344,19 @@ public class QuestionController {
         }
     }
 
-    public void createQuestion() { // TODO
-
+    public void createQuestion() { // TODO TESTARE
+        try {
+            QuestionPageDTO questionPageDTO = new QuestionPageDTO();
+            questionView.createQuestion(questionPageDTO);
+            questionService.createQuestion(questionPageDTO);
+            mainView.showMessage("######################################### QUESTION CREATED #########################################");
+        } catch (BusinessException ex){
+            System.out.println(ex.getMessage());
+            System.exit(1);
+        }
     }
 
-    public void updateAnser() { // TODO
+    public void updateAnswer() { // TODO
 
     }
 
