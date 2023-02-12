@@ -4,7 +4,6 @@ import it.unipi.lsmsd.coding_qa.controller.MainController;
 
 public class Main {
     public static void main(String [] args){
-        MainController mainController = new MainController();
-        mainController.startApplication();
+        MainController.startApplication();
     }
 }

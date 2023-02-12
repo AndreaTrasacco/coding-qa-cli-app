@@ -7,18 +7,12 @@ import it.unipi.lsmsd.coding_qa.utils.Constants;
 import it.unipi.lsmsd.coding_qa.view.*;
 
 public class QuestionController {
-    private QuestionService questionService;
-    private AnswerService answerService;
-    private QuestionView questionView = new QuestionView();
-    private MainView mainView = new MainView();
-    private UserController userController = new UserController();
+    private static QuestionService questionService = ServiceLocator.getQuestionService();
+    private static AnswerService answerService = ServiceLocator.getAnswerService();
+    private static QuestionView questionView = new QuestionView();
+    private static MainView mainView = new MainView();
 
-    public QuestionController() {
-        questionService = ServiceLocator.getQuestionService();
-        answerService = ServiceLocator.getAnswerService();
-    }
-
-    public void browseQuestions(int userType) { // userType --> 0: Admin, 1: Logged, 2: NotLogged TODO TESTARE
+    public static void browseQuestions(int userType) { // userType --> 0: Admin, 1: Logged, 2: NotLogged TODO TESTARE
         try {
             int page = 1;
             do {
@@ -58,7 +52,7 @@ public class QuestionController {
         }
     }
 
-    public void searchQuestion(int userType) { // 0: Owner, 1: Logged, 2: NotLogged // TODO TESTARE
+    public static void searchQuestion(int userType) { // 0: Owner, 1: Logged, 2: NotLogged // TODO TESTARE
         try {
             int page = 1;
             do {
@@ -97,7 +91,7 @@ public class QuestionController {
         }
     }
 
-    public void browseAnswers(int userType, String questionId, String questionOwner) { // 1: Logged, 2: NotLogged and Admin, 3: Owner // TODO TESTARE
+    public static void browseAnswers(int userType, String questionId, String questionOwner) { // 1: Logged, 2: NotLogged and Admin, 3: Owner // TODO TESTARE
         try {
             int page = 1;
             do {
@@ -136,7 +130,7 @@ public class QuestionController {
         }
     }
 
-    public void browseYourQuestions() { // TODO MANCANO ALCUNE CHIAMATE AL SERVICE
+    public static void browseYourQuestions() { // TODO MANCANO ALCUNE CHIAMATE AL SERVICE
         /*try {
             int page = 1;
             int pageAns = 1;
@@ -234,7 +228,7 @@ public class QuestionController {
         }*/
     }
 
-    public void browseCreatedOrAnsweredQuestions(String nickname, boolean type) throws Exception { //type : true for created q | false for answered q TODO TESTARE
+    public static void browseCreatedOrAnsweredQuestions(String nickname, boolean type) throws Exception { //type : true for created q | false for answered q TODO TESTARE
         int page = 1;
         do {
             PageDTO<QuestionDTO> pageDTO;
@@ -264,7 +258,7 @@ public class QuestionController {
         } while (true);
     }
 
-    public void updateQuestion(QuestionPageDTO questionPageDTO) throws BusinessException { // TODO TESTARE
+    public static void updateQuestion(QuestionPageDTO questionPageDTO) throws BusinessException { // TODO TESTARE
         QuestionModifyDTO questionModifyDTO = new QuestionModifyDTO();
         questionModifyDTO.setId(questionPageDTO.getId());
         questionModifyDTO.setBody(questionPageDTO.getBody());
@@ -274,7 +268,7 @@ public class QuestionController {
         questionService.updateQuestion(questionModifyDTO);
     }
 
-    public void openQuestion(String questionId, int userType) throws BusinessException { // TODO TESTARE
+    public static void openQuestion(String questionId, int userType) throws BusinessException { // TODO TESTARE
         QuestionPageDTO questionPageDTO = questionService.getQuestionInfo(questionId);
         switch (userType) {
             case 0: // Admin
@@ -291,7 +285,7 @@ public class QuestionController {
     }
 
 
-    public void openAnswer(AnswerDTO answerDTO, String questionOwner) throws BusinessException { // TODO TESTARE
+    public static void openAnswer(AnswerDTO answerDTO, String questionOwner) throws BusinessException { // TODO TESTARE
         mainView.view(answerDTO);
         UserDTO loggedUser = AuthenticationController.getLoggedUser();
         switch (questionView.menuInCompleteAnswer()) {
@@ -339,12 +333,12 @@ public class QuestionController {
                     mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
                 break;
             case 7: // View User Profile
-                userController.openProfile(answerDTO.getAuthor());
+                UserController.openProfile(answerDTO.getAuthor());
                 break;
         }
     }
 
-    public void createQuestion() { // TODO TESTARE
+    public static void createQuestion() { // TODO TESTARE
         try {
             QuestionPageDTO questionPageDTO = new QuestionPageDTO();
             questionView.createQuestion(questionPageDTO);
@@ -356,20 +350,20 @@ public class QuestionController {
         }
     }
 
-    public void updateAnswer() { // TODO
+    public static void updateAnswer() { // TODO
 
     }
 
-    public void questionPageLogged(QuestionPageDTO questionPageDTO) { // TODO
+    public static void questionPageLogged(QuestionPageDTO questionPageDTO) { // TODO
         mainView.view(questionPageDTO);
 
     }
 
-    public void questionPageNotLoggedOrAdmin(QuestionPageDTO questionPageDTO, int userType) { // userType: 0 for admin, 2 for not logged user
+    public static void questionPageNotLoggedOrAdmin(QuestionPageDTO questionPageDTO, int userType) { // userType: 0 for admin, 2 for not logged user
         // TODO
     }
 
-    public void questionPageOwner(QuestionPageDTO questionPageDTO) { // TODO
+    public static void questionPageOwner(QuestionPageDTO questionPageDTO) { // TODO
 
     }
 }

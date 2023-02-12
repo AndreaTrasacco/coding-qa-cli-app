@@ -6,14 +6,11 @@ import it.unipi.lsmsd.coding_qa.utils.Constants;
 import it.unipi.lsmsd.coding_qa.view.*;
 
 public class AdminController {
-    private AdminView adminView = new AdminView();
-    private MainView mainView = new MainView();
-    private QuestionService questionService;
-    private AnswerService answerService;
-    private UserService userService;
-    private UserController userController = new UserController();
-    private AnalyticsController analyticsController = new AnalyticsController();
-    private QuestionController questionController = new QuestionController();
+    private static AdminView adminView = new AdminView();
+    private static MainView mainView = new MainView();
+    private static QuestionService questionService = ServiceLocator.getQuestionService();;
+    private static AnswerService answerService = ServiceLocator.getAnswerService();;
+    private static UserService userService = ServiceLocator.getUserService();;
 
     public static void main(String[] args){
         AdminController adminController = new AdminController();
@@ -24,13 +21,7 @@ public class AdminController {
         }
     }
 
-    public AdminController() {
-        questionService = ServiceLocator.getQuestionService();
-        answerService = ServiceLocator.getAnswerService();
-        userService = ServiceLocator.getUserService();
-    }
-
-    public void start() {
+    public static void start() {
         do {
             switch (adminView.mainMenuAdmin()) {
                 case 1: // reported questions
@@ -40,13 +31,13 @@ public class AdminController {
                     manageReportedAnswers();
                     break;
                 case 3: // analytics
-                    analyticsController.start();
+                    AnalyticsController.start();
                     break;
                 case 4: // browse questions
-                    questionController.browseQuestions(0);
+                    QuestionController.browseQuestions(0);
                     break;
                 case 5: // search questions
-                    questionController.searchQuestion(0);
+                    QuestionController.searchQuestion(0);
                     break;
                 case 6: // exit from the application
                     System.exit(0);
@@ -54,7 +45,7 @@ public class AdminController {
         } while (true);
     }
 
-    private void manageReportedQuestions() {
+    private static void manageReportedQuestions() {
         try {
             int page = 1;
             do {
@@ -77,7 +68,7 @@ public class AdminController {
                                     questionService.reportQuestion(questionPageDTO.getId(), false);
                                     break;
                                 case 3: // open user profile
-                                    userController.openProfileIfAdmin(userService.getInfo(questionPageDTO.getAuthor()));
+                                    UserController.openProfileIfAdmin(userService.getInfo(questionPageDTO.getAuthor()));
                                     break;
                                 case 4: // go back
                                     return;
@@ -106,7 +97,7 @@ public class AdminController {
         }
     }
 
-    private void manageReportedAnswers() {
+    private static void manageReportedAnswers() {
         try {
             int page = 1;
             do {
@@ -130,7 +121,7 @@ public class AdminController {
                                     answerService.reportAnswer(answerDTO.getId(), false);
                                     break;
                                 case 3: // open user profile
-                                    userController.openProfileIfAdmin(userService.getInfo(answerDTO.getAuthor()));
+                                    UserController.openProfileIfAdmin(userService.getInfo(answerDTO.getAuthor()));
                                     break;
                                 case 4: // go back
                                     return;

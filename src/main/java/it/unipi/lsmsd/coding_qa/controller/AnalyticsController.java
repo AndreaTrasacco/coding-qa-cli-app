@@ -1,26 +1,19 @@
 package it.unipi.lsmsd.coding_qa.controller;
 
-import com.mongodb.internal.connection.Server;
 import it.unipi.lsmsd.coding_qa.dto.aggregations.ExperienceLevelDTO;
 import it.unipi.lsmsd.coding_qa.dto.aggregations.QuestionScoreDTO;
 import it.unipi.lsmsd.coding_qa.dto.aggregations.TopicDTO;
 import it.unipi.lsmsd.coding_qa.service.AggregationsService;
 import it.unipi.lsmsd.coding_qa.service.ServiceLocator;
 import it.unipi.lsmsd.coding_qa.view.AnalyticsView;
-import it.unipi.lsmsd.coding_qa.view.MainView;
 
 import java.util.List;
 
 public class AnalyticsController {
-    private AnalyticsView analyticsView = new AnalyticsView();
-    private MainView mainView = new MainView();
-    private AggregationsService aggregationsService;
+    private static AnalyticsView analyticsView = new AnalyticsView();
+    private static AggregationsService aggregationsService = ServiceLocator.getAggregationsService();
 
-    public AnalyticsController() {
-        aggregationsService = ServiceLocator.getAggregationsService();
-    }
-
-    public void start() {
+    public static void start() {
         try {
             List<QuestionScoreDTO> questionScoreDTOList = null;
             List<ExperienceLevelDTO> experienceLevelDTOList = null;
@@ -54,7 +47,6 @@ public class AnalyticsController {
     }
 
     public static void main(String[] args){
-        AnalyticsController analyticsController = new AnalyticsController();
-        analyticsController.start();
+        AnalyticsController.start();
     }
 }
