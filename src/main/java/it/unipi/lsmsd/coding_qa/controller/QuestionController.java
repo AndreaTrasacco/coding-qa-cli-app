@@ -137,7 +137,7 @@ public class QuestionController {
     }
 
 
-    public void browseYourQuestions() { // TODO MANCANO ALCUNE CHIAMATE AL SERVICE
+    /*public void browseYourQuestions() { // TODO MANCANO ALCUNE CHIAMATE AL SERVICE
         try {
             int page = 1;
             int pageAns = 1;
@@ -263,7 +263,7 @@ public class QuestionController {
                     return;
             }
         } while (true);
-    }
+    }*/
 
     public void updateQuestion(QuestionPageDTO questionPageDTO) throws BusinessException { // TODO TESTARE
         QuestionModifyDTO questionModifyDTO = new QuestionModifyDTO();
