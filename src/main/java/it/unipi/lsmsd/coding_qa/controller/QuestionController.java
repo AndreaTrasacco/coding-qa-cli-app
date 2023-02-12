@@ -241,13 +241,13 @@ public class QuestionController {
         switch (userType) {
             case 0: // Admin
             case 2: // NotLogged
-                questionPageNotLoggedOrAdmin(questionPageDTO, userType);
+                //questionPageNotLoggedOrAdmin(questionPageDTO, userType);
                 break;
             case 1: // Logged (not owner of the question)
-                questionPageLogged(questionPageDTO);
+                //questionPageLogged(questionPageDTO);
                 break;
             case 3: // Owner of question
-                questionPageOwner(questionPageDTO);
+                //questionPageOwner(questionPageDTO);
                 break;
         }
 
