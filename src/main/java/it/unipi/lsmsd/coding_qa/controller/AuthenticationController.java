@@ -16,7 +16,7 @@ import java.security.NoSuchAlgorithmException;
 public class AuthenticationController {
     private static AuthenticationView authView = new AuthenticationView();
     private static MainView mainView = new MainView();
-    private UserService userService = ServiceLocator.getUserService();;
+    private static UserService userService = ServiceLocator.getUserService();;
     private static UserDTO loggedUser = null;
 
     public static int start() { // do .. while

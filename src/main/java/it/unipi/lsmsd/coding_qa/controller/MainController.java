@@ -6,7 +6,7 @@ public class MainController { // This class manages logic behind main functional
     private static MainView mainView = new MainView();
 
     public static void startApplication() {
-        int choice = authController.start();
+        int choice = AuthenticationController.start();
         if (choice == -1 || choice == 4) return;
         int type = 2;
         if (AuthenticationController.getLoggedUser() != null) {
@@ -17,7 +17,7 @@ public class MainController { // This class manages logic behind main functional
             }
         }
         switch (type){
-            case 0: adminController.start(); break;
+            case 0: AdminController.start(); break;
             case 1: mainMenuLoggedUser(); break;
             case 2: mainMenuNotLoggedUser(); break;
         }
