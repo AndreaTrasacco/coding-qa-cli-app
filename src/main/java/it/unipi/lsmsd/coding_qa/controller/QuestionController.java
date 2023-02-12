@@ -124,40 +124,6 @@ public class QuestionController {
         }
     }
 
-    public static void browseYourQuestions() { // TODO CONTROLLARE SE UGUALE AL PRIMO METODO
-        try {
-            int page = 1;
-            do {
-                UserDTO loggedUser = AuthenticationController.getLoggedUser();
-                PageDTO<QuestionDTO> pageDTO = questionService.viewCreatedQuestions(loggedUser.getNickname(), page);
-                if (pageDTO.getCounter() == 0) return;
-                switch (questionView.browseQuestionsMenu()) {
-                    case 1: // open a question
-                        int number = mainView.inputMessageWithPaging("Specify the question number", pageDTO.getCounter());
-                        openQuestion(pageDTO.getEntries().get(number - 1).getId());
-                        break;
-                    case 2: // go to the next page
-                        if (pageDTO.getCounter() == Constants.PAGE_SIZE)
-                            page++;
-                        else
-                            mainView.showMessage("!!!! THIS IS THE LAST PAGE !!!!");
-                        break;
-                    case 3: // go ot the previous page
-                        if (page > 1)
-                            page--;
-                        else
-                            mainView.showMessage("!!!! THIS IS THE FIRST PAGE !!!!");
-                        break;
-                    case 4: // go back
-                        return;
-                }
-            } while (true);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            System.exit(1);
-        }
-    }
-
     public static void browseCreatedOrAnsweredQuestions(String nickname, boolean type) throws Exception { //type : true for created q | false for answered q TODO TESTARE
         int page = 1;
         do {
@@ -167,6 +133,8 @@ public class QuestionController {
             else
                 pageDTO = questionService.viewAnsweredQuestions(nickname, page);
             mainView.viewPage(pageDTO);
+            if(page == 1 && pageDTO.getCounter() == 0)
+                return;
             switch (questionView.searchQuestionsMenu()) {
                 case 1: // Open a question
                     int index = mainView.inputMessageWithPaging("Specify the question number", pageDTO.getCounter()) - 1;
@@ -255,7 +223,7 @@ public class QuestionController {
         }
     }
 
-    public static void questionPageNotLoggedOrAdmin(QuestionPageDTO questionPageDTO) throws BusinessException {
+    public static void questionPageNotLoggedOrAdmin(QuestionPageDTO questionPageDTO) { // TODO TESTARE
         mainView.view(questionPageDTO);
         switch (questionView.menuInQuestionPageNotLoggedOrAdmin()) {
             case 1: // browse answers

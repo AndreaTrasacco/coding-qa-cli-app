@@ -23,7 +23,7 @@ public class UserController {
             do {
                 switch (userView.selfUserProfileMenu()) {
                     case 1: // browse your questions
-                        QuestionController.browseYourQuestions();
+                        QuestionController.browseCreatedOrAnsweredQuestions(loggedUser.getNickname(), true);
                         break;
                     case 2: // browse your answers
                         QuestionController.browseCreatedOrAnsweredQuestions(loggedUser.getNickname(), false);
