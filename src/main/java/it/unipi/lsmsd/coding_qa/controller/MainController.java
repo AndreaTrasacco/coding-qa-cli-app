@@ -27,10 +27,10 @@ public class MainController { // This class manages logic behind main functional
         do {
             switch (mainView.mainMenuLoggedIn()) {
                 case 1: // browse questions
-                    QuestionController.browseQuestions(1);
+                    QuestionController.browseQuestions();
                     break;
                 case 2: // search question
-                    QuestionController.searchQuestion(1);
+                    QuestionController.searchQuestion();
                     break;
                 case 3: // publish new question
                     QuestionController.createQuestion();
@@ -57,10 +57,10 @@ public class MainController { // This class manages logic behind main functional
         do {
             switch (mainView.mainMenuNotLoggedIn()) {
                 case 1: // browse questions
-                    QuestionController.browseQuestions(2);
+                    QuestionController.browseQuestions();
                     break;
                 case 2: // search question
-                    QuestionController.searchQuestion(2);
+                    QuestionController.searchQuestion();
                     break;
                 case 3: // Exit
                     System.exit(0);

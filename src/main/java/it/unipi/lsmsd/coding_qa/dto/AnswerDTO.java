@@ -9,9 +9,9 @@ public class AnswerDTO {
     private String body = "";
     private Date createdDate;
     private String author;
-    private int score;
-    private List<String> voters;
-    private boolean accepted;
+    private int score = 0;
+    private List<String> voters = new ArrayList<>();
+    private boolean accepted = false;
 
     public AnswerDTO() {
     }

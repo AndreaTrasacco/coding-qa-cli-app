@@ -12,7 +12,7 @@ public class QuestionController {
     private static QuestionView questionView = new QuestionView();
     private static MainView mainView = new MainView();
 
-    public static void browseQuestions(int userType) { // userType --> 0: Admin, 1: Logged, 2: NotLogged TODO TESTARE
+    public static void browseQuestions() { // userType --> 0: Admin, 1: Logged, 2: NotLogged TODO TESTARE
         try {
             int page = 1;
             do {
@@ -22,10 +22,7 @@ public class QuestionController {
                     case 1: // Open a question
                         int index = mainView.inputMessageWithPaging("Specify the question number", pageDTO.getCounter()) - 1;
                         QuestionDTO questionDTO = pageDTO.getEntries().get(index);
-                        if (questionDTO.getAuthor().equals(AuthenticationController.getLoggedUser().getNickname())) {
-                            userType = 3; // 3: Logged and Owner of the question
-                        }
-                        openQuestion(questionDTO.getId(), userType);
+                        openQuestion(questionDTO.getId());
                         break;
                     case 2: // Next page
                         if (pageDTO.getCounter() == Constants.PAGE_SIZE)
@@ -40,7 +37,7 @@ public class QuestionController {
                             mainView.showMessage("!!!! THIS IS THE FIRST PAGE !!!!");
                         break;
                     case 4: // Search question
-                        searchQuestion(userType);
+                        searchQuestion();
                         break;
                     case 5: // Exit
                         return;
@@ -52,7 +49,7 @@ public class QuestionController {
         }
     }
 
-    public static void searchQuestion(int userType) { // 0: Owner, 1: Logged, 2: NotLogged // TODO TESTARE
+    public static void searchQuestion() { // TODO TESTARE
         try {
             int page = 1;
             QuestionSearchDTO questionSearchDTO = new QuestionSearchDTO();
@@ -64,10 +61,7 @@ public class QuestionController {
                     case 1: // Open a question
                         int index = mainView.inputMessageWithPaging("Specify the question number", pageDTO.getCounter()) - 1;
                         QuestionDTO questionDTO = pageDTO.getEntries().get(index);
-                        if (questionDTO.getAuthor().equals(AuthenticationController.getLoggedUser().getNickname())) {
-                            userType = 3; // 3: Logged and Owner of the question
-                        }
-                        openQuestion(questionDTO.getId(), userType);
+                        openQuestion(questionDTO.getId());
                         break;
                     case 2: // Next page
                         if (pageDTO.getCounter() == Constants.PAGE_SIZE)
@@ -130,7 +124,7 @@ public class QuestionController {
         }
     }
 
-    public static void browseYourQuestions() { // TODO MANCANO ALCUNE CHIAMATE AL SERVICE
+    public static void browseYourQuestions() { // TODO CONTROLLARE SE UGUALE AL PRIMO METODO
         try {
             int page = 1;
             do {
@@ -140,28 +134,8 @@ public class QuestionController {
                 switch (questionView.browseQuestionsMenu()) {
                     case 1: // open a question
                         int number = mainView.inputMessageWithPaging("Specify the question number", pageDTO.getCounter());
-                        QuestionPageDTO questionPageDTO = questionService.getQuestionInfo(pageDTO.getEntries().get(number - 1).getId());
-                        openQuestion(pageDTO.getEntries().get(number - 1).getId(), 0);
-                        mainView.view(questionPageDTO);
-                        switch (questionView.menuInQuestionPageOwner()) {
-                            case 1: // add an answer
-                                AnswerDTO answerDTO = new AnswerDTO();
-                                answerDTO.setAuthor(loggedUser.getNickname());
-                                questionView.createAnswer(answerDTO);
-                                answerService.addAnswer(questionPageDTO.getId(), answerDTO);
-                                break;
-                            case 2: // browse answers
-                                browseAnswers(questionPageDTO.getId(), questionPageDTO.getAuthor());
-                                break;
-                            case 3: // delete question
-                                questionService.deleteQuestion(questionPageDTO.getId());
-                                break;
-                            case 4: // update question
-                                updateQuestion(questionPageDTO);
-                                break;
-                            case 5: // go back
-                                return;
-                        }
+                        openQuestion(pageDTO.getEntries().get(number - 1).getId());
+                        break;
                     case 2: // go to the next page
                         if (pageDTO.getCounter() == Constants.PAGE_SIZE)
                             page++;
@@ -197,16 +171,7 @@ public class QuestionController {
                 case 1: // Open a question
                     int index = mainView.inputMessageWithPaging("Specify the question number", pageDTO.getCounter()) - 1;
                     QuestionDTO questionDTO = pageDTO.getEntries().get(index);
-                    int userType = 2; // Not Logged In
-                    if (AuthenticationController.getLoggedUser() != null) {
-                        userType = 1; //  Logged user
-                        if (AuthenticationController.getLoggedUserNickname().equals("admin"))
-                            userType = 0; // Admin
-                        else if (questionDTO.getAuthor().equals(AuthenticationController.getLoggedUserNickname())) {
-                            userType = 3; // 3: Logged and Owner of the question
-                        }
-                    }
-                    openQuestion(questionDTO.getId(), userType);
+                    openQuestion(questionDTO.getId());
                     break;
                 case 2: // go to the next page
                     if (pageDTO.getCounter() == Constants.PAGE_SIZE)
@@ -236,35 +201,68 @@ public class QuestionController {
         questionService.updateQuestion(questionModifyDTO);
     }
 
-    public static void openQuestion(String questionId, int userType) throws BusinessException { // TODO TESTARE
+    public static void openQuestion(String questionId) throws BusinessException { // TODO TESTARE
         QuestionPageDTO questionPageDTO = questionService.getQuestionInfo(questionId);
+        int userType = 2; // Not Logged In
+        if (AuthenticationController.getLoggedUser() != null) {
+            userType = 1; //  Logged user
+            if (AuthenticationController.getLoggedUserNickname().equals("admin"))
+                userType = 0; // Admin
+            else if (questionPageDTO.getAuthor().equals(AuthenticationController.getLoggedUserNickname())) {
+                userType = 3; // 3: Logged and Owner of the question
+            }
+        }
         switch (userType) {
             case 0: // Admin
             case 2: // NotLogged
-                questionPageNotLoggedOrAdmin(questionPageDTO, userType);
+                questionPageNotLoggedOrAdmin(questionPageDTO);
                 break;
-            case 1: // Logged (not owner of the question)
-                questionPageLogged(questionPageDTO);
-                break;
+            case 1: // Logged (not owner of the question) or Owner of the question
             case 3: // Owner of question
-                questionPageOwner(questionPageDTO);
+                questionPageLoggedOrLoggedOwner(questionPageDTO);
                 break;
         }
-
-
     }
 
-    public static void questionPageOwner(QuestionPageDTO questionPageDTO) {
+    public static void questionPageLoggedOrLoggedOwner(QuestionPageDTO questionPageDTO) throws BusinessException { // TODO TESTARE
+        mainView.view(questionPageDTO);
+        switch (questionView.menuInQuestionPageLoggedOrOwner()) {
+            case 1: // add an answer
+                AnswerDTO answerDTO = new AnswerDTO();
+                answerDTO.setAuthor(AuthenticationController.getLoggedUserNickname());
+                questionView.createAnswer(answerDTO);
+                answerService.addAnswer(questionPageDTO.getId(), answerDTO);
+                mainView.showMessage("########################################## ANSWER CREATED ##########################################");
+                break;
+            case 2: // browse answers
+                browseAnswers(questionPageDTO.getId(), questionPageDTO.getAuthor());
+                break;
+            case 3: // report question
+                questionService.reportQuestion(questionPageDTO.getId(), true);
+                break;
+            case 4: // delete question --> only owner of question
+                if (AuthenticationController.getLoggedUserNickname().equals(questionPageDTO.getAuthor()))
+                    questionService.deleteQuestion(questionPageDTO.getId());
+                else
+                    mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
+                break;
+            case 5: // update question --> only owner of question
+                if (AuthenticationController.getLoggedUserNickname().equals(questionPageDTO.getAuthor()))
+                    updateQuestion(questionPageDTO);
+                else
+                    mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
+                break;
+        }
     }
 
-    public static void questionPageLogged(QuestionPageDTO questionPageDTO) {
-        
+    public static void questionPageNotLoggedOrAdmin(QuestionPageDTO questionPageDTO) throws BusinessException {
+        mainView.view(questionPageDTO);
+        switch (questionView.menuInQuestionPageNotLoggedOrAdmin()) {
+            case 1: // browse answers
+                browseAnswers(questionPageDTO.getId(), questionPageDTO.getAuthor());
+                break;
+        }
     }
-
-    public static void questionPageNotLoggedOrAdmin(QuestionPageDTO questionPageDTO, int userType) {
-        
-    }
-
 
     public static void openAnswer(AnswerDTO answerDTO, String questionOwner) throws BusinessException { // TODO TESTARE
         mainView.view(answerDTO);

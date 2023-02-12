@@ -25,6 +25,9 @@ public class SuggestionsController {
                     pageDTO = suggestionsService.questionsToReadSuggestions(page, AuthenticationController.getLoggedUserNickname());
                 else
                     pageDTO = suggestionsService.questionsToAnswerSuggestions(page, AuthenticationController.getLoggedUserNickname());
+                mainView.viewPage(pageDTO);
+                if(page == 1 && pageDTO.getCounter() == 0)
+                    return;
                 switch (suggestionsView.menuSuggestions()) {
                     case 1: // Open a question
                         if (pageDTO.getCounter() == 0)
@@ -32,7 +35,7 @@ public class SuggestionsController {
                         else {
                             int number = mainView.inputMessageWithPaging("Specify the question number", pageDTO.getCounter());
                             QuestionPageDTO questionPageDTO = questionService.getQuestionInfo(pageDTO.getEntries().get(number - 1).getId());
-                            QuestionController.questionPageLogged(questionPageDTO);
+                            QuestionController.questionPageLoggedOrLoggedOwner(questionPageDTO);
                         }
                         break;
                     case 2: // Go to the next page
