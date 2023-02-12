@@ -14,16 +14,12 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class AuthenticationController {
-    private AuthenticationView authView = new AuthenticationView();
-    private MainView mainView = new MainView();
-    private UserService userService;
+    private static AuthenticationView authView = new AuthenticationView();
+    private static MainView mainView = new MainView();
+    private UserService userService = ServiceLocator.getUserService();;
     private static UserDTO loggedUser = null;
 
-    public AuthenticationController() {
-        userService = ServiceLocator.getUserService();
-    }
-
-    public int start() { // do .. while
+    public static int start() { // do .. while
         try {
             int choice = authView.initialMenu();
             switch (choice) {
@@ -50,7 +46,7 @@ public class AuthenticationController {
         }
     }
 
-    public void logout() {
+    public static void logout() {
         authView.showLogoutMessage();
     }
 

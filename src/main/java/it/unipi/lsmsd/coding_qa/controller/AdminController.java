@@ -15,6 +15,15 @@ public class AdminController {
     private AnalyticsController analyticsController = new AnalyticsController();
     private QuestionController questionController = new QuestionController();
 
+    public static void main(String[] args){
+        AdminController adminController = new AdminController();
+        try {
+            adminController.start();
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public AdminController() {
         questionService = ServiceLocator.getQuestionService();
         answerService = ServiceLocator.getAnswerService();

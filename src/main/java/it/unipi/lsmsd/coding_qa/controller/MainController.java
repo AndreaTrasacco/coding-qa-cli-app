@@ -3,15 +3,9 @@ package it.unipi.lsmsd.coding_qa.controller;
 import it.unipi.lsmsd.coding_qa.view.*;
 
 public class MainController { // This class manages logic behind main functionalities of users
-    private AuthenticationController authController = new AuthenticationController();
-    private AdminController adminController = new AdminController();
-    private AnalyticsController analyticsController = new AnalyticsController();
-    private UserController userController = new UserController();
-    private QuestionController questionController = new QuestionController();
-    private SuggestionsController suggestionsController = new SuggestionsController();
-    private MainView mainView = new MainView();
+    private static MainView mainView = new MainView();
 
-    public void startApplication() {
+    public static void startApplication() {
         int choice = authController.start();
         if (choice == -1 || choice == 4) return;
         int type = 2;
@@ -29,7 +23,7 @@ public class MainController { // This class manages logic behind main functional
         }
     }
 
-    public void mainMenuLoggedUser() {
+    public static void mainMenuLoggedUser() {
         do {
             switch (mainView.mainMenuLoggedIn()) {
                 case 1: // browse questions
@@ -59,7 +53,7 @@ public class MainController { // This class manages logic behind main functional
         } while (true);
     }
 
-    private void mainMenuNotLoggedUser() {
+    private static void mainMenuNotLoggedUser() {
         do {
             switch (mainView.mainMenuNotLoggedIn()) {
                 case 1: // browse questions
