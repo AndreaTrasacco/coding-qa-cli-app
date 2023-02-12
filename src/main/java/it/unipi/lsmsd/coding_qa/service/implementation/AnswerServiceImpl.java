@@ -136,7 +136,7 @@ public class AnswerServiceImpl implements AnswerService {
             answer.setScore(0);
             answer.setAccepted(false);
             answerDAO.getCompleteAnswer(answer);
-            answerDTO.setBody(answerDTO.getBody());
+            answerDTO.setBody(answer.getBody());
             answerDTO.setScore(answer.getScore());
             answerDTO.setAccepted(answer.isAccepted());
         } catch (Exception e) {
