@@ -91,7 +91,7 @@ public class QuestionController {
         }
     }
 
-    public static void browseAnswers(int userType, String questionId, String questionOwner) { // 1: Logged, 2: NotLogged and Admin, 3: Owner // TODO TESTARE
+    public static void browseAnswers(String questionId, String questionOwner) { // TODO TESTARE
         try {
             int page = 1;
             do {
@@ -131,71 +131,27 @@ public class QuestionController {
     }
 
     public static void browseYourQuestions() { // TODO MANCANO ALCUNE CHIAMATE AL SERVICE
-        /*try {
+        try {
             int page = 1;
-            int pageAns = 1;
             do {
-                UserDTO userDTO = AuthenticationController.getLoggedUser();
-                PageDTO<QuestionDTO> pageDTO = questionService.viewCreatedQuestions(userDTO.getNickname(), page);
+                UserDTO loggedUser = AuthenticationController.getLoggedUser();
+                PageDTO<QuestionDTO> pageDTO = questionService.viewCreatedQuestions(loggedUser.getNickname(), page);
                 if (pageDTO.getCounter() == 0) return;
                 switch (questionView.browseQuestionsMenu()) {
                     case 1: // open a question
                         int number = mainView.inputMessageWithPaging("Specify the question number", pageDTO.getCounter());
                         QuestionPageDTO questionPageDTO = questionService.getQuestionInfo(pageDTO.getEntries().get(number - 1).getId());
+                        openQuestion(pageDTO.getEntries().get(number - 1).getId(), 0);
                         mainView.view(questionPageDTO);
                         switch (questionView.menuInQuestionPageOwner()) {
                             case 1: // add an answer
                                 AnswerDTO answerDTO = new AnswerDTO();
-                                answerDTO.setAuthor(userDTO.getNickname());
+                                answerDTO.setAuthor(loggedUser.getNickname());
                                 questionView.createAnswer(answerDTO);
-                                // TODO SERVICE
+                                answerService.addAnswer(questionPageDTO.getId(), answerDTO);
                                 break;
                             case 2: // browse answers
-                                PageDTO<AnswerDTO> pageDTOAns = answerService.getAnswersPage(pageAns, questionPageDTO.getId());
-                                if (pageDTOAns.getCounter() == 0) return;
-                                switch (questionView.menuInAnswerPageLogged()) {
-                                    case 1:  // select an answer
-                                        int ansNumber = mainView.inputMessageWithPaging("Specify the answer number", pageDTO.getCounter());
-                                        // TODO METTERE OPEN ANSWER
-                                        switch (questionView.menuInAnswer()) {
-                                            case 1:  // Upvote
-                                                VoteDTO voteDTO = new VoteDTO();
-                                                voteDTO.setAnswerId(pageDTOAns.getEntries().get(ansNumber - 1).getId());
-                                                voteDTO.setVoteType(true);
-                                                voteDTO.setAnswerOwner(pageDTOAns.getEntries().get(ansNumber - 1).getAuthor());
-                                                voteDTO.setVoterId(userDTO.getId());
-                                                answerService.voteAnswer(voteDTO);
-                                                break;
-                                            case 2:  // Downvote
-                                                VoteDTO voteDTO1 = new VoteDTO();
-                                                voteDTO1.setAnswerId(pageDTOAns.getEntries().get(ansNumber - 1).getId());
-                                                voteDTO1.setVoteType(false);
-                                                voteDTO1.setAnswerOwner(pageDTOAns.getEntries().get(ansNumber - 1).getAuthor());
-                                                voteDTO1.setVoterId(userDTO.getId());
-                                                answerService.voteAnswer(voteDTO1);
-                                                break;
-                                            case 3:  // Report
-                                                answerService.reportAnswer(pageDTOAns.getEntries().get(ansNumber - 1).getId(), true);
-                                                break;
-                                            case 4:  // go back
-                                                return;
-                                        }
-                                        break;
-                                    case 2:  // go to the next page
-                                        if (pageDTOAns.getCounter() == Constants.PAGE_SIZE)
-                                            pageAns++;
-                                        else
-                                            mainView.showMessage("!!!! THIS IS THE LAST PAGE !!!!");
-                                        break;
-                                    case 3:  // go to the previous page
-                                        if (pageAns > 1)
-                                            pageAns--;
-                                        else
-                                            mainView.showMessage("!!!! THIS IS THE FIRST PAGE !!!!");
-                                        break;
-                                    case 4:  // go back
-                                        return;
-                                }
+                                browseAnswers(questionPageDTO.getId(), questionPageDTO.getAuthor());
                                 break;
                             case 3: // delete question
                                 questionService.deleteQuestion(questionPageDTO.getId());
@@ -225,7 +181,7 @@ public class QuestionController {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.exit(1);
-        }*/
+        }
     }
 
     public static void browseCreatedOrAnsweredQuestions(String nickname, boolean type) throws Exception { //type : true for created q | false for answered q TODO TESTARE
@@ -238,7 +194,19 @@ public class QuestionController {
                 pageDTO = questionService.viewAnsweredQuestions(nickname, page);
             mainView.viewPage(pageDTO);
             switch (questionView.searchQuestionsMenu()) {
-                case 1:
+                case 1: // Open a question
+                    int index = mainView.inputMessageWithPaging("Specify the question number", pageDTO.getCounter()) - 1;
+                    QuestionDTO questionDTO = pageDTO.getEntries().get(index);
+                    int userType = 2; // Not Logged In
+                    if (AuthenticationController.getLoggedUser() != null) {
+                        userType = 1; //  Logged user
+                        if (AuthenticationController.getLoggedUserNickname().equals("admin"))
+                            userType = 0; // Admin
+                        else if (questionDTO.getAuthor().equals(AuthenticationController.getLoggedUserNickname())) {
+                            userType = 3; // 3: Logged and Owner of the question
+                        }
+                    }
+                    openQuestion(questionDTO.getId(), userType);
                     break;
                 case 2: // go to the next page
                     if (pageDTO.getCounter() == Constants.PAGE_SIZE)
@@ -275,13 +243,15 @@ public class QuestionController {
             case 2: // NotLogged
                 questionPageNotLoggedOrAdmin(questionPageDTO, userType);
                 break;
-            case 1: // Logged (not owner of the question
+            case 1: // Logged (not owner of the question)
                 questionPageLogged(questionPageDTO);
                 break;
             case 3: // Owner of question
                 questionPageOwner(questionPageDTO);
                 break;
         }
+
+
     }
 
 
@@ -316,7 +286,7 @@ public class QuestionController {
                 break;
             case 4: // Modify answer --> possible only if the logged user is the author of the answer
                 if (loggedUser.getNickname().equals(answerDTO.getAuthor()))
-                    updateAnswer();
+                    updateAnswer(answerDTO);
                 else
                     mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
                 break;
@@ -341,29 +311,20 @@ public class QuestionController {
     public static void createQuestion() { // TODO TESTARE
         try {
             QuestionPageDTO questionPageDTO = new QuestionPageDTO();
+            questionPageDTO.setAuthor(AuthenticationController.getLoggedUserNickname());
             questionView.createQuestion(questionPageDTO);
             questionService.createQuestion(questionPageDTO);
             mainView.showMessage("######################################### QUESTION CREATED #########################################");
-        } catch (BusinessException ex){
+        } catch (BusinessException ex) {
             System.out.println(ex.getMessage());
             System.exit(1);
         }
     }
 
-    public static void updateAnswer() { // TODO
-
-    }
-
-    public static void questionPageLogged(QuestionPageDTO questionPageDTO) { // TODO
-        mainView.view(questionPageDTO);
-
-    }
-
-    public static void questionPageNotLoggedOrAdmin(QuestionPageDTO questionPageDTO, int userType) { // userType: 0 for admin, 2 for not logged user
-        // TODO
-    }
-
-    public static void questionPageOwner(QuestionPageDTO questionPageDTO) { // TODO
-
+    public static void updateAnswer(AnswerDTO answerDTO) throws BusinessException { // TODO TESTARE
+        AnswerModifyDTO answerModifyDTO = new AnswerModifyDTO(answerDTO.getBody());
+        questionView.modifyAnswer(answerModifyDTO);
+        answerService.updateAnswer(answerDTO.getId(), answerModifyDTO.getBody());
+        mainView.showMessage("########################################## ANSWER UPDATED ##########################################");
     }
 }
