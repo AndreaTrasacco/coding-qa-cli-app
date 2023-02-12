@@ -27,25 +27,25 @@ public class MainController { // This class manages logic behind main functional
         do {
             switch (mainView.mainMenuLoggedIn()) {
                 case 1: // browse questions
-                    questionController.browseQuestions(1);
+                    QuestionController.browseQuestions(1);
                     break;
                 case 2: // search question
-                    questionController.searchQuestion(1);
+                    QuestionController.searchQuestion(1);
                     break;
                 case 3: // publish new question
-                    questionController.createQuestion();
+                    QuestionController.createQuestion();
                     break;
                 case 4: // Browse suggested questions to answer
-                    suggestionsController.browseSuggestedQuestions(false);
+                    SuggestionsController.browseSuggestedQuestions(false);
                     break;
                 case 5: // Browse suggested questions to read
-                    suggestionsController.browseSuggestedQuestions(true);
+                    SuggestionsController.browseSuggestedQuestions(true);
                     break;
                 case 6: // Open your profile
-                    userController.openSelfProfile();
+                    UserController.openSelfProfile();
                     break;
                 case 7: // Analytics
-                    analyticsController.start();
+                    AnalyticsController.start();
                     break;
                 case 8: // Exit
                     System.exit(0);
@@ -57,10 +57,10 @@ public class MainController { // This class manages logic behind main functional
         do {
             switch (mainView.mainMenuNotLoggedIn()) {
                 case 1: // browse questions
-                    questionController.browseQuestions(2);
+                    QuestionController.browseQuestions(2);
                     break;
                 case 2: // search question
-                    questionController.searchQuestion(2);
+                    QuestionController.searchQuestion(2);
                     break;
                 case 3: // Exit
                     System.exit(0);
