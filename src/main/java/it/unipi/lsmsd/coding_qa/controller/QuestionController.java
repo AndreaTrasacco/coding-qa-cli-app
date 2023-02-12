@@ -55,10 +55,10 @@ public class QuestionController {
     public static void searchQuestion(int userType) { // 0: Owner, 1: Logged, 2: NotLogged // TODO TESTARE
         try {
             int page = 1;
+            QuestionSearchDTO questionSearchDTO = new QuestionSearchDTO();
+            questionView.search(questionSearchDTO); // take topic and text to be search in input
             do {
-                QuestionSearchDTO questionSearchDTO = new QuestionSearchDTO();
-                questionView.search(questionSearchDTO); // take topic and text to be search in input
-                PageDTO<QuestionDTO> pageDTO = questionService.searchQuestions(1, questionSearchDTO.getText(), questionSearchDTO.getTopic());
+                PageDTO<QuestionDTO> pageDTO = questionService.searchQuestions(page, questionSearchDTO.getText(), questionSearchDTO.getTopic());
                 mainView.viewPage(pageDTO);
                 switch (questionView.searchQuestionsMenu()) {
                     case 1: // Open a question
@@ -241,17 +241,28 @@ public class QuestionController {
         switch (userType) {
             case 0: // Admin
             case 2: // NotLogged
-                //questionPageNotLoggedOrAdmin(questionPageDTO, userType);
+                questionPageNotLoggedOrAdmin(questionPageDTO, userType);
                 break;
             case 1: // Logged (not owner of the question)
-                //questionPageLogged(questionPageDTO);
+                questionPageLogged(questionPageDTO);
                 break;
             case 3: // Owner of question
-                //questionPageOwner(questionPageDTO);
+                questionPageOwner(questionPageDTO);
                 break;
         }
 
 
+    }
+
+    public static void questionPageOwner(QuestionPageDTO questionPageDTO) {
+    }
+
+    public static void questionPageLogged(QuestionPageDTO questionPageDTO) {
+        
+    }
+
+    public static void questionPageNotLoggedOrAdmin(QuestionPageDTO questionPageDTO, int userType) {
+        
     }
 
 
