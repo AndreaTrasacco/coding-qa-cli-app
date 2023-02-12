@@ -7,6 +7,7 @@ import it.unipi.lsmsd.coding_qa.dao.AggregationsDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAOException;
 import it.unipi.lsmsd.coding_qa.dto.aggregations.ExperienceLevelDTO;
+import it.unipi.lsmsd.coding_qa.dto.aggregations.LevelDTO;
 import it.unipi.lsmsd.coding_qa.dto.aggregations.QuestionScoreDTO;
 import it.unipi.lsmsd.coding_qa.dto.aggregations.TopicDTO;
 import javafx.util.Pair;
@@ -32,10 +33,11 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("users");
 
-            //{ $project : {country: 1, exp_level: { $cond: [ { $gte: ["$score", 10]}, { $cond: [{ $gte: ["$score", 100]}, "advanced", "intermediate"]}, "beginner" ] } } }
+            Bson match = match(exists("country"));
+            //{ $project : {country: 1, exp_level: { $cond: [ { $gte: ["$score", 3]}, { $cond: [{ $gte: ["$score", 20]}, "advanced", "intermediate"]}, "beginner" ] } } }
             Bson project1 = new Document("$project", new Document("country", 1)
-                    .append("exp_level", new Document("$cond", Arrays.asList(new Document("$gte", Arrays.asList("$score", 10)),
-                            new Document("$cond", Arrays.asList(new Document("$gte", Arrays.asList("$score", 100)), "advanced", "intermediate")), "beginner"))));
+                    .append("exp_level", new Document("$cond", Arrays.asList(new Document("$gte", Arrays.asList("$score", 3)),
+                            new Document("$cond", Arrays.asList(new Document("$gte", Arrays.asList("$score", 20)), "advanced", "intermediate")), "beginner"))));
 
             // { $group : { _id: {country: "$country", exp_level: "$exp_level"}, numUsers : { $sum : 1 } } }
             Bson group1 = new Document("$group",
@@ -61,13 +63,13 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
             Bson project3 = new Document("$project", new Document("levels.numUsers", 0));
             Bson sort = new Document("$sort", new Document("country", 1));
 
-            collectionQuestions.aggregate(Arrays.asList(project1, group1, group2, project2, project3, sort)).forEach(doc -> {
-                List<Pair<String, Double>> pairList = new ArrayList<>();
+            collectionQuestions.aggregate(Arrays.asList(match, project1, group1, group2, project2, project3, sort)).forEach(doc -> {
+                List<LevelDTO> levels = new ArrayList<>();
                 for (Document level : doc.getList("levels", Document.class)){
-                    Pair<String, Double> pair = new Pair<>(level.getString("exp_level"), level.getDouble("percentage"));
-                    pairList.add(pair);
+                    LevelDTO expLevel = new LevelDTO(level.getString("exp_level"), level.getDouble("percentage"));
+                    levels.add(expLevel);
                 }
-                ExperienceLevelDTO temp = new ExperienceLevelDTO(doc.getString("country"), pairList);
+                ExperienceLevelDTO temp = new ExperienceLevelDTO(doc.getString("country"), levels);
                 experienceLevelDTOList.add(temp);
 
             });
@@ -132,8 +134,6 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
 
     public static void main(String[] args) throws DAOException {
         AggregationsMongoDBDAO aggDAO = new AggregationsMongoDBDAO();
-        List<ExperienceLevelDTO> experienceLevelDTOList = aggDAO.getExperienceLvlPerCountry();
-        List<QuestionScoreDTO> questionScoreDTOList = aggDAO.getUsefulQuestions();
-        List<TopicDTO> topicDTOList= aggDAO.getTopicRank();
+        aggDAO.getTopicRank();
     }
 }

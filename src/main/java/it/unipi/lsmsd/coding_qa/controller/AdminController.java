@@ -34,13 +34,13 @@ public class AdminController {
                     analyticsController.start();
                     break;
                 case 4: // browse questions
-                    questionController.browse(0);
+                    questionController.browseQuestions(0);
                     break;
                 case 5: // search questions
-                    questionController.search(0);
+                    questionController.searchQuestion(0);
                     break;
                 case 6: // exit from the application
-                    return;
+                    System.exit(0);
             }
         } while (true);
     }
@@ -54,21 +54,25 @@ public class AdminController {
                 if (pageDTO.getCounter() == 0) return;
                 switch (adminView.adminReportedQuestionMenu()) {
                     case 1: // Open a question
-                        int number = mainView.inputMessageWithPaging("Specify the question number", pageDTO.getCounter());
-                        QuestionPageDTO questionPageDTO = questionService.getQuestionInfo(pageDTO.getEntries().get(number - 1).getId());
-                        mainView.view(questionPageDTO);
-                        switch (adminView.adminQuestionMenu()) {
-                            case 1: // delete question
-                                questionService.deleteQuestion(questionPageDTO.getId());
-                                break;
-                            case 2: // toggle the report from the question
-                                questionService.reportQuestion(questionPageDTO.getId(), false);
-                                break;
-                            case 3: // open user profile
-                                userController.openProfileIfAdmin(userService.getInfo(questionPageDTO.getAuthor()));
-                                break;
-                            case 4: // go back
-                                return;
+                        if (pageDTO.getCounter() == 0)
+                            mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
+                        else {
+                            int number = mainView.inputMessageWithPaging("Specify the question number", pageDTO.getCounter());
+                            QuestionPageDTO questionPageDTO = questionService.getQuestionInfo(pageDTO.getEntries().get(number - 1).getId());
+                            mainView.view(questionPageDTO);
+                            switch (adminView.adminQuestionMenu()) {
+                                case 1: // delete question
+                                    questionService.deleteQuestion(questionPageDTO.getId());
+                                    break;
+                                case 2: // toggle the report from the question
+                                    questionService.reportQuestion(questionPageDTO.getId(), false);
+                                    break;
+                                case 3: // open user profile
+                                    userController.openProfileIfAdmin(userService.getInfo(questionPageDTO.getAuthor()));
+                                    break;
+                                case 4: // go back
+                                    return;
+                            }
                         }
                         break;
                     case 2: // Go to the next page
@@ -102,22 +106,26 @@ public class AdminController {
                 if (pageDTO.getCounter() == 0) return;
                 switch (adminView.adminReportedAnswersMenu()) {
                     case 1: // Read answer
-                        int number = mainView.inputMessageWithPaging("Specify the answer number", pageDTO.getCounter());
-                        AnswerDTO answerDTO = pageDTO.getEntries().get(number - 1);
-                        answerService.getCompleteAnswer(answerDTO);
-                        mainView.view(answerDTO);
-                        switch (adminView.adminAnswerMenu()) {
-                            case 1: // delete answer
-                                answerService.deleteAnswer(answerDTO);
-                                break;
-                            case 2: // toggle the report from the answer
-                                answerService.reportAnswer(answerDTO.getId(), false);
-                                break;
-                            case 3: // open user profile
-                                userController.openProfileIfAdmin(userService.getInfo(answerDTO.getAuthor()));
-                                break;
-                            case 4: // go back
-                                return;
+                        if (pageDTO.getCounter() == 0)
+                            mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
+                        else {
+                            int number = mainView.inputMessageWithPaging("Specify the answer number", pageDTO.getCounter());
+                            AnswerDTO answerDTO = pageDTO.getEntries().get(number - 1);
+                            answerService.getCompleteAnswer(answerDTO);
+                            mainView.view(answerDTO);
+                            switch (adminView.adminAnswerMenu()) {
+                                case 1: // delete answer
+                                    answerService.deleteAnswer(answerDTO);
+                                    break;
+                                case 2: // toggle the report from the answer
+                                    answerService.reportAnswer(answerDTO.getId(), false);
+                                    break;
+                                case 3: // open user profile
+                                    userController.openProfileIfAdmin(userService.getInfo(answerDTO.getAuthor()));
+                                    break;
+                                case 4: // go back
+                                    return;
+                            }
                         }
                         break;
                     case 2: // Go to the next page

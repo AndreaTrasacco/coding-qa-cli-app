@@ -166,7 +166,7 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
 
     public void createAnswer(Answer answer) throws DAONodeException {
         String createQuery = "MATCH (u:User), (q:Question) WHERE u.nickname = $nickname "+
-                "AND q.id = $questionId CREATE (u)-[:ANSWERED]->(q)";
+                "AND q.id = $questionId MERGE (u)-[:ANSWERED]->(q)";
 
         try (Session session = getSession()) {
             session.writeTransaction(tx -> {

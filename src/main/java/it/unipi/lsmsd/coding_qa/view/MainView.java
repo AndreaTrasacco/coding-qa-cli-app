@@ -70,4 +70,5 @@ public class MainView {
     public void view(Object o){
         System.out.println(o);
     }
+
 }

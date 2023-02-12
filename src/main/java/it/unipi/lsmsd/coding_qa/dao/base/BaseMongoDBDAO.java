@@ -8,9 +8,12 @@ import com.mongodb.client.*;
 
 public abstract class BaseMongoDBDAO {
 
-    private final static String URI = "mongodb://10.1.1.15:27020,10.1.1.16:27020,10.1.1.17:27020/?retryWrites=true&w=majority&wtimeout=10000";
-    protected static final String DB_NAME = "codingqa";
+    //private final static String URI = "mongodb://10.1.1.15:27020,10.1.1.16:27020,10.1.1.17:27020/?retryWrites=true&w=majority&wtimeout=10000";
+    //protected static final String DB_NAME = "codingqa";
 
+    private final static String URI = "mongodb://localhost:27017";
+    //protected static final String DB_NAME = "codingqa";
+    protected static final String DB_NAME = "mongo_practice";
     public static MongoClient getConnection(){
         return MongoClients.create(URI);
     }

@@ -2,17 +2,19 @@ package it.unipi.lsmsd.coding_qa.dto.aggregations;
 
 import javafx.util.Pair;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 public class ExperienceLevelDTO {
 
     private String country;
-    private List<Pair<String, Double>> levels;
+    private List<LevelDTO> levels;
 
-    public ExperienceLevelDTO(String country, List<Pair<String, Double>> levels) {
+    public ExperienceLevelDTO(String country, List<LevelDTO> levels) {
         this.country = country;
-        this.levels = levels;
+        setLevels(levels);
     }
 
     public String getCountry() {
@@ -23,11 +25,25 @@ public class ExperienceLevelDTO {
         this.country = country;
     }
 
-    public List<Pair<String, Double>> getLevels() {
+    public List<LevelDTO> getLevels() {
         return levels;
     }
 
-    public void setLevels(List<Pair<String, Double>> levels) {
+    public void setLevels(List<LevelDTO> levels) {
+        Collections.sort(levels, new Comparator<LevelDTO>() {
+            @Override
+            public int compare(LevelDTO lhs, LevelDTO rhs) {
+                // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                return (lhs.getValue() > rhs.getValue()) ? -1 : (lhs.getValue() < rhs.getValue()) ? 1 : 0;
+            }
+        });
         this.levels = levels;
+    }
+
+    @Override
+    public String toString() {
+        return "\t* Country: " + country +
+                "\n\t* Experience levels: \t" + levels +
+                "\n****************************************************************************************************";
     }
 }

@@ -1,5 +1,9 @@
 package it.unipi.lsmsd.coding_qa.view;
 
+import it.unipi.lsmsd.coding_qa.dto.aggregations.ExperienceLevelDTO;
+import it.unipi.lsmsd.coding_qa.dto.aggregations.QuestionScoreDTO;
+
+import java.util.List;
 import java.util.Scanner;
 
 public class AnalyticsView {
@@ -20,4 +24,12 @@ public class AnalyticsView {
             System.out.println("############################################### EXIT ###############################################");
         return choice;
     }
+
+    public <T> void showAnalytic(List<T> list){
+        for (int i = 0; i < list.size(); i++) {
+            System.out.println("################################################ " + (i + 1) + " ################################################");
+            System.out.println(list.get(i));
+        }
+    }
+
 }

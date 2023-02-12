@@ -23,7 +23,7 @@ public class UserView {
             System.out.println("\t[4] Browse user's answered questions");
             System.out.println("\t[5] Exit");
             System.out.println("Input: ");
-            choice = Integer.parseInt(scanner.nextLine());;
+            choice = Integer.parseInt(scanner.nextLine());
         } while (choice < 1 || choice > 5);
         if (choice == 5)
             System.out.println("############################################### EXIT ###############################################");
@@ -39,7 +39,7 @@ public class UserView {
             System.out.println("\t[3] Browse user's answered questions");
             System.out.println("\t[4] Exit");
             System.out.println("Input: ");
-            choice = Integer.parseInt(scanner.nextLine());;
+            choice = Integer.parseInt(scanner.nextLine());
         } while (choice < 1 || choice > 4);
         if (choice == 4)
             System.out.println("############################################### EXIT ###############################################");
@@ -51,25 +51,29 @@ public class UserView {
         int choice;
         do {
             System.out.println("\t[1] Browse your questions");
-            System.out.println("\t[2] Browse your answers");
-            System.out.println("\t[3] Show your info");
-            System.out.println("\t[4] Update your profile");
-            System.out.println("\t[5] Browse followed users");
-            System.out.println("\t[6] Exit");
+            System.out.println("\t[2] Browse your answered questions");
+            System.out.println("\t[3] Update your profile");
+            System.out.println("\t[4] Browse followed users");
+            System.out.println("\t[5] Exit");
             System.out.println("Input: ");
-            choice = Integer.parseInt(scanner.nextLine());;
-        } while (choice < 1 || choice > 6);
-        if (choice == 6)
+            choice = Integer.parseInt(scanner.nextLine());
+        } while (choice < 1 || choice > 5);
+        if (choice == 5)
             System.out.println("############################################### EXIT ###############################################");
         return choice;
     }
 
-    public void updateProfile(UserRegistrationDTO userRegistrationDTO){
+    public void updateProfile(UserRegistrationDTO userRegistrationDTO){ // TODO TESTARE
         System.out.println("############################################### UPDATE #############################################");
         System.out.println("* Full name (Press Enter if you don't want to change it): ");
         String fullName = scanner.nextLine();
         if(!fullName.equals("")){
             userRegistrationDTO.setFullName(fullName);
+        }
+        System.out.println("* Password (Press Enter if you don't want to change it): ");
+        String password = scanner.nextLine();
+        if(!password.equals("")){
+            userRegistrationDTO.setEncPassword(AuthenticationController.encryptPassword(password));
         }
         System.out.println("Possible Countries: " + Arrays.toString(Constants.COUNTRIES.toArray()));
         String country;
@@ -88,21 +92,6 @@ public class UserView {
         if(!website.equals("")){
             userRegistrationDTO.setWebsite(website);
         }
-        System.out.println("* Password (Press Enter if you don't want to change it): ");
-        String password = scanner.nextLine();
-        if(!password.equals("")){
-            userRegistrationDTO.setEncPassword(AuthenticationController.encryptPassword(password));
-        }
-        System.out.println("* Year of birth date (Press Enter if you don't want to change it): ");
-        String year = scanner.nextLine();
-        if(year.equals("")){
-            return;
-        }
-        System.out.println("* Month of birth date: ");
-        int month = Integer.parseInt(scanner.nextLine());;
-        System.out.println("* Day of birth date: ");
-        int day = Integer.parseInt(scanner.nextLine());;
-        userRegistrationDTO.setBirthdate(new Date(Integer.parseInt(year) - 1900, month - 1, day));
     }
 
     public int browseFollowedUsers(PageDTO<String> users){
@@ -115,7 +104,7 @@ public class UserView {
             System.out.println("\t[3] Go to the previous page");
             System.out.println("\t[4] Exit");
             System.out.println("Input: ");
-            choice = Integer.parseInt(scanner.nextLine());;
+            choice = Integer.parseInt(scanner.nextLine());
         } while (choice < 1 || choice > 4);
         if (choice == 4)
             System.out.println("############################################### EXIT ###############################################");
@@ -130,7 +119,7 @@ public class UserView {
             System.out.println("\t[1] Delete user");
             System.out.println("\t[2] Exit");
             System.out.println("Input: ");
-            choice = Integer.parseInt(scanner.nextLine());;
+            choice = Integer.parseInt(scanner.nextLine());
         } while (choice < 1 || choice > 2);
         if (choice == 2)
             System.out.println("############################################### EXIT ###############################################");

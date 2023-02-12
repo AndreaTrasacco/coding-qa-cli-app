@@ -95,7 +95,6 @@ public class UserServiceImpl implements UserService {
         try {
             RegisteredUser registeredUser = new RegisteredUser();
             registeredUser.setCountry(userRegistrationDTO.getCountry());
-            registeredUser.setBirthdate(userRegistrationDTO.getBirthdate());
             registeredUser.setWebsite(userRegistrationDTO.getWebsite());
             registeredUser.setEncPassword(userRegistrationDTO.getEncPassword());
             registeredUser.setFullName(userRegistrationDTO.getFullName());

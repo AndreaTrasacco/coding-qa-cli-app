@@ -14,6 +14,7 @@ import it.unipi.lsmsd.coding_qa.model.Admin;
 import it.unipi.lsmsd.coding_qa.model.RegisteredUser;
 import it.unipi.lsmsd.coding_qa.model.User;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
 import static com.mongodb.client.model.Projections.include;
@@ -84,12 +85,17 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
         try(MongoClient mongoClient = getConnection()) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionUser = database.getCollection("users");
-            collectionUser.updateOne(Filters.eq("nickname", user.getNickname()),
-                    Updates.combine(Updates.set("fullName", user.getFullName()),
-                            Updates.set("password", user.getEncPassword()),
-                            Updates.set("birthdate", user.getBirthdate()),
-                            Updates.set("country", user.getCountry()),
-                            Updates.set("website", user.getWebsite())));
+            Bson combine;
+            if(!user.getEncPassword().equals("")) // password update
+                combine = Updates.combine(Updates.set("fullName", user.getFullName()),
+                        Updates.set("password", user.getEncPassword()),
+                        Updates.set("country", user.getCountry()),
+                        Updates.set("website", user.getWebsite()));
+            else // no password update
+                combine  = Updates.combine(Updates.set("fullName", user.getFullName()),
+                        Updates.set("country", user.getCountry()),
+                        Updates.set("website", user.getWebsite()));
+            collectionUser.updateOne(Filters.eq("nickname", user.getNickname()), combine);
         } catch(Exception e){
             throw new DAOException(e);
         }

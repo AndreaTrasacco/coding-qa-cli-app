@@ -5,6 +5,7 @@ import it.unipi.lsmsd.coding_qa.dao.base.BaseNeo4JDAO;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAONodeException;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import org.neo4j.driver.*;
+import org.neo4j.driver.summary.ResultSummary;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +72,7 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
     @Override
     public void followUser(String myNickname, String userToFollow) throws DAONodeException {
         final String followString = "MATCH (u1:User{nickname : $myNickname}), (u2: User{nickname : $userToFollow}) " +
-                "CREATE (u1)-[r:FOLLOW]->(u2)";
+                "MERGE (u1)-[r:FOLLOW]->(u2)";
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
                 tx.run(followString, parameters("myNickname", myNickname, "userToFollow", userToFollow)).consume();
@@ -85,7 +86,7 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
     @Override
     public void deleteFollowed(String myNickname, String userToUnfollow) throws DAONodeException {
         final String unfollow = "MATCH (u1:User{nickname : $myNickname})-[r:FOLLOW]->(u2:User{nickname : $userToUnfollow}) " +
-                "DETACH DELETE r";
+                "DELETE r";
         try(Session session = getSession()){
             session.writeTransaction(tx -> {
                 tx.run(unfollow, parameters("myNickname", myNickname, "userToUnfollow", userToUnfollow)).consume();

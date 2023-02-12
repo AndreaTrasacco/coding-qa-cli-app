@@ -37,4 +37,12 @@ public class QuestionScoreDTO {
     public void setTopic(String topic) {
         this.topic = topic;
     }
+
+    @Override
+    public String toString() {
+        return "\t* Topic: " + topic +
+                "\n\t* Title: " + title +
+                "\n\t* Total score: " + score +
+                "\n****************************************************************************************************";
+    }
 }
