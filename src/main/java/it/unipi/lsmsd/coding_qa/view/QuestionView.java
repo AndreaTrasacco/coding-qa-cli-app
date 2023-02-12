@@ -31,7 +31,7 @@ public class QuestionView {
         do {
             System.out.println("* Topic: ");
             topic = scanner.nextLine();
-        } while (!Constants.COUNTRIES.contains(topic));
+        } while (!Constants.TOPICS.contains(topic));
         questionSearchDTO.setTopic(topic);
         System.out.println("* Text: ");
         questionSearchDTO.setText(scanner.nextLine());

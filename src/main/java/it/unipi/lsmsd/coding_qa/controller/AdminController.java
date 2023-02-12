@@ -1,9 +1,13 @@
 package it.unipi.lsmsd.coding_qa.controller;
 
+import it.unipi.lsmsd.coding_qa.dao.mongodb.QuestionMongoDBDAO;
 import it.unipi.lsmsd.coding_qa.dto.*;
+import it.unipi.lsmsd.coding_qa.model.Question;
 import it.unipi.lsmsd.coding_qa.service.*;
 import it.unipi.lsmsd.coding_qa.utils.Constants;
 import it.unipi.lsmsd.coding_qa.view.*;
+
+import java.util.Date;
 
 public class AdminController {
     private static AdminView adminView = new AdminView();
@@ -14,7 +18,15 @@ public class AdminController {
 
     public static void main(String[] args){
         AdminController adminController = new AdminController();
+        Question question = new Question();
+        question.setTitle("titolo");
+        question.setBody("12345");
+        question.setTopic("javascript");
+        question.setAuthor("autore10");
+        question.setCreatedDate(new Date());
+        question.setReported(false);
         try {
+            //new QuestionMongoDBDAO().createQuestion(question);
             adminController.start();
         } catch(Exception e){
             e.printStackTrace();
@@ -51,7 +63,10 @@ public class AdminController {
             do {
                 PageDTO<QuestionDTO> pageDTO = questionService.getReportedQuestions(page);
                 mainView.viewPage(pageDTO);
-                if (pageDTO.getCounter() == 0) return;
+                if (pageDTO.getCounter() == 0){
+                    return;
+                }
+
                 switch (adminView.adminReportedQuestionMenu()) {
                     case 1: // Open a question
                         if (pageDTO.getCounter() == 0)
