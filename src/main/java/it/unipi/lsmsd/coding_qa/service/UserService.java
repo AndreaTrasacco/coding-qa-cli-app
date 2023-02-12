@@ -24,7 +24,7 @@ public interface UserService {
 
     void delete(String id, String nickname) throws BusinessException;
 
-    PageDTO<String> getFollowerList(String nickname) throws BusinessException;
+    PageDTO<String> getFollowerList(String nickname, int page) throws BusinessException;
 
     int getScore(String userId) throws BusinessException;
 }

@@ -49,7 +49,7 @@ public class UserController {
             int page = 1;
             do {
                 UserDTO loggedUser = AuthenticationController.getLoggedUser();
-                PageDTO<String> pageDTO = userService.getFollowerList(loggedUser.getNickname());
+                PageDTO<String> pageDTO = userService.getFollowerList(loggedUser.getNickname(), page);
                 if (pageDTO.getCounter() == 0) return;
                 switch (userView.browseFollowedUsers(pageDTO)) {
                     case 1: // choose a user to view
@@ -141,6 +141,7 @@ public class UserController {
 
     public static void openProfile(String nickname) throws BusinessException {  // TODO TESTARE
         UserDTO userDTO = userService.getInfo(nickname);
+        mainView.view(userDTO);
         if (AuthenticationController.getLoggedUserNickname().equals("admin")) // admin
             openProfileIfAdmin(userDTO);
         else if (nickname.equals(AuthenticationController.getLoggedUserNickname())) // self profile

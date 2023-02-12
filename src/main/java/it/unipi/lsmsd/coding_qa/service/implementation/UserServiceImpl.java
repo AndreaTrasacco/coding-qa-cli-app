@@ -139,9 +139,9 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public PageDTO<String> getFollowerList(String nickname) throws BusinessException {
+    public PageDTO<String> getFollowerList(String nickname, int page) throws BusinessException {
         try {
-            return userNodeDAO.getFollowingList(nickname);
+            return userNodeDAO.getFollowingList(nickname, page);
         } catch (Exception e) {
             throw new BusinessException("Error getting follower list");
         }

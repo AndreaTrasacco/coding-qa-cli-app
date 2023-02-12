@@ -4,6 +4,7 @@ import it.unipi.lsmsd.coding_qa.dao.UserNodeDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseNeo4JDAO;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAONodeException;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
+import it.unipi.lsmsd.coding_qa.utils.Constants;
 import org.neo4j.driver.*;
 import org.neo4j.driver.summary.ResultSummary;
 
@@ -45,14 +46,17 @@ public class UserNeo4JDAO extends BaseNeo4JDAO implements UserNodeDAO {
 
     //this method returns the list of follower
     @Override
-    public PageDTO<String> getFollowingList(String nickname) throws DAONodeException {
+    public PageDTO<String> getFollowingList(String nickname, int page) throws DAONodeException {
         List<String> followerList;
         PageDTO<String> pageDTO = new PageDTO<>();
+        int pageOffset = (page - 1) * Constants.PAGE_SIZE;
         final String listOfUser = "MATCH (u:User{nickname : $nickname})-[:FOLLOW]->(u1:User) " +
-                "RETURN u1.nickname as nickname";
+                "RETURN u1.nickname as nickname " +
+                "SKIP $pageOffset " +
+                "LIMIT $pageSize";
         try(Session session = getSession()){
             followerList = session.readTransaction( (TransactionWork<List<String>>) tx -> {
-                Result result = tx.run(listOfUser, parameters("nickname", nickname));
+                Result result = tx.run(listOfUser, parameters("nickname", nickname, "pageOffset", pageOffset, "pageSize", Constants.PAGE_SIZE));
                 ArrayList<String> users = new ArrayList<>();
                 while(result.hasNext()){
                     Record user = result.next();
