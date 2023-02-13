@@ -196,13 +196,13 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
         }
     }
 
-    public void deleteAnswer(String answerId, String author) throws DAONodeException {
-        final String deleteQuery = "MATCH (u: User{nickname: $nickname})-[a:ANSWERED]->(q: Question{id: $id})" +
+    public void deleteAnswer(String questionId, String author) throws DAONodeException {
+        final String deleteQuery = "MATCH (u: User{nickname: $nickname})-[a:ANSWERED]->(q: Question{id: $id})\n" +
                 "DELETE a";
         try (Session session = getSession()) {
             session.writeTransaction(tx -> {
                 tx.run(deleteQuery, parameters("nickname", author,
-                        "id", answerId.substring(0, answerId.indexOf('_'))));
+                        "id", questionId));
                 return 1;
             });
         } catch (Exception ex) {

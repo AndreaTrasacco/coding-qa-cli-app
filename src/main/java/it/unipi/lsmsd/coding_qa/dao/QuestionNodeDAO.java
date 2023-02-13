@@ -21,5 +21,5 @@ public interface QuestionNodeDAO {
 
     void createAnswer(Answer answer) throws DAONodeException;
 
-    void deleteAnswer(String answerId, String author) throws DAONodeException;
+    void deleteAnswer(String questionId, String author) throws DAONodeException;
 }
