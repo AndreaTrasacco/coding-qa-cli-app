@@ -15,7 +15,7 @@ public class UserController {
     private static QuestionView questionView = new QuestionView();
     private static MainView mainView = new MainView();
 
-    public static void openSelfProfile() { // TODO TESTARE
+    public static void openSelfProfile() {
         try {
             UserDTO loggedUser = AuthenticationController.getLoggedUser();
             mainView.showMessage("########################################### YOUR PROFILE ###########################################");
@@ -44,7 +44,7 @@ public class UserController {
         }
     }
 
-    private static void browseFollowedUser() { // TODO TESTARE
+    private static void browseFollowedUser() {
         try {
             int page = 1;
             do {
@@ -78,7 +78,7 @@ public class UserController {
         }
     }
 
-    private static void updateYourProfile() { // TODO TESTARE
+    private static void updateYourProfile() {
         try {
             UserDTO userDTO = AuthenticationController.getLoggedUser();
             UserRegistrationDTO userRegistrationDTO = new UserRegistrationDTO();
@@ -97,7 +97,7 @@ public class UserController {
         }
     }
 
-    public static void openProfileIfAdmin(UserDTO userDTO) {  // TODO TESTARE
+    public static void openProfileIfAdmin(UserDTO userDTO) {
         try {
             mainView.view(userDTO);
             switch (userView.adminUserProfile()) {
@@ -111,7 +111,7 @@ public class UserController {
         }
     }
 
-    private static void openUserProfile(UserDTO userDTO) { // TODO TESTARE
+    private static void openUserProfile(UserDTO userDTO) {
         try {
             UserDTO loggedUser = AuthenticationController.getLoggedUser();
             mainView.view(userDTO);
@@ -139,7 +139,7 @@ public class UserController {
         }
     }
 
-    public static void openProfile(String nickname) throws BusinessException {  // TODO TESTARE
+    public static void openProfile(String nickname) throws BusinessException {
         UserDTO userDTO = userService.getInfo(nickname);
         if (userDTO == null) {
             mainView.showMessage("!!!! THE USER HAS BEEN DELETED BY THE ADMIN !!!!");

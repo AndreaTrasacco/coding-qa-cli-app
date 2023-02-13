@@ -146,7 +146,7 @@ public class QuestionView {
         return choice;
     }
 
-    public void modifyAnswer(AnswerModifyDTO answerDTO) { // TODO TESTARE
+    public void modifyAnswer(AnswerModifyDTO answerDTO) {
         System.out.println("########################################### MODIFY ANSWER ##########################################");
         System.out.println("(Press ENTER if you don't want to modify the body)");
         System.out.println("* Body (Press ENTER 2 times to end writing the body): ");
@@ -203,7 +203,7 @@ public class QuestionView {
         answerDTO.setBody(body);
     }
 
-    public void createQuestion(QuestionPageDTO questionPageDTO){ // TODO TESTARE
+    public void createQuestion(QuestionPageDTO questionPageDTO){
         System.out.println("########################################## ADD QUESTION #########################################");
         System.out.println("* Title: ");
         questionPageDTO.setTitle(scanner.nextLine());

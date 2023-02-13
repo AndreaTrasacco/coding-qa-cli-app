@@ -32,6 +32,6 @@ public class LevelDTO {
 
     @Override
     public String toString(){
-        return " { " + level + " : " + value + "% }"; // TODO TESTARE
+        return " { " + level + " : " + value + "% }";
     }
 }

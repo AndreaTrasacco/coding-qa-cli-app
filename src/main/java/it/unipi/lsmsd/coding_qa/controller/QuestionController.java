@@ -12,7 +12,7 @@ public class QuestionController {
     private static QuestionView questionView = new QuestionView();
     private static MainView mainView = new MainView();
 
-    public static void browseQuestions() { // TODO TESTARE
+    public static void browseQuestions() {
         try {
             int page = 1;
             do {
@@ -49,7 +49,7 @@ public class QuestionController {
         }
     }
 
-    public static void searchQuestion() { // TODO TESTARE
+    public static void searchQuestion() {
         try {
             int page = 1;
             QuestionSearchDTO questionSearchDTO = new QuestionSearchDTO();
@@ -87,7 +87,7 @@ public class QuestionController {
         }
     }
 
-    public static void browseAnswers(String questionId, String questionOwner) { // TODO TESTARE
+    public static void browseAnswers(String questionId, String questionOwner) {
         try {
             int page = 1;
             do {
@@ -128,7 +128,7 @@ public class QuestionController {
         }
     }
 
-    public static void browseCreatedOrAnsweredQuestions(String nickname, boolean type) throws Exception { //type : true for created q | false for answered q TODO TESTARE
+    public static void browseCreatedOrAnsweredQuestions(String nickname, boolean type) throws Exception { //type : true for created q | false for answered q
         int page = 1;
         do {
             PageDTO<QuestionDTO> pageDTO;
@@ -163,7 +163,7 @@ public class QuestionController {
         } while (true);
     }
 
-    public static void updateQuestion(QuestionPageDTO questionPageDTO) throws BusinessException { // TODO TESTARE
+    public static void updateQuestion(QuestionPageDTO questionPageDTO) throws BusinessException {
         QuestionModifyDTO questionModifyDTO = new QuestionModifyDTO();
         questionModifyDTO.setId(questionPageDTO.getId());
         questionModifyDTO.setBody(questionPageDTO.getBody());
@@ -173,7 +173,7 @@ public class QuestionController {
         questionService.updateQuestion(questionModifyDTO);
     }
 
-    public static void openQuestion(String questionId) throws BusinessException { // TODO TESTARE
+    public static void openQuestion(String questionId) throws BusinessException {
         QuestionPageDTO questionPageDTO = questionService.getQuestionInfo(questionId);
         int userType = 2; // Not Logged In
         if (AuthenticationController.getLoggedUser() != null) {
@@ -196,53 +196,61 @@ public class QuestionController {
         }
     }
 
-    public static void questionPageLoggedOrLoggedOwner(QuestionPageDTO questionPageDTO) throws BusinessException { // TODO TESTARE
-        mainView.view(questionPageDTO);
-        switch (questionView.menuInQuestionPageLoggedOrOwner()) {
-            case 1: // add an answer
-                AnswerDTO answerDTO = new AnswerDTO();
-                answerDTO.setAuthor(AuthenticationController.getLoggedUserNickname());
-                questionView.createAnswer(answerDTO);
-                answerService.addAnswer(questionPageDTO.getId(), answerDTO);
-                mainView.showMessage("########################################## ANSWER CREATED ##########################################");
-                break;
-            case 2: // browse answers
-                browseAnswers(questionPageDTO.getId(), questionPageDTO.getAuthor());
-                break;
-            case 3: // report question
-                questionService.reportQuestion(questionPageDTO.getId(), true);
-                break;
-            case 4: // delete question --> only owner of question
-                if (AuthenticationController.getLoggedUserNickname().equals(questionPageDTO.getAuthor()))
-                    questionService.deleteQuestion(questionPageDTO.getId());
-                else
-                    mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
-                break;
-            case 5: // update question --> only owner of question
-                if (AuthenticationController.getLoggedUserNickname().equals(questionPageDTO.getAuthor()))
-                    updateQuestion(questionPageDTO);
-                else
-                    mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
-                break;
-            case 6: // view user profile
-                UserController.openProfile(questionPageDTO.getAuthor());
-                break;
-        }
+    public static void questionPageLoggedOrLoggedOwner(QuestionPageDTO questionPageDTO) throws BusinessException {
+        do {
+            mainView.view(questionPageDTO);
+            switch (questionView.menuInQuestionPageLoggedOrOwner()) {
+                case 1: // add an answer
+                    AnswerDTO answerDTO = new AnswerDTO();
+                    answerDTO.setAuthor(AuthenticationController.getLoggedUserNickname());
+                    questionView.createAnswer(answerDTO);
+                    answerService.addAnswer(questionPageDTO.getId(), answerDTO);
+                    mainView.showMessage("########################################## ANSWER CREATED ##########################################");
+                    break;
+                case 2: // browse answers
+                    browseAnswers(questionPageDTO.getId(), questionPageDTO.getAuthor());
+                    break;
+                case 3: // report question
+                    questionService.reportQuestion(questionPageDTO.getId(), true);
+                    break;
+                case 4: // delete question --> only owner of question
+                    if (AuthenticationController.getLoggedUserNickname().equals(questionPageDTO.getAuthor()))
+                        questionService.deleteQuestion(questionPageDTO.getId());
+                    else
+                        mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
+                    break;
+                case 5: // update question --> only owner of question
+                    if (AuthenticationController.getLoggedUserNickname().equals(questionPageDTO.getAuthor()))
+                        updateQuestion(questionPageDTO);
+                    else
+                        mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
+                    break;
+                case 6: // view user profile
+                    UserController.openProfile(questionPageDTO.getAuthor());
+                    break;
+                case 7: // exit
+                    break;
+            }
+        } while (true);
     }
 
-    public static void questionPageNotLoggedOrAdmin(QuestionPageDTO questionPageDTO) throws BusinessException { // TODO TESTARE
-        mainView.view(questionPageDTO);
-        switch (questionView.menuInQuestionPageNotLoggedOrAdmin()) {
-            case 1: // browse answers
-                browseAnswers(questionPageDTO.getId(), questionPageDTO.getAuthor());
-                break;
-            case 2: // open user profile
-                UserController.openProfile(questionPageDTO.getAuthor());
-                break;
-        }
+    public static void questionPageNotLoggedOrAdmin(QuestionPageDTO questionPageDTO) throws BusinessException {
+        do {
+            mainView.view(questionPageDTO);
+            switch (questionView.menuInQuestionPageNotLoggedOrAdmin()) {
+                case 1: // browse answers
+                    browseAnswers(questionPageDTO.getId(), questionPageDTO.getAuthor());
+                    break;
+                case 2: // open user profile
+                    UserController.openProfile(questionPageDTO.getAuthor());
+                    break;
+                case 3: // exit
+                    return;
+            }
+        } while (true);
     }
 
-    public static void openAnswer(AnswerDTO answerDTO, String questionOwner) throws BusinessException { // TODO TESTARE
+    public static void openAnswer(AnswerDTO answerDTO, String questionOwner) throws BusinessException {
         mainView.view(answerDTO);
         UserDTO loggedUser = AuthenticationController.getLoggedUser();
         if (loggedUser == null) {
@@ -256,7 +264,7 @@ public class QuestionController {
                     voteDTO.setVoteType(true);
                     voteDTO.setAnswerOwner(answerDTO.getAuthor());
                     voteDTO.setVoterId(loggedUser.getId());
-                    if(!answerService.voteAnswer(voteDTO)){
+                    if (!answerService.voteAnswer(voteDTO)) {
                         mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
                     }
                 } else
@@ -269,7 +277,7 @@ public class QuestionController {
                     voteDTO.setVoteType(false);
                     voteDTO.setAnswerOwner(answerDTO.getAuthor());
                     voteDTO.setVoterId(loggedUser.getId());
-                    if(!answerService.voteAnswer(voteDTO)){
+                    if (!answerService.voteAnswer(voteDTO)) {
                         mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
                     }
                 } else
@@ -305,7 +313,7 @@ public class QuestionController {
         }
     }
 
-    public static void createQuestion() { // TODO TESTARE
+    public static void createQuestion() {
         try {
             QuestionPageDTO questionPageDTO = new QuestionPageDTO();
             questionPageDTO.setAuthor(AuthenticationController.getLoggedUserNickname());
@@ -318,7 +326,7 @@ public class QuestionController {
         }
     }
 
-    public static void updateAnswer(AnswerDTO answerDTO) throws BusinessException { // TODO TESTARE
+    public static void updateAnswer(AnswerDTO answerDTO) throws BusinessException {
         AnswerModifyDTO answerModifyDTO = new AnswerModifyDTO(answerDTO.getBody());
         questionView.modifyAnswer(answerModifyDTO);
         answerService.updateAnswer(answerDTO.getId(), answerModifyDTO.getBody());

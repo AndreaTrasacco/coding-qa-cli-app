@@ -47,7 +47,7 @@ public class UserView {
         return choice;
     }
 
-    public void updateProfile(UserRegistrationDTO userRegistrationDTO){ // TODO TESTARE
+    public void updateProfile(UserRegistrationDTO userRegistrationDTO){
         System.out.println("############################################### UPDATE #############################################");
         System.out.println("* Full name (Press Enter if you don't want to change it): ");
         String fullName = scanner.nextLine();
@@ -109,7 +109,7 @@ public class UserView {
         return choice;
     }
 
-    public void waitInputInUserProfileNotLogged(){ // TODO TESTARE
+    public void waitInputInUserProfileNotLogged(){
         System.out.println("\t Press ENTER to go back");
         scanner.nextLine();
     }
