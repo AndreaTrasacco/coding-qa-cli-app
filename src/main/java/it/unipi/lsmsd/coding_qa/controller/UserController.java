@@ -141,6 +141,9 @@ public class UserController {
 
     public static void openProfile(String nickname) throws BusinessException {  // TODO TESTARE
         UserDTO userDTO = userService.getInfo(nickname);
+        if(userDTO == null){
+            mainView.showMessage("!!!! THE USER HAS BEEN DELETED BY THE ADMIN !!!!");
+        }
         if (AuthenticationController.getLoggedUserNickname().equals("admin")) // admin
             openProfileIfAdmin(userDTO);
         else if (nickname.equals(AuthenticationController.getLoggedUserNickname())) // self profile
