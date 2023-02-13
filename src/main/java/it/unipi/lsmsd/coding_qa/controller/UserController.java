@@ -102,7 +102,7 @@ public class UserController {
             mainView.view(userDTO);
             switch (userView.adminUserProfile()) {
                 case 1: // delete user
-                    userService.delete(userDTO.getId(), userDTO.getNickname());
+                    userService.delete(userDTO.getNickname());
                     break;
             }
         } catch (Exception e) {

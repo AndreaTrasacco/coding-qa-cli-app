@@ -22,7 +22,7 @@ public interface UserService {
 
     void unfollow(String myself, String userToUnFollow) throws BusinessException;
 
-    void delete(String id, String nickname) throws BusinessException;
+    void delete(String nickname) throws BusinessException;
 
     PageDTO<String> getFollowerList(String nickname, int page) throws BusinessException;
 

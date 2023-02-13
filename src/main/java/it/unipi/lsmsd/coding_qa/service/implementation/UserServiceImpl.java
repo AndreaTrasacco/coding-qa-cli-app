@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
             return userDTO;
         } catch (DAONodeException ex) {
             try {
-                userDAO.delete(registeredUser.getId());
+                userDAO.delete(registeredUser.getNickname());
             } catch (Exception e) {
                 throw new BusinessException("Error in the registration");
             }
@@ -123,9 +123,9 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public void delete(String id, String nickname) throws BusinessException {
+    public void delete(String nickname) throws BusinessException {
         try {
-            userDAO.delete(id);
+            userDAO.delete(nickname);
             userNodeDAO.delete(nickname);
         } catch (DAONodeException ex) { // If there is a failure in the deletion of node User --> retry deletion
             try {
