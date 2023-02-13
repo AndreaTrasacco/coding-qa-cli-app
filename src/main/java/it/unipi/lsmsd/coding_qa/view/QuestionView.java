@@ -43,11 +43,12 @@ public class QuestionView {
         System.out.println("########################################### QUESTION MENU ##########################################");
         do {
             System.out.println("\t[1] Browse answers");
-            System.out.println("\t[2] Exit");
+            System.out.println("\t[2] View user profile");
+            System.out.println("\t[3] Exit");
             System.out.println("Input: ");
             choice = Integer.parseInt(scanner.nextLine());
-        } while (choice < 1 || choice > 2);
-        if (choice == 2)
+        } while (choice < 1 || choice > 3);
+        if (choice == 3)
             System.out.println("############################################### EXIT ###############################################");
 
         return choice;
@@ -62,11 +63,12 @@ public class QuestionView {
             System.out.println("\t[3] Report");
             System.out.println("\t[4] Delete");
             System.out.println("\t[5] Update");
-            System.out.println("\t[6] Exit");
+            System.out.println("\t[6] View user profile");
+            System.out.println("\t[7] Exit");
             System.out.println("Input: ");
             choice = Integer.parseInt(scanner.nextLine());
-        } while (choice < 1 || choice > 6);
-        if (choice == 6)
+        } while (choice < 1 || choice > 7);
+        if (choice == 7)
             System.out.println("############################################### EXIT ###############################################");
 
         return choice;

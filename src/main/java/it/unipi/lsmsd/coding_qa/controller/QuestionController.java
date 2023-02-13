@@ -224,14 +224,20 @@ public class QuestionController {
                 else
                     mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
                 break;
+            case 6: // view user profile
+                UserController.openProfile(questionPageDTO.getAuthor());
+                break;
         }
     }
 
-    public static void questionPageNotLoggedOrAdmin(QuestionPageDTO questionPageDTO) { // TODO TESTARE
+    public static void questionPageNotLoggedOrAdmin(QuestionPageDTO questionPageDTO) throws BusinessException { // TODO TESTARE
         mainView.view(questionPageDTO);
         switch (questionView.menuInQuestionPageNotLoggedOrAdmin()) {
             case 1: // browse answers
                 browseAnswers(questionPageDTO.getId(), questionPageDTO.getAuthor());
+                break;
+            case 2: // open user profile
+                UserController.openProfile(questionPageDTO.getAuthor());
                 break;
         }
     }
