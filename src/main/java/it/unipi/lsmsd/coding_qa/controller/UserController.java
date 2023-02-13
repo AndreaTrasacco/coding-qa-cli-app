@@ -99,6 +99,7 @@ public class UserController {
 
     public static void openProfileIfAdmin(UserDTO userDTO) {  // TODO TESTARE
         try {
+            mainView.view(userDTO);
             switch (userView.adminUserProfile()) {
                 case 1: // delete user
                     userService.delete(userDTO.getId(), userDTO.getNickname());
@@ -113,6 +114,7 @@ public class UserController {
     private static void openUserProfile(UserDTO userDTO) { // TODO TESTARE
         try {
             UserDTO loggedUser = AuthenticationController.getLoggedUser();
+            mainView.view(userDTO);
             if (loggedUser == null) {
                 userView.waitInputInUserProfileNotLogged();
                 return;
@@ -139,7 +141,6 @@ public class UserController {
 
     public static void openProfile(String nickname) throws BusinessException {  // TODO TESTARE
         UserDTO userDTO = userService.getInfo(nickname);
-        mainView.view(userDTO);
         if (AuthenticationController.getLoggedUserNickname().equals("admin")) // admin
             openProfileIfAdmin(userDTO);
         else if (nickname.equals(AuthenticationController.getLoggedUserNickname())) // self profile
