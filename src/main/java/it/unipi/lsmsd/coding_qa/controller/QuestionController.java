@@ -12,7 +12,7 @@ public class QuestionController {
     private static QuestionView questionView = new QuestionView();
     private static MainView mainView = new MainView();
 
-    public static void browseQuestions() { // userType --> 0: Admin, 1: Logged, 2: NotLogged TODO TESTARE
+    public static void browseQuestions() { // TODO TESTARE
         try {
             int page = 1;
             do {
@@ -57,6 +57,8 @@ public class QuestionController {
             do {
                 PageDTO<QuestionDTO> pageDTO = questionService.searchQuestions(page, questionSearchDTO.getText(), questionSearchDTO.getTopic());
                 mainView.viewPage(pageDTO);
+                if (page == 1 && pageDTO.getCounter() == 0)
+                    return;
                 switch (questionView.searchQuestionsMenu()) {
                     case 1: // Open a question
                         int index = mainView.inputMessageWithPaging("Specify the question number", pageDTO.getCounter()) - 1;
@@ -91,6 +93,8 @@ public class QuestionController {
             do {
                 PageDTO<AnswerDTO> pageDTO = answerService.getAnswersPage(page, questionId);
                 mainView.viewPage(pageDTO);
+                if (page == 1 && pageDTO.getCounter() == 0)
+                    return;
                 switch (questionView.menuInAnswersPage()) {
                     case 1: // Select an answer
                         if (pageDTO.getCounter() == 0)
@@ -133,7 +137,7 @@ public class QuestionController {
             else
                 pageDTO = questionService.viewAnsweredQuestions(nickname, page);
             mainView.viewPage(pageDTO);
-            if(page == 1 && pageDTO.getCounter() == 0)
+            if (page == 1 && pageDTO.getCounter() == 0)
                 return;
             switch (questionView.searchQuestionsMenu()) {
                 case 1: // Open a question
@@ -235,6 +239,9 @@ public class QuestionController {
     public static void openAnswer(AnswerDTO answerDTO, String questionOwner) throws BusinessException { // TODO TESTARE
         mainView.view(answerDTO);
         UserDTO loggedUser = AuthenticationController.getLoggedUser();
+        if (loggedUser == null) {
+            mainView.showMessage("!!!! YOUR ARE NOT LOGGED -> YOU CAN ONLY READ THE ANSWER AND VIEW THE AUTHOR PROFILE !!!!");
+        }
         switch (questionView.menuInCompleteAnswer()) {
             case 1:  // Upvote --> possible only for a logged user and not for admin
                 if (loggedUser != null && !loggedUser.getNickname().equals("admin")) {
@@ -258,23 +265,26 @@ public class QuestionController {
                 } else
                     mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
                 break;
-            case 3:  // Report
-                answerService.reportAnswer(answerDTO.getId(), true);
+            case 3:  // Report --> possible only if user is logged in
+                if (loggedUser != null)
+                    answerService.reportAnswer(answerDTO.getId(), true);
+                else
+                    mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
                 break;
             case 4: // Modify answer --> possible only if the logged user is the author of the answer
-                if (loggedUser.getNickname().equals(answerDTO.getAuthor()))
+                if (loggedUser != null && loggedUser.getNickname().equals(answerDTO.getAuthor()))
                     updateAnswer(answerDTO);
                 else
                     mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
                 break;
             case 5: // Accept --> possible only if the logged user is the author of question of the answer
-                if (loggedUser.getNickname().equals(questionOwner))
+                if (loggedUser != null && loggedUser.getNickname().equals(questionOwner))
                     answerService.acceptAnswer(answerDTO.getId()); // The answer will be marked as accepted if and only if there isn't any other anser of the question that has been already accepted
                 else
                     mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
                 break;
             case 6: // Delete Answer --> possible only if the logged user is the author of the answer
-                if (loggedUser.getNickname().equals(answerDTO.getAuthor()))
+                if (loggedUser != null && loggedUser.getNickname().equals(answerDTO.getAuthor()))
                     answerService.deleteAnswer(answerDTO);
                 else
                     mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");

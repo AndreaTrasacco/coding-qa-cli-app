@@ -114,9 +114,8 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
             LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
-            LocalDateTime currentDate = LocalDateTime.now();
 
-            Bson match = match(and(exists("answers", true), gte("createdDate", sevenDaysAgo), lt("createdDate", currentDate)));
+            Bson match = match(and(exists("answers", true), gte("createdDate", sevenDaysAgo)));
             Bson project1 = project(fields(include("topic", "createdDate"), new Document("answerCount", new Document("$size", "$answers")))); // There are no helpers in java driver for $size operator, so I use the notation with "new Document(..)"
             Bson group = group("$topic", sum("count", "$answerCount"));
             Bson sort = sort(descending("count"));

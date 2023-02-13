@@ -113,18 +113,16 @@ public class UserController {
     private static void openUserProfile(UserDTO userDTO) { // TODO TESTARE
         try {
             UserDTO loggedUser = AuthenticationController.getLoggedUser();
+            if (loggedUser == null) {
+                userView.waitInputInUserProfileNotLogged();
+                return;
+            }
             switch (userView.otherUserProfileMenu()) {
                 case 1: // follow user
-                    if (loggedUser != null)
-                        userService.follow(loggedUser.getNickname(), userDTO.getNickname());
-                    else
-                        mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
+                    userService.follow(loggedUser.getNickname(), userDTO.getNickname());
                     break;
                 case 2: // unfollow user
-                    if (loggedUser != null)
-                        userService.unfollow(loggedUser.getNickname(), userDTO.getNickname());
-                    else
-                        mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
+                    userService.unfollow(loggedUser.getNickname(), userDTO.getNickname());
                     break;
                 case 3: // browse created q
                     QuestionController.browseCreatedOrAnsweredQuestions(userDTO.getNickname(), true);

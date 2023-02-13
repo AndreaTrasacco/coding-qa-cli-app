@@ -118,7 +118,8 @@ public class AdminController {
             do {
                 PageDTO<AnswerDTO> pageDTO = answerService.getReportedAnswers(page);
                 mainView.viewPage(pageDTO);
-                if (pageDTO.getCounter() == 0) return;
+                if(page == 1 && pageDTO.getCounter() == 0)
+                    return;
                 switch (adminView.adminReportedAnswersMenu()) {
                     case 1: // Read answer
                         if (pageDTO.getCounter() == 0)
