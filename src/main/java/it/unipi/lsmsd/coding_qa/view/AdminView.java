@@ -71,7 +71,7 @@ public class AdminView {
         System.out.println("################################### ADMIN REPORTED ANSWERS MENU ###################################");
         int choice;
         do {
-            System.out.println("\t[1] Read answer");
+            System.out.println("\t[1] Read an answer");
             System.out.println("\t[2] Go to the next page");
             System.out.println("\t[3] Go to the previous page");
             System.out.println("\t[4] Exit from reported answers");

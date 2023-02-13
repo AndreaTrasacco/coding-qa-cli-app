@@ -57,7 +57,8 @@ public class AnswerServiceImpl implements AnswerService {
         String questionId = null;
         try {
             questionId = answerDAO.delete(answerDTO.getId());
-            questionNodeDAO.deleteAnswer(questionId, answerDTO.getAuthor());
+            if(questionId != null)
+                questionNodeDAO.deleteAnswer(questionId, answerDTO.getAuthor());
         } catch (
                 DAONodeException ex) { // If there is an error in deletion of Answer with "question node" -> retry deletion
             try {
