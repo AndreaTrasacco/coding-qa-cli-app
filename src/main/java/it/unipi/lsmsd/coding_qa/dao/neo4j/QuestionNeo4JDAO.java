@@ -130,11 +130,11 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
         }
     }
 
-    private PageDTO<QuestionDTO> getQuestions(String nickname, int page, String edge) throws DAONodeException {
+    public PageDTO<QuestionDTO> viewCreatedQuestions(String nickname, int page) throws DAONodeException {
         int offset = (page - 1) * Constants.PAGE_SIZE;
         try (Session session = getSession()) {
             return session.readTransaction(tx -> {
-                String query = "MATCH (u:User {nickname: $nickname})-[:" + edge + "]->(q:Question) " +
+                String query = "MATCH (u:User {nickname: $nickname})-[:CREATED]->(q:Question) " +
                         "RETURN q.id AS id, q.title AS title, q.createdDate AS cDate, q.topic AS topic " +
                         "ORDER BY cDate DESC " +
                         "SKIP $offset " +
@@ -143,7 +143,7 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
                 List<QuestionDTO> entries = new ArrayList<>();
                 while (result.hasNext()) {
                     Record r = result.next();
-                    entries.add(new QuestionDTO(r.get("id").asString(), r.get("title").asString(), Date.from(Instant.parse( r.get("cDate").toString())), r.get("topic").asString(), nickname));
+                    entries.add(new QuestionDTO(r.get("id").asString(), r.get("title").asString(), Date.from(Instant.parse(r.get("cDate").toString())), r.get("topic").asString(), nickname));
                 }
                 PageDTO<QuestionDTO> questions = new PageDTO<>();
                 questions.setEntries(entries);
@@ -155,17 +155,34 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
         }
     }
 
-    public PageDTO<QuestionDTO> viewCreatedQuestions(String nickname, int page) throws DAONodeException {
-        return getQuestions(nickname, page, "CREATED");
-    }
-
     public PageDTO<QuestionDTO> viewAnsweredQuestions(String nickname, int page) throws DAONodeException {
-        return getQuestions(nickname, page, "ANSWERED");
+        int offset = (page - 1) * Constants.PAGE_SIZE;
+        try (Session session = getSession()) {
+            return session.readTransaction(tx -> {
+                String query = "MATCH (u:User {nickname: $nickname})-[:ANSWERED]->(q:Question)<-[:CREATED]-(u1:User) " +
+                        "RETURN q.id AS id, q.title AS title, q.createdDate AS cDate, q.topic AS topic, u1.nickname AS AnsAuthor " +
+                        "ORDER BY cDate DESC " +
+                        "SKIP $offset " +
+                        "LIMIT $limit ";
+                Result result = tx.run(query, parameters("nickname", nickname, "offset", offset, "limit", Constants.PAGE_SIZE));
+                List<QuestionDTO> entries = new ArrayList<>();
+                while (result.hasNext()) {
+                    Record r = result.next();
+                    entries.add(new QuestionDTO(r.get("id").asString(), r.get("title").asString(), Date.from(Instant.parse(r.get("cDate").toString())), r.get("topic").asString(), r.get("AnsAuthor").asString()));
+                }
+                PageDTO<QuestionDTO> questions = new PageDTO<>();
+                questions.setEntries(entries);
+                questions.setCounter(entries.size());
+                return questions;
+            });
+        } catch (Exception ex) {
+            throw new DAONodeException(ex);
+        }
     }
 
 
     public void createAnswer(Answer answer) throws DAONodeException {
-        String createQuery = "MATCH (u:User), (q:Question) WHERE u.nickname = $nickname "+
+        String createQuery = "MATCH (u:User), (q:Question) WHERE u.nickname = $nickname " +
                 "AND q.id = $questionId MERGE (u)-[:ANSWERED]->(q)";
 
         try (Session session = getSession()) {
@@ -179,10 +196,10 @@ public class QuestionNeo4JDAO extends BaseNeo4JDAO implements QuestionNodeDAO {
         }
     }
 
-    public void deleteAnswer(String answerId, String author) throws DAONodeException{
+    public void deleteAnswer(String answerId, String author) throws DAONodeException {
         final String deleteQuery = "MATCH (u: User{nickname: $nickname})-[a:ANSWERED]->(q: Question{id: $id})" +
                 "DELETE a";
-        try(Session session = getSession()){
+        try (Session session = getSession()) {
             session.writeTransaction(tx -> {
                 tx.run(deleteQuery, parameters("nickname", author,
                         "id", answerId.substring(0, answerId.indexOf('_'))));
