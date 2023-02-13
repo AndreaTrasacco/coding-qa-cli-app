@@ -99,7 +99,7 @@ public class UserController {
 
     public static void openProfileIfAdmin(UserDTO userDTO) {  // TODO TESTARE
         try {
-            switch (userView.adminUserProfile(userDTO)) {
+            switch (userView.adminUserProfile()) {
                 case 1: // delete user
                     userService.delete(userDTO.getId(), userDTO.getNickname());
                     break;
