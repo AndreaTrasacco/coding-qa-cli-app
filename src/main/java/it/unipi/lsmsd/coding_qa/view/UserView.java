@@ -96,7 +96,6 @@ public class UserView {
     }
 
     public int adminUserProfile(UserDTO userDTO){
-        System.out.println(userDTO);
         System.out.println("#################################### USER PROFILE MENU (ADMIN) #####################################");
         int choice;
         do {
