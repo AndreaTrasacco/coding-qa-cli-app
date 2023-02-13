@@ -145,9 +145,9 @@ public class UserController {
             mainView.showMessage("!!!! THE USER HAS BEEN DELETED BY THE ADMIN !!!!");
             return;
         }
-        if (AuthenticationController.getLoggedUserNickname().equals("admin")) // admin
+        if (AuthenticationController.getLoggedUserNickname() != null && AuthenticationController.getLoggedUserNickname().equals("admin")) // admin
             openProfileIfAdmin(userDTO);
-        else if (nickname.equals(AuthenticationController.getLoggedUserNickname())) // self profile
+        else if (AuthenticationController.getLoggedUserNickname() != null && nickname.equals(AuthenticationController.getLoggedUserNickname())) // self profile
             openSelfProfile();
         else // other user profile
             openUserProfile(userDTO);
