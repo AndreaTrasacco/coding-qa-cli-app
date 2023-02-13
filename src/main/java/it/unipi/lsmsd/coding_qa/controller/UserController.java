@@ -143,6 +143,7 @@ public class UserController {
         UserDTO userDTO = userService.getInfo(nickname);
         if(userDTO == null){
             mainView.showMessage("!!!! THE USER HAS BEEN DELETED BY THE ADMIN !!!!");
+            return;
         }
         if (AuthenticationController.getLoggedUserNickname().equals("admin")) // admin
             openProfileIfAdmin(userDTO);
