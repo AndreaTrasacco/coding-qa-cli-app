@@ -28,6 +28,7 @@ public class QuestionView {
         // Input topic and text to be searched
         System.out.println("########################################## SEARCH QUESTION #########################################");
         String topic;
+        System.out.println("Possible Topics: " + Arrays.toString(Constants.TOPICS.toArray()));
         do {
             System.out.println("* Topic: ");
             topic = scanner.nextLine();
@@ -123,22 +124,6 @@ public class QuestionView {
         return choice;
     }
 
-    public int menuInAnswerPageNotLoggedOrAdmin() {
-        int choice;
-        System.out.println("############################################ ANSWER MENU ###########################################");
-        do {
-            System.out.println("\t[1] Next Page");
-            System.out.println("\t[2] Previous Page");
-            System.out.println("\t[3] Exit");
-            System.out.println("Input: ");
-            choice = Integer.parseInt(scanner.nextLine());
-        } while (choice < 1 || choice > 3);
-        if (choice == 3)
-            System.out.println("############################################### EXIT ###############################################");
-
-        return choice;
-    }
-
     public int menuInCompleteAnswer() {
         int choice;
         System.out.println("########################################### ANSWER MENU ##########################################");
@@ -194,10 +179,11 @@ public class QuestionView {
             questionDTO.setBody(body);
         }
         String topic;
+        System.out.println("Possible Topics: " + Arrays.toString(Constants.TOPICS.toArray()));
         do {
             System.out.println("* Topic: ");
             topic = scanner.nextLine();
-        } while (!Constants.COUNTRIES.contains(topic) || !topic.equals(""));
+        } while (!Constants.TOPICS.contains(topic) || !topic.equals(""));
         if (!topic.equals("")) {
             questionDTO.setTopic(topic);
         }

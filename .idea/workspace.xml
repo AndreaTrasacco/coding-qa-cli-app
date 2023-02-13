@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7a80ea41-8b1b-40fc-abb8-1008547220f9" name="Changes" comment="Corrected QuestionView">
+    <list default="true" id="7a80ea41-8b1b-40fc-abb8-1008547220f9" name="Changes" comment="Corrected AnswerMongoDBDAO">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/controller/QuestionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/controller/QuestionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/base/BaseMongoDBDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/base/BaseMongoDBDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/base/BaseNeo4JDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/base/BaseNeo4JDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/view/QuestionView.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/view/QuestionView.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,7 +73,7 @@
       <recent name="it.unipi.lsmsd.coding_qa.dao" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.RegisteredUserView">
+  <component name="RunManager" selected="Application.Main">
     <configuration name="AdminView" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.view.AdminView" />
       <module name="coding_qa" />
@@ -84,25 +87,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="AnswerMongoDBDAO" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.dao.mongodb.AnswerMongoDBDAO" />
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.Main" />
       <module name="coding_qa" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="it.unipi.lsmsd.coding_qa.dao.mongodb.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="AuthenticationView" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.view.AuthenticationView" />
-      <module name="coding_qa" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="it.unipi.lsmsd.coding_qa.view.*" />
+          <option name="PATTERN" value="it.unipi.lsmsd.coding_qa.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -136,13 +126,26 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="UserController" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="it.unipi.lsmsd.coding_qa.controller.UserController" />
+      <module name="coding_qa" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="it.unipi.lsmsd.coding_qa.controller.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Main" />
+        <item itemvalue="Application.UserController" />
         <item itemvalue="Application.RegisteredUserView" />
         <item itemvalue="Application.MainView" />
         <item itemvalue="Application.AdminView" />
-        <item itemvalue="Application.AuthenticationView" />
-        <item itemvalue="Application.AnswerMongoDBDAO" />
       </list>
     </recent_temporary>
   </component>
@@ -173,7 +176,10 @@
       <workItem from="1675958065204" duration="11821000" />
       <workItem from="1676045751809" duration="10784000" />
       <workItem from="1676128040688" duration="6694000" />
-      <workItem from="1676136619193" duration="3950000" />
+      <workItem from="1676136619193" duration="6978000" />
+      <workItem from="1676214712768" duration="15317000" />
+      <workItem from="1676231325069" duration="308000" />
+      <workItem from="1676304679263" duration="3308000" />
     </task>
     <task id="LOCAL-00001" summary="Packaging 1">
       <created>1675020274919</created>
@@ -357,7 +363,49 @@
       <option name="project" value="LOCAL" />
       <updated>1676138843874</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="Added UserController">
+      <created>1676140834654</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1676140834654</updated>
+    </task>
+    <task id="LOCAL-00028" summary="Added UserController">
+      <created>1676143574484</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1676143574484</updated>
+    </task>
+    <task id="LOCAL-00029" summary="Corrected with static">
+      <created>1676220982313</created>
+      <option name="number" value="00029" />
+      <option name="presentableId" value="LOCAL-00029" />
+      <option name="project" value="LOCAL" />
+      <updated>1676220982313</updated>
+    </task>
+    <task id="LOCAL-00030" summary="Modified QuestionView">
+      <created>1676223299095</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1676223299095</updated>
+    </task>
+    <task id="LOCAL-00031" summary="Corrected pageDTO">
+      <created>1676226988283</created>
+      <option name="number" value="00031" />
+      <option name="presentableId" value="LOCAL-00031" />
+      <option name="project" value="LOCAL" />
+      <updated>1676226988283</updated>
+    </task>
+    <task id="LOCAL-00032" summary="Corrected AnswerMongoDBDAO">
+      <created>1676231361945</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1676231361945</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -375,9 +423,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Packaging 1" />
-    <MESSAGE value="added BaseNeo4JDAO, RegisteredUser and User" />
-    <MESSAGE value="added UserNeo4JDAO" />
     <MESSAGE value="added DAOLocator and DAORepositoryEnum" />
     <MESSAGE value="Added ExperienceLevelDTO" />
     <MESSAGE value="Added TopicDTO, QuestionScoreDTO, QuestionMongoDBDAO (some of its methods) and AggregationsMongoDBDAO (some of its methods)" />
@@ -398,6 +443,58 @@
     <MESSAGE value="Added MainView, RegisteredUserView, AdminView" />
     <MESSAGE value="Corrected UpdateQuestion" />
     <MESSAGE value="Corrected QuestionView" />
-    <option name="LAST_COMMIT_MESSAGE" value="Corrected QuestionView" />
+    <MESSAGE value="Added UserController" />
+    <MESSAGE value="Corrected with static" />
+    <MESSAGE value="Modified QuestionView" />
+    <MESSAGE value="Corrected pageDTO" />
+    <MESSAGE value="Corrected AnswerMongoDBDAO" />
+    <option name="LAST_COMMIT_MESSAGE" value="Corrected AnswerMongoDBDAO" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/service/implementation/UserServiceImpl.java</url>
+          <line>93</line>
+          <properties class="it.unipi.lsmsd.coding_qa.service.implementation.UserServiceImpl" method="updateInfo">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/neo4j/UserNeo4JDAO.java</url>
+          <line>48</line>
+          <properties class="it.unipi.lsmsd.coding_qa.dao.neo4j.UserNeo4JDAO" method="getFollowingList">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/mongodb/AnswerMongoDBDAO.java</url>
+          <line>158</line>
+          <properties class="it.unipi.lsmsd.coding_qa.dao.mongodb.AnswerMongoDBDAO" method="vote">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-method">
+          <url>file://$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/mongodb/AnswerMongoDBDAO.java</url>
+          <line>239</line>
+          <properties class="it.unipi.lsmsd.coding_qa.dao.mongodb.AnswerMongoDBDAO" method="getAnswersPage">
+            <option name="EMULATED" value="true" />
+            <option name="WATCH_EXIT" value="false" />
+          </properties>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/it/unipi/lsmsd/coding_qa/dao/mongodb/AnswerMongoDBDAO.java</url>
+          <line>251</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

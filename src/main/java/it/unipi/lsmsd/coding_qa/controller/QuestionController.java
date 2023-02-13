@@ -250,7 +250,9 @@ public class QuestionController {
                     voteDTO.setVoteType(true);
                     voteDTO.setAnswerOwner(answerDTO.getAuthor());
                     voteDTO.setVoterId(loggedUser.getId());
-                    answerService.voteAnswer(voteDTO);
+                    if(answerService.voteAnswer(voteDTO)){
+                        mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
+                    }
                 } else
                     mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
                 break;
@@ -261,7 +263,9 @@ public class QuestionController {
                     voteDTO.setVoteType(false);
                     voteDTO.setAnswerOwner(answerDTO.getAuthor());
                     voteDTO.setVoterId(loggedUser.getId());
-                    answerService.voteAnswer(voteDTO);
+                    if(answerService.voteAnswer(voteDTO)){
+                        mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
+                    }
                 } else
                     mainView.showMessage("!!!! ACTION NOT POSSIBLE !!!!");
                 break;
