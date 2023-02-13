@@ -183,7 +183,7 @@ public class QuestionView {
         do {
             System.out.println("* Topic: ");
             topic = scanner.nextLine();
-        } while (!Constants.TOPICS.contains(topic) || !topic.equals(""));
+        } while (!Constants.TOPICS.contains(topic) && !topic.equals(""));
         if (!topic.equals("")) {
             questionDTO.setTopic(topic);
         }
@@ -218,7 +218,7 @@ public class QuestionView {
         do {
             System.out.println("* Topic: ");
             topic = scanner.nextLine();
-        } while (!Constants.TOPICS.contains(topic) || topic.equals(""));
+        } while (!Constants.TOPICS.contains(topic));
         questionPageDTO.setTopic(topic);
     }
 }

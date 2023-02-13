@@ -25,7 +25,7 @@ public class UserController {
                     case 1: // browse your questions
                         QuestionController.browseCreatedOrAnsweredQuestions(loggedUser.getNickname(), true);
                         break;
-                    case 2: // browse your answers
+                    case 2: // browse your answered questions
                         QuestionController.browseCreatedOrAnsweredQuestions(loggedUser.getNickname(), false);
                         break;
                     case 3: // update your profile
