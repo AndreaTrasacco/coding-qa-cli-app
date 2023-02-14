@@ -9,9 +9,7 @@ import com.mongodb.client.*;
 public abstract class BaseMongoDBDAO {
     protected static MongoClient mongoClient;
     private final static String URI = "mongodb://10.1.1.15:27020,10.1.1.16:27020,10.1.1.17:27020/?retryWrites=true&w=1&wtimeout=10000&readPreference=nearest";
-    //protected static final String DB_NAME = "codingqa";
-
-    protected static final String DB_NAME = "test";
+    protected static final String DB_NAME = "codingqa";
 
     public static MongoClient getConnection() {
         return MongoClients.create(URI);

@@ -6,11 +6,9 @@ import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
 
 public abstract class BaseNeo4JDAO {
-    //private static final String NEO4J_URI = "neo4j://10.1.1.15:7687";
-    private static final String NEO4J_URI = "neo4j://localhost:7687";
+    private static final String NEO4J_URI = "neo4j://10.1.1.15:7687";
     private static final String NEO4J_USER = "neo4j";
-    // private static final String NEO4J_PASSWORD = "studenti";
-    private static final String NEO4J_PASSWORD = "neo4j";
+    private static final String NEO4J_PASSWORD = "studenti";
     private static Driver neo4jDriver;
 
     //method that returns the driver instance

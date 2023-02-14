@@ -99,13 +99,14 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
                 }
                 // After deletion of answer --> get score and update the score of the author of the answer
                 Document docBefore = collectionQuestions.findOneAndUpdate(
+                        session,
                         eq("_id", new ObjectId(questionId)),
                         Updates.combine(Updates.pull("answers", new Document("createdDate", createdDate))),
                         new FindOneAndUpdateOptions().projection(fields(excludeId(), Projections.elemMatch("answers", and(eq("createdDate", createdDate), ne("score", 0)))))
                 );
                 if (docBefore != null && docBefore.containsKey("answers")) {
                     Document ansDoc = docBefore.getList("answers", Document.class).get(0);
-                    collectionUsers.updateOne(eq("nickname", ansDoc.getString("author")),
+                    collectionUsers.updateOne(session, eq("nickname", ansDoc.getString("author")),
                             Updates.inc("score", ansDoc.getInteger("score") * (-1)));
                 }
                 return questionId;
