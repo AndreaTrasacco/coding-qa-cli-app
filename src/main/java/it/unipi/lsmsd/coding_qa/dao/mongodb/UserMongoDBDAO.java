@@ -144,19 +144,6 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
     }
 
     @Override
-    public void updateScore(String nickname, int quantity) throws DAOException {
-        try {
-            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
-            MongoCollection<Document> collectionUser = database.getCollection("users");
-
-            collectionUser.updateOne(Filters.eq("nickname", nickname),
-                    Updates.inc("score", quantity));
-        } catch (Exception e) {
-            throw new DAOException(e);
-        }
-    }
-
-    @Override
     public void delete(String nickname) throws DAOException {
         try {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);

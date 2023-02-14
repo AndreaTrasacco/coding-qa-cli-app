@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface SuggestionsDAO {
     PageDTO<QuestionDTO> questionsToRead(int page, String nickname) throws DAONodeException;
+
     PageDTO<QuestionDTO> questionsToAnswer(int page, String nickname) throws DAONodeException;
 }
