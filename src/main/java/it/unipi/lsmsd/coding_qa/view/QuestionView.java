@@ -9,21 +9,6 @@ import java.util.Scanner;
 public class QuestionView {
     private Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) {
-        QuestionView questionView = new QuestionView();
-        //questionView.search(new QuestionSearchDTO());
-        //questionView.menuInQuestionPageLogged();
-        //questionView.menuInQuestionPageNonLogged();
-        //questionView.menuInAnswerPageLogged();
-        //questionView.menuInAnswerPageNonLogged();
-        //questionView.menuInVoteAnswer();
-        //questionView.menuInQuestionPageOwner();
-        //questionView.menuInAnswerPageOwner();
-        //System.out.println(questionView.specifyQuestionIndex(new PageDTO<QuestionDTO>()));
-        //System.out.println(questionView.specifyAnswerIndex(new PageDTO<AnswerDTO>()));
-        //questionView.browseQuestionsMenu();
-    }
-
     public void search(QuestionSearchDTO questionSearchDTO) {
         // Input topic and text to be searched
         System.out.println("########################################## SEARCH QUESTION #########################################");

@@ -16,23 +16,6 @@ public class AdminController {
     private static AnswerService answerService = ServiceLocator.getAnswerService();;
     private static UserService userService = ServiceLocator.getUserService();;
 
-    public static void main(String[] args){
-        AdminController adminController = new AdminController();
-        Question question = new Question();
-        question.setTitle("titolo");
-        question.setBody("12345");
-        question.setTopic("javascript");
-        question.setAuthor("autore10");
-        question.setCreatedDate(new Date());
-        question.setReported(false);
-        try {
-            //new QuestionMongoDBDAO().createQuestion(question);
-            adminController.start();
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-    }
-
     public static void start() {
         do {
             switch (adminView.mainMenuAdmin()) {

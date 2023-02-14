@@ -29,7 +29,7 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
     @Override
     public List<ExperienceLevelDTO> getExperienceLvlPerCountry() throws DAOException {
         List<ExperienceLevelDTO> experienceLevelDTOList = new ArrayList<>();
-        try (MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("users");
 
@@ -65,7 +65,7 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
 
             collectionQuestions.aggregate(Arrays.asList(match, project1, group1, group2, project2, project3, sort)).forEach(doc -> {
                 List<LevelDTO> levels = new ArrayList<>();
-                for (Document level : doc.getList("levels", Document.class)){
+                for (Document level : doc.getList("levels", Document.class)) {
                     LevelDTO expLevel = new LevelDTO(level.getString("exp_level"), level.getDouble("percentage"));
                     levels.add(expLevel);
                 }
@@ -84,7 +84,7 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
     @Override
     public List<QuestionScoreDTO> getUsefulQuestions() throws DAOException {
         List<QuestionScoreDTO> questionScoreDTOList = new ArrayList<>();
-        try (MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
@@ -110,7 +110,7 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
     @Override
     public List<TopicDTO> getTopicRank() throws DAOException {
         List<TopicDTO> topicDTOList = new ArrayList<>();
-        try (MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
             LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
@@ -129,10 +129,5 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
         } catch (Exception ex) {
             throw new DAOException(ex);
         }
-    }
-
-    public static void main(String[] args) throws DAOException {
-        AggregationsMongoDBDAO aggDAO = new AggregationsMongoDBDAO();
-        aggDAO.getTopicRank();
     }
 }

@@ -68,9 +68,4 @@ public class AuthenticationView {
     public void showLogoutMessage() {
         System.out.println("############################################## LOG OUT #############################################");
     }
-
-    public static void main(String [] args){
-        AuthenticationView authenticationView = new AuthenticationView();
-        authenticationView.signUp();
-    }
 }

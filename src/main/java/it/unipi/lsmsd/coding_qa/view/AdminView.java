@@ -5,11 +5,6 @@ import java.util.Scanner;
 public class AdminView {
     private Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) {
-        AdminView adminView = new AdminView();
-        adminView.mainMenuAdmin();
-    }
-
     public int mainMenuAdmin() {
         System.out.println("\n########################################## ADMIN MAIN MENU #########################################");
         int choice;

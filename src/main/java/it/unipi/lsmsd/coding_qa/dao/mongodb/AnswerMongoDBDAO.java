@@ -25,30 +25,10 @@ import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
 
 public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
-    public static void main(String[] args) {
-        AnswerMongoDBDAO answerDAO = new AnswerMongoDBDAO();
-        try {
-            // Answer answer = new Answer("BODY", new Date(System.currentTimeMillis()), "AUTHOR");
-            // answerDAO.create("63d171b409f8b5fdd264791f", answer);
-            // System.out.println(answer.getId());
-            // answerDAO.report(answer.getId(), true);
-            // System.out.println(answerDAO.accept(answer.getId()));
-            // PageDTO<AnswerDTO> page = answerDAO.getReportedAnswers(1);
-            // System.out.println(answerDAO.vote(answer.getId(), true, "1"));
-            // System.out.println(answerDAO.vote(answer.getId(), false, "2"));
-            // System.out.println(answerDAO.vote(answer.getId(), false, "2"));
-            // AnswerScoreDTO answerScoreDTO = answerDAO.delete(answer.getId());
-            // page = answerDAO.getAnswersPage(1, "63d171b409f8b5fdd2647926");
-            // System.out.println("END MAIN");
-            System.out.println(answerDAO.accept("63d171b409f8b5fdd264792c_2022-12-01T00:22:05.490Z", true));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     public void create(String questionId, Answer answer) throws DAOException {
-        try (MongoClient myClient = getConnection()) {
-            MongoDatabase database = myClient.getDatabase(DB_NAME);
+        try {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
             Document answerDoc = new Document();
             answerDoc.put("body", answer.getBody());
@@ -64,8 +44,8 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
     }
 
     public void updateBody(String id, String body) throws DAOException {
-        try (MongoClient myClient = getConnection()) {
-            MongoDatabase database = myClient.getDatabase(DB_NAME);
+        try {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
             // Structure of answer id : questionId_createdDate
             String questionId = id.substring(0, id.indexOf('_'));
@@ -81,8 +61,8 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
     }
 
     public void getCompleteAnswer(Answer answer) throws DAOException {
-        try (MongoClient myClient = getConnection()) {
-            MongoDatabase database = myClient.getDatabase(DB_NAME);
+        try {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
             String answerId = answer.getId();
             String questionId = answerId.substring(0, answerId.indexOf('_'));
@@ -103,7 +83,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
     }
 
     public String delete(String id) throws DAOException { // The method returns the question id of the deleted answer
-        try (MongoClient mongoClient = getConnection(); ClientSession session = mongoClient.startSession()) {
+        try (ClientSession session = mongoClient.startSession()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
 
             TransactionBody txnBody = (TransactionBody<String>) () -> {
@@ -126,7 +106,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
                 if (docBefore != null && docBefore.containsKey("answers")) {
                     Document ansDoc = docBefore.getList("answers", Document.class).get(0);
                     collectionUsers.updateOne(eq("nickname", ansDoc.getString("author")),
-                    Updates.inc("score", ansDoc.getInteger("score") * (-1)));
+                            Updates.inc("score", ansDoc.getInteger("score") * (-1)));
                 }
                 return questionId;
             };
@@ -141,8 +121,8 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
     }
 
     public void report(String id, boolean report) throws DAOException {
-        try (MongoClient myClient = getConnection()) {
-            MongoDatabase database = myClient.getDatabase(DB_NAME);
+        try {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
             String questionId = id.substring(0, id.indexOf('_'));
             Date createdDate = getDateFromString(id.substring(id.indexOf('_') + 1));
@@ -158,7 +138,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
 
     public boolean vote(String id, boolean voteType, String idVoter, String owner) throws DAOException {
         // The method will vote the answer (and return true) if and only if idVoter is not already in the voters of the answer
-        try (MongoClient mongoClient = getConnection(); ClientSession session = mongoClient.startSession()) {
+        try (ClientSession session = mongoClient.startSession()) {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             int increment = voteType ? 1 : -1;
             String questionId = id.substring(0, id.indexOf('_'));
@@ -177,7 +157,7 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
                         new UpdateOptions().arrayFilters(Arrays.asList(and(eq("xxx.createdDate", createdDate),
                                 ne("xxx.voters", new ObjectId(idVoter)))))
                 );
-                if(updateResult.getModifiedCount() == 1){
+                if (updateResult.getModifiedCount() == 1) {
                     collectionUsers.updateOne(
                             session,
                             eq("nickname", owner),
@@ -195,8 +175,8 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
     public String accept(String id, boolean accepted) throws DAOException {
         // The method will accept the answer (and return the questionId) if and only if there isn't already an accepted answer
         // If there is already an accepted answer the method will return null
-        try (MongoClient myClient = getConnection()) {
-            MongoDatabase database = myClient.getDatabase(DB_NAME);
+        try {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestion = database.getCollection("questions");
             String questionId = id.substring(0, id.indexOf('_'));
             Date createdDate = getDateFromString(id.substring(id.indexOf('_') + 1));
@@ -212,8 +192,8 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
     }
 
     public PageDTO<AnswerDTO> getReportedAnswers(int page) throws DAOException {
-        try (MongoClient myClient = getConnection()) {
-            MongoDatabase database = myClient.getDatabase(DB_NAME);
+        try {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             PageDTO<AnswerDTO> pageDTO = new PageDTO<>();
             List<AnswerDTO> reportedAnswers = new ArrayList<>();
             MongoCollection<Document> collectionQuestions = database.getCollection("questions");
@@ -240,23 +220,23 @@ public class AnswerMongoDBDAO extends BaseMongoDBDAO implements AnswerDAO {
     public PageDTO<AnswerDTO> getAnswersPage(int page, String questionId) throws DAOException {
         PageDTO<AnswerDTO> answersPage = new PageDTO<>();
         List<AnswerDTO> answers = new ArrayList<>();
-        try (MongoClient myClient = getConnection()) {
-            MongoDatabase database = myClient.getDatabase(DB_NAME);
+        try {
+            MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = database.getCollection("questions");
             Bson match = match(Filters.eq("_id", new ObjectId(questionId)));
             Bson unwind = unwind("$answers");
-            Bson project = project(fields(exclude("title","body","createdDate","author","topic"))); // exclude "question fields" and leave only _id and "answer fields"
+            Bson project = project(fields(exclude("title", "body", "createdDate", "author", "topic"))); // exclude "question fields" and leave only _id and "answer fields"
             Bson skip = Aggregates.skip((page - 1) * Constants.PAGE_SIZE);
             Bson limit = Aggregates.limit(Constants.PAGE_SIZE);
             collectionQuestions.aggregate(Arrays.asList(match, unwind, project, skip, limit)).forEach(doc -> {
-                if(doc.containsKey("answers")){
+                if (doc.containsKey("answers")) {
                     Document ansDoc = doc.get("answers", Document.class);
                     boolean accepted = false;
-                    if(ansDoc.containsKey("accepted"))
+                    if (ansDoc.containsKey("accepted"))
                         accepted = ansDoc.getBoolean("accepted");
                     List<String> voters = new ArrayList<>();
-                    if(ansDoc.containsKey("voters")){
-                        for(ObjectId voter : ansDoc.getList("voters", ObjectId.class)){
+                    if (ansDoc.containsKey("voters")) {
+                        for (ObjectId voter : ansDoc.getList("voters", ObjectId.class)) {
                             voters.add(voter.toString());
                         }
                     }

@@ -77,8 +77,4 @@ public class AuthenticationController {
     public static String getLoggedUserNickname() {
         return loggedUser.getNickname();
     }
-
-    public static void main(String[] args) {
-        System.out.println(encryptPassword("admin"));
-    }
 }

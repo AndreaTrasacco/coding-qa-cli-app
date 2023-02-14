@@ -2,12 +2,10 @@ package it.unipi.lsmsd.coding_qa.view;
 
 import it.unipi.lsmsd.coding_qa.controller.AuthenticationController;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
-import it.unipi.lsmsd.coding_qa.dto.UserDTO;
 import it.unipi.lsmsd.coding_qa.dto.UserRegistrationDTO;
 import it.unipi.lsmsd.coding_qa.utils.Constants;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Scanner;
 
 public class UserView {
@@ -110,7 +108,7 @@ public class UserView {
     }
 
     public void waitInputInUserProfileNotLogged(){
-        System.out.println("\t Press ENTER to go back");
+        System.out.println("\t Press ENTER two times to go back");
         scanner.nextLine();
     }
 }

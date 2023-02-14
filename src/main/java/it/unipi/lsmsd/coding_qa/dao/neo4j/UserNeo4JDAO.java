@@ -6,7 +6,6 @@ import it.unipi.lsmsd.coding_qa.dao.exception.DAONodeException;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.utils.Constants;
 import org.neo4j.driver.*;
-import org.neo4j.driver.summary.ResultSummary;
 
 import java.util.ArrayList;
 import java.util.List;

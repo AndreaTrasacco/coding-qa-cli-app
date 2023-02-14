@@ -7,13 +7,6 @@ import java.util.Scanner;
 public class MainView {
     private Scanner scanner = new Scanner(System.in);
 
-    public static void main(String [] args)
-    {
-        MainView mainView = new MainView();
-        mainView.mainMenuLoggedIn();
-        mainView.mainMenuNotLoggedIn();
-    }
-
     public int mainMenuNotLoggedIn() {
         System.out.println("#################################### MAIN MENU (NOT LOGGED IN) #####################################");
         int choice;

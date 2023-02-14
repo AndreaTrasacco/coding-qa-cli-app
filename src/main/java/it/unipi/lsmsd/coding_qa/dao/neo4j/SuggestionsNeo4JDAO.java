@@ -1,20 +1,13 @@
 package it.unipi.lsmsd.coding_qa.dao.neo4j;
 
 import it.unipi.lsmsd.coding_qa.dao.SuggestionsDAO;
-import it.unipi.lsmsd.coding_qa.dao.base.BaseMongoDBDAO;
 import it.unipi.lsmsd.coding_qa.dao.base.BaseNeo4JDAO;
 import it.unipi.lsmsd.coding_qa.dao.exception.DAONodeException;
 import it.unipi.lsmsd.coding_qa.dto.PageDTO;
 import it.unipi.lsmsd.coding_qa.dto.QuestionDTO;
-import it.unipi.lsmsd.coding_qa.model.Answer;
-import it.unipi.lsmsd.coding_qa.model.Question;
-import it.unipi.lsmsd.coding_qa.model.User;
 import it.unipi.lsmsd.coding_qa.utils.Constants;
 import org.neo4j.driver.*;
-import org.neo4j.driver.summary.ResultSummary;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,20 +47,20 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
         List<QuestionDTO> questionDTOList;
         int pageOffset = (page - 1) * Constants.PAGE_SIZE;
 
-        try(Session session = getSession()){
-            questionDTOList = session.readTransaction( (TransactionWork<List<QuestionDTO>>) tx -> {
+        try (Session session = getSession()) {
+            questionDTOList = session.readTransaction((TransactionWork<List<QuestionDTO>>) tx -> {
                 Result result = tx.run(suggestionQuery, parameters("nickname", nickname, "toSkip", pageOffset, "toLimit", Constants.PAGE_SIZE));
                 ArrayList<QuestionDTO> questions = new ArrayList<>();
-                while(result.hasNext()) {
+                while (result.hasNext()) {
                     Record question = result.next();
-                    Date createdDate = Date.from(Instant.parse( question.get("createdDate").toString()));
+                    Date createdDate = Date.from(Instant.parse(question.get("createdDate").toString()));
                     QuestionDTO temp = new QuestionDTO(question.get("id").asString(), question.get("title").asString(),
                             createdDate, question.get("topic").asString(), question.get("nickname").asString());
                     questions.add(temp);
                 }
                 return questions;
             });
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new DAONodeException(e);
         }
 

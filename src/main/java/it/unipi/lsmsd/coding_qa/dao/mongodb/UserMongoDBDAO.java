@@ -23,7 +23,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
 
     @Override
     public void register(RegisteredUser user) throws DAOException {
-        try(MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionUser = database.getCollection("users");
             Document docUser = new Document("nickname", user.getNickname())
@@ -34,18 +34,18 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
                     .append("createdDate", user.getCreatedDate())
                     .append("score", user.getScore());
             String website = user.getWebsite();
-            if(!website.equals(""))
+            if (!website.equals(""))
                 docUser.append("website", user.getWebsite());
             InsertOneResult result = collectionUser.insertOne(docUser);
             user.setId(result.getInsertedId().toString());
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new DAOException(e);
         }
     }
 
     @Override
     public User authenticate(String username, String encPassword) throws DAOException {
-        try(MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionUser = database.getCollection("users");
             Document temp = collectionUser.find(Filters.and(Filters.eq("nickname", username),
@@ -54,7 +54,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
                 return null;
             }
 
-            if(temp.getString("nickname").equals("admin")){
+            if (temp.getString("nickname").equals("admin")) {
                 Admin user = new Admin();
                 user.setId(temp.getObjectId("_id").toString());
                 user.setNickname(temp.getString("nickname"));
@@ -68,42 +68,42 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
                 user.setFullName(temp.getString("fullName"));
                 user.setEncPassword(encPassword);
                 user.setScore(temp.getInteger("score"));
-                if(temp.containsKey("website"))
+                if (temp.containsKey("website"))
                     user.setWebsite(temp.getString("website"));
                 user.setBirthdate(temp.getDate("createdDate"));
                 user.setCreatedDate(temp.getDate("createdDate"));
                 user.setCountry(temp.getString("country"));
                 return user;
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new DAOException(e);
         }
     }
 
     @Override
     public void updateInfo(RegisteredUser user) throws DAOException {
-        try(MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionUser = database.getCollection("users");
             Bson combine;
-            if(!user.getEncPassword().equals("")) // password update
+            if (!user.getEncPassword().equals("")) // password update
                 combine = Updates.combine(Updates.set("fullName", user.getFullName()),
                         Updates.set("password", user.getEncPassword()),
                         Updates.set("country", user.getCountry()),
                         Updates.set("website", user.getWebsite()));
             else // no password update
-                combine  = Updates.combine(Updates.set("fullName", user.getFullName()),
+                combine = Updates.combine(Updates.set("fullName", user.getFullName()),
                         Updates.set("country", user.getCountry()),
                         Updates.set("website", user.getWebsite()));
             collectionUser.updateOne(Filters.eq("nickname", user.getNickname()), combine);
-        } catch(Exception e){
+        } catch (Exception e) {
             throw new DAOException(e);
         }
     }
 
     @Override
     public UserDTO getInfo(String nickname) throws DAOException {
-        try(MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionUser = database.getCollection("users");
             Document userDoc = collectionUser.find(Filters.eq("nickname", nickname)).first();
@@ -111,7 +111,7 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
                 return null;
             }
 
-            if(userDoc.containsKey("deleted") && userDoc.getBoolean("deleted")){
+            if (userDoc.containsKey("deleted") && userDoc.getBoolean("deleted")) {
                 return null;
             }
 
@@ -125,48 +125,48 @@ public class UserMongoDBDAO extends BaseMongoDBDAO implements UserDAO {
                     userDoc.getInteger("score"));
 
             return user;
-        } catch(Exception e){
+        } catch (Exception e) {
             throw new DAOException(e);
         }
     }
 
     @Override
     public int getScore(String id) throws DAOException {
-        try(MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionUser = database.getCollection("users");
             Document userDoc = collectionUser.find(Filters.eq("_id", new ObjectId(id))).projection(include("score")).first();
 
             return userDoc.getInteger("score");
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new DAOException(e);
         }
     }
 
     @Override
     public void updateScore(String nickname, int quantity) throws DAOException {
-        try(MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionUser = database.getCollection("users");
 
             collectionUser.updateOne(Filters.eq("nickname", nickname),
                     Updates.inc("score", quantity));
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new DAOException(e);
         }
     }
 
     @Override
     public void delete(String nickname) throws DAOException {
-        try(MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase database = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionUser = database.getCollection("users");
             collectionUser.replaceOne(
-                   Filters.eq("nickname", nickname),
-                   new Document("nickname", nickname)
-                           .append("deleted", true)
-                   );
-        } catch(Exception e){
+                    Filters.eq("nickname", nickname),
+                    new Document("nickname", nickname)
+                            .append("deleted", true)
+            );
+        } catch (Exception e) {
             throw new DAOException(e);
         }
     }

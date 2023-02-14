@@ -45,8 +45,4 @@ public class AnalyticsController {
             System.exit(1);
         }
     }
-
-    public static void main(String[] args){
-        AnalyticsController.start();
-    }
 }

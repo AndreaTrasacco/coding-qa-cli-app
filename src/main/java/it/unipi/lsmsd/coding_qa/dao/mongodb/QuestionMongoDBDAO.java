@@ -1,9 +1,5 @@
 package it.unipi.lsmsd.coding_qa.dao.mongodb;
 
-import com.mongodb.ReadConcern;
-import com.mongodb.ReadPreference;
-import com.mongodb.TransactionOptions;
-import com.mongodb.WriteConcern;
 import com.mongodb.client.*;
 import com.mongodb.client.model.*;
 import com.mongodb.client.result.InsertOneResult;
@@ -32,7 +28,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
                 .append("topic", question.getTopic())
                 .append("author", question.getAuthor())
                 .append("createdDate", question.getCreatedDate());
-        try (MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
             InsertOneResult result = collectionQuestions.insertOne(docQuestion);
@@ -45,7 +41,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
 
     @Override
     public void deleteQuestion(String id) throws DAOException {
-        try (MongoClient mongoClient = getConnection(); ClientSession session = mongoClient.startSession()) {
+        try (ClientSession session = mongoClient.startSession()) {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
 
             TransactionBody txnBody = (TransactionBody<String>) () -> {
@@ -79,7 +75,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     @Override
     public Question updateQuestion(Question question) throws DAOException {
         //Only title, body and topic can be updated with this method
-        try (MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
             Document doc = collectionQuestions.findOneAndUpdate(
@@ -102,7 +98,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
 
     @Override
     public void reportQuestion(String id, boolean report) throws DAOException {
-        try (MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
             collectionQuestions.updateOne(eq("_id", new ObjectId(id)), Updates.set("reported", report));
@@ -113,7 +109,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
 
     @Override
     public QuestionPageDTO getQuestionInfo(String id) throws DAOException {
-        try (MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
             QuestionPageDTO questionPageDTO = new QuestionPageDTO();
@@ -135,7 +131,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     public PageDTO<QuestionDTO> getReportedQuestions(int page) throws DAOException {
         PageDTO<QuestionDTO> reportedQuestions = new PageDTO<>();
         List<QuestionDTO> reportedQ = new ArrayList<>();
-        try (MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
 
@@ -159,7 +155,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     public PageDTO<QuestionDTO> searchQuestions(int page, String searchString, String topicFilter) throws DAOException {
         PageDTO<QuestionDTO> pageDTO = new PageDTO<>();
         List<QuestionDTO> questionDTOList = new ArrayList<>();
-        try (MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
             int pageOffset = (page - 1) * Constants.PAGE_SIZE;
@@ -183,7 +179,7 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
     public PageDTO<QuestionDTO> browseQuestions(int page) throws DAOException {
         PageDTO<QuestionDTO> pageDTO = new PageDTO<>();
         List<QuestionDTO> questionDTOList = new ArrayList<>();
-        try (MongoClient mongoClient = getConnection()) {
+        try {
             MongoDatabase mongoDatabase = mongoClient.getDatabase(DB_NAME);
             MongoCollection<Document> collectionQuestions = mongoDatabase.getCollection("questions");
             int pageOffset = (page - 1) * Constants.PAGE_SIZE;
@@ -198,42 +194,6 @@ public class QuestionMongoDBDAO extends BaseMongoDBDAO implements QuestionDAO {
             return pageDTO;
         } catch (Exception ex) {
             throw new DAOException(ex);
-        }
-    }
-
-    public static void main(String[] args) {
-        Question q = new Question();
-        q.setTitle("TITLE");
-        q.setBody("BODY");
-        q.setAuthor("AUTHOR");
-        q.setTopic("TOPIC");
-        Date cDate = new Date(System.currentTimeMillis());
-        q.setCreatedDate(cDate);
-        QuestionMongoDBDAO qDAO = new QuestionMongoDBDAO();
-        try {
-            // test create and get q info
-            /*qDAO.createQuestion(q);
-            QuestionPageDTO qPage = qDAO.getQuestionInfo(q.getId());
-            System.out.println(qPage.getBody().equals(q.getBody()));
-            // test update
-            q.setTitle("ELTIT");
-            qDAO.updateQuestion(q);
-            qPage = qDAO.getQuestionInfo(q.getId());
-            System.out.println(qPage.getTitle().equals("ELTIT"));
-            // test report and get reported questions
-            qDAO.reportQuestion(q.getId(), true);
-            PageDTO<QuestionDTO> page = qDAO.getReportedQuestions();
-            System.out.println(page.getEntries().get(0).getId().equals(q.getId()));
-            // test search
-            page = qDAO.searchQuestions(1, "BODY", "TOPIC");
-            System.out.println(page.getEntries().get(0).getId().equals(q.getId()));*/
-            // test delete
-            //qDAO.deleteQuestion("63d171b409f8b5fdd2647921");
-            //qDAO.reportQuestion("63d171b409f8b5fdd264792c", true);
-            PageDTO<QuestionDTO> page = qDAO.getReportedQuestions(1);
-            System.out.println(page);
-        } catch (Exception ex) {
-            ex.printStackTrace();
         }
     }
 }
