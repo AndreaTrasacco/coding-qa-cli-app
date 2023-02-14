@@ -229,7 +229,7 @@ public class QuestionController {
                     UserController.openProfile(questionPageDTO.getAuthor());
                     break;
                 case 7: // exit
-                    break;
+                    return;
             }
         } while (true);
     }
