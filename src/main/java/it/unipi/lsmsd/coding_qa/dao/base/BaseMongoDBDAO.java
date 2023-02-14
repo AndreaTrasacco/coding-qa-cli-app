@@ -12,18 +12,21 @@ public abstract class BaseMongoDBDAO {
     //protected static final String DB_NAME = "codingqa";
 
     protected static final String DB_NAME = "test";
-    public static MongoClient getConnection(){
+
+    public static MongoClient getConnection() {
         return MongoClients.create(URI);
     }
-    public static void init(){
+
+    public static void init() {
         mongoClient = MongoClients.create(URI);
     }
+
     public static TransactionOptions txnOptions = TransactionOptions.builder()
             .readPreference(ReadPreference.primary())
             .writeConcern(WriteConcern.MAJORITY)
             .build();
 
-    public static void close(){
+    public static void close() {
         mongoClient.close();
     }
 }

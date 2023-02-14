@@ -51,7 +51,6 @@ public class AggregationsMongoDBDAO extends BaseMongoDBDAO implements Aggregatio
                     .append("exp_levels", new Document("$push", new Document("exp_level", "$_id.exp_level")
                             .append("numUsers", "$numUsers"))));
 
-
             //{ $project: { _id: 0, country: "$_id", levels: { $map: { input: "$exp_levels", in: { $mergeObjects: [ "$$this", { percentage : { $multiply: [ { $divide: ["$$this.numUsers", "$total"]}, 100] } } ] } } } } }
             Bson project2 = new Document("$project", new Document("_id", 0)
                     .append("country", "$_id")

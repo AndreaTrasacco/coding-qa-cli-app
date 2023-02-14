@@ -14,24 +14,24 @@ public abstract class BaseNeo4JDAO {
     private static Driver neo4jDriver;
 
     //method that returns the driver instance
-    private static Driver getDriver(){
-        if(neo4jDriver == null)
+    private static Driver getDriver() {
+        if (neo4jDriver == null)
             initPool();
         return neo4jDriver;
     }
 
     //method that returns the session
-    public static Session getSession(){
+    public static Session getSession() {
         return getDriver().session();
     }
 
     //method that initializes the Neo4j driver
-    public static void initPool(){
+    public static void initPool() {
         neo4jDriver = GraphDatabase.driver(NEO4J_URI, AuthTokens.basic(NEO4J_USER, NEO4J_PASSWORD));
     }
 
     //method that closes the Neo4j connection
-    public static void close(){
+    public static void close() {
         neo4jDriver.close();
     }
 
