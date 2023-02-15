@@ -1,6 +1,5 @@
 package it.unipi.lsmsd.coding_qa.dao.base;
 
-import com.mongodb.ReadConcern;
 import com.mongodb.ReadPreference;
 import com.mongodb.TransactionOptions;
 import com.mongodb.WriteConcern;
