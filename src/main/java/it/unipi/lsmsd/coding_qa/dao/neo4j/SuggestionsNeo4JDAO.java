@@ -33,8 +33,8 @@ public class SuggestionsNeo4JDAO extends BaseNeo4JDAO implements SuggestionsDAO 
 
     // method for suggesting questions that the user might be able to answer
     public PageDTO<QuestionDTO> questionsToAnswer(int page, String nickname) throws DAONodeException {
-        String suggestionQuery = "MATCH (u1:User{nickname : $nickname})-[:ANSWERED]->(q1)<-[:CREATED]-(followed:User)-[:CREATED]->(q2:Question{closed: false})<-[a:ANSWERED]-() " +
-                "RETURN q2.id AS id, q2.createdDate AS createdDate, q2.title AS title, q2.topic AS topic, followed.nickname AS nickname, followed, COUNT(a) AS ans_count " +
+        String suggestionQuery = "MATCH (u1:User{nickname : $nickname})-[:ANSWERED]->(q1)<-[:CREATED]-(u2:User)-[:CREATED]->(q2:Question{closed: false})<-[a:ANSWERED]-() " +
+                "RETURN q2.id AS id, q2.createdDate AS createdDate, q2.title AS title, q2.topic AS topic, u2.nickname AS nickname, u2, COUNT(a) AS ans_count " +
                 "ORDER BY ans_count, createdDate DESC " +
                 "SKIP $toSkip " +
                 "LIMIT $toLimit ";
